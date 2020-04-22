@@ -1,7 +1,5 @@
 package ass2;
 
-import javax.swing.*;
-
 public class Main {
 
     public static void main(String[] args) {
@@ -11,6 +9,11 @@ public class Main {
 
         //Wikipedia Client
         wikipediaClient wc = new wikipediaClient(gui);
+
+        try{
+            wc.parseURL();
+        }catch (Exception ex){}
+
 
     }
 }
