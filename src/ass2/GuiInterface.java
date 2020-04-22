@@ -8,10 +8,19 @@ public class GuiInterface {
     private int level;
 
     public GuiInterface(){
+        this.concept = "";
+        this.level = 0;
+    }
 
-        // Memorizzo i dati inseriti dall'utente
-        this.concept = JOptionPane.showInputDialog("Enter the concept");
+    public void setValue() {
 
+        //Controllo che venga inserito un concetto
+        while(this.concept.trim().equals("")) {
+            // Memorizzo i dati inseriti dall'utente
+            this.concept = JOptionPane.showInputDialog("Enter the concept");
+        }
+
+        // TODO fare verifica che l'utente digiti un numero e non una stringa
         try {
             this.level = Integer.parseInt(JOptionPane.showInputDialog("Enter the level"));
         }
