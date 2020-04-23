@@ -1,28 +1,25 @@
 package ass2;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class Main {
 
     public static void main(String[] args) {
 
         //Gui
         GuiInterface gui = new GuiInterface();
-        gui.setConcept();
-        gui.setLevel();
 
         //Graph
-        MyGraph myGraph = new MyGraph(gui);
+        MyGraph graph = new MyGraph(gui);
 
         //Wikipedia Client
-        WikipediaClient wc = new WikipediaClient(gui, myGraph);
+        WikipediaClient wc = new WikipediaClient(gui, graph);
 
-        try{
-            wc.parseURL();
+        // WikipediaExecutor
+        WikipediaExecutor we = new WikipediaExecutor(gui, wc, graph);
 
-            //Disegna il grafo
-            myGraph.drawGraph();
-
-        }catch (Exception ex) {
-            System.out.println("Non è stato possibile trovare nessun link per il concetto specificato!");
-        }
+        //Faccio partire il primo executor
+        we.start();
     }
 }

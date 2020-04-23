@@ -13,16 +13,22 @@ import java.util.List;
 
 public class MyGraph {
 
+    private final GuiInterface gui;
     private final Graph<String, DefaultEdge> graph;
     private List<Graph<String, DefaultEdge>> subGraphStrongConnectly;
 
     public MyGraph(GuiInterface gui){
 
+        this.gui = gui;
+
         //Creo il grafo
         this.graph = new DefaultDirectedGraph<>(DefaultEdge.class);
+    }
+
+    public void setFirstVertex(){
+
         //Creo il vertice iniziale: coincide con il primo concetto dato in input
         this.graph.addVertex(gui.getConcept());
-
     }
 
     //Inserisce i vertici e gli arche nel grafo
@@ -39,6 +45,7 @@ public class MyGraph {
             this.graph.addEdge(currentVertex, elem.get("*").getAsString());
             log("Aggiugno l'arco tra "+currentVertex+" and "+elem.get("*").getAsString());
         }
+        log("\nHo aggiunto per "+currentVertex+": "+links.size()+" archi!");
     }
 
     //Disegna il grafo
@@ -49,8 +56,8 @@ public class MyGraph {
         this.subGraphStrongConnectly = scAlg.getStronglyConnectedComponents();
 
         log("\n\n*** Disegno il grafo ***\n");
-        for (int i = 0; i < this.subGraphStrongConnectly.size(); i++) {
-            System.out.println(this.subGraphStrongConnectly.get(i));
+        for (Graph<String, DefaultEdge> stringDefaultEdgeGraph : this.subGraphStrongConnectly) {
+            System.out.println(stringDefaultEdgeGraph);
         }
     }
 
