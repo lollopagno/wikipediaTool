@@ -40,6 +40,7 @@ public class WikipediaClient {
 
         //Parse del URL per estrarre i link
         this.extractLink(result.toString());
+
     }
 
     //Estrae i links del URL parsato

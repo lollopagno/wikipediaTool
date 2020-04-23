@@ -9,23 +9,32 @@ public class GuiInterface {
 
     public GuiInterface(){
         this.concept = "";
-        this.level = 0;
+        this.level = -1;
     }
 
-    public void setValue() {
+    //Logica per settare un concetto dall'utente
+    public void setConcept(){
 
         //Controllo che venga inserito un concetto
         while(this.concept.trim().equals("")) {
             // Memorizzo i dati inseriti dall'utente
             this.concept = JOptionPane.showInputDialog("Enter the concept");
         }
+    }
 
-        // TODO fare verifica che l'utente digiti un numero e non una stringa
-        try {
-            this.level = Integer.parseInt(JOptionPane.showInputDialog("Enter the level"));
+    //Logica per settare il livello desiderato dall'utente
+    public void setLevel(){
+
+        //Controllo che venga inserito un numero e non una stringa
+        while (this.level == -1 || this.level == 0) {
+            try {
+                this.level = Integer.parseInt(JOptionPane.showInputDialog("Enter the level > 0"));
+            }
+            // In caso in cui non sia un numero
+            catch (NumberFormatException ex) {
+                this.level = -1;
+            }
         }
-        // in caso in cui non sia un numero
-        catch (NumberFormatException ex){}
 
     }
 
@@ -34,7 +43,7 @@ public class GuiInterface {
         return this.concept;
     }
 
-    //Get dellla profondità desiderata
+    //Get della profondità desiderata
     public int getLevel(){
         return this.level;
     }

@@ -6,7 +6,8 @@ public class Main {
 
         //Gui
         GuiInterface gui = new GuiInterface();
-        gui.setValue();
+        gui.setConcept();
+        gui.setLevel();
 
         //Graph
         MyGraph myGraph = new MyGraph(gui);
@@ -16,11 +17,12 @@ public class Main {
 
         try{
             wc.parseURL();
-        }catch (Exception ex) {
-            System.out.println(ex);
-        }
 
-        //Disegno il grafo
-        myGraph.drawGraph();
+            //Disegna il grafo
+            myGraph.drawGraph();
+
+        }catch (Exception ex) {
+            System.out.println("Non è stato possibile trovare nessun link per il concetto specificato!");
+        }
     }
 }
