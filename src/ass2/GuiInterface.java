@@ -35,7 +35,6 @@ public class GuiInterface {
                 this.level = -1;
             }
         }
-
     }
 
     // Get del concetto da cercare su wiki
