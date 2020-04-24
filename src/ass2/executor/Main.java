@@ -1,7 +1,7 @@
-package ass2;
+package ass2.executor;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import ass2.GuiInterface;
+import ass2.MyGraph;
 
 public class Main {
 
@@ -20,6 +20,6 @@ public class Main {
         WikipediaExecutor we = new WikipediaExecutor(gui, wc, graph);
 
         //Faccio partire il primo executor
-        we.start();
+        we.mainExec();
     }
 }

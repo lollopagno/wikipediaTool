@@ -1,5 +1,7 @@
-package ass2;
+package ass2.executor;
 
+import ass2.GuiInterface;
+import ass2.MyGraph;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -13,7 +15,7 @@ public class WikipediaClient {
 
     private final GuiInterface gui;
     private final MyGraph graph;
-    private final Gson gson = new Gson();
+    private JsonArray arrayLinks;
 
     public WikipediaClient(GuiInterface gui, MyGraph graph) {
         this.gui = gui;
@@ -48,11 +50,15 @@ public class WikipediaClient {
 
         JsonObject json = new Gson().fromJson(result, JsonObject.class);
         json = json.get("parse").getAsJsonObject();
-        JsonArray jsonArray = json.get("links").getAsJsonArray();
+        this.arrayLinks = json.get("links").getAsJsonArray();
 
         // Inserisco i link nel grafico
         // TODO capire come memorizzare il vertice corrente
-        graph.insertVertex(jsonArray, gui.getConcept());
+        graph.insertVertex(this.arrayLinks, gui.getConcept());
+    }
+
+    public synchronized int getLenghtLinks(){
+        return this.arrayLinks.size();
     }
 
     //Log

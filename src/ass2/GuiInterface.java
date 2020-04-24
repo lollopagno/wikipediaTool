@@ -42,8 +42,19 @@ public class GuiInterface {
         return this.concept;
     }
 
-    //Get della profondità desiderata
-    public int getLevel(){
+    // Ritorna quante ricerche devo ancora effettuare
+    public synchronized int getLevel(){
         return this.level;
+    }
+
+     //Aggiorno il livello di profondità
+    public synchronized boolean updateLevel(){
+
+        if (this.level > 0) {
+            this.level -= 1;
+            return true;
+        }else{
+            return false;
+        }
     }
 }
