@@ -3,9 +3,6 @@ package ass2.executor;
 import ass2.GuiInterface;
 import ass2.MyGraph;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 public class WikipediaMainTask implements Runnable {
 
     private final WikipediaClient wc;
@@ -32,28 +29,14 @@ public class WikipediaMainTask implements Runnable {
             graph.setFirstVertex();
 
             //Parsing Url
-            wc.parseURL();
-
-            // Creo i prossimi pool di executor
-            /*
-                Non c'è bisogno di fare controlli specifici
-                poichè qui il livello di profondità è sempre > 0
-             */
-            //TODO creo il pool di thread per i successivi link
-            ExecutorService exec = Executors.newFixedThreadPool(wc.getLenghtLinks());
-
-            //Controlli da effettuare per creare i pool di executor successivi al primo gruppo
-            /*if (gui.updateLevel()){
-
-            }else {
-                log("--> Ho terminato la ricerca. Livello: "+gui.getLevel());
-            }*/
+            wc.parseURL(gui.getConcept());
 
             //Disegna il grafo
+            log("\n\n*** Disegno il grafo *** per "+gui.getConcept());
             graph.drawGraph();
 
         }catch (Exception ex) {
-            System.out.println("Non è stato possibile trovare nessun link per il concetto specificato!");
+            log("\nNon è stato possibile trovare nessun link per il concetto: "+gui.getConcept()+"\n");
         }
     }
 

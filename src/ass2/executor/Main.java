@@ -21,5 +21,7 @@ public class Main {
 
         //Faccio partire il primo executor
         we.mainExec();
+        we.taskExec();
+
     }
 }

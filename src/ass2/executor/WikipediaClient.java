@@ -23,12 +23,12 @@ public class WikipediaClient {
     }
 
     //Fa la GET dell'URL passato
-    public void parseURL() throws Exception {
+    public void parseURL(String concept) throws Exception {
 
         // TODO mettere Retrofit per la GET dell'URL
 
         StringBuilder result = new StringBuilder();
-        URL url = new URL("https://it.wikipedia.org/w/api.php?action=parse&page="+this.gui.getConcept()+
+        URL url = new URL("https://it.wikipedia.org/w/api.php?action=parse&page="+concept+
                 "&format=json&section=0&prop=links");
 
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -41,24 +41,28 @@ public class WikipediaClient {
         rd.close();
 
         //Parse del URL per estrarre i link
-        this.extractLink(result.toString());
+        this.extractLink(result.toString(), concept);
 
     }
 
     //Estrae i links del URL parsato
-    private void extractLink(String result){
+    private void extractLink(String result, String concept){
 
         JsonObject json = new Gson().fromJson(result, JsonObject.class);
         json = json.get("parse").getAsJsonObject();
         this.arrayLinks = json.get("links").getAsJsonArray();
 
         // Inserisco i link nel grafico
-        // TODO capire come memorizzare il vertice corrente
-        graph.insertVertex(this.arrayLinks, gui.getConcept());
+        graph.insertVertex(this.arrayLinks, concept);
     }
 
-    public synchronized int getLenghtLinks(){
+    public int getLenghtLinks(){
         return this.arrayLinks.size();
+    }
+
+    public String getElemArray(int i){
+        JsonObject elem = (JsonObject) this.arrayLinks.get(i);
+        return elem.get("*").getAsString();
     }
 
     //Log

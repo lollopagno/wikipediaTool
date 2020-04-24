@@ -55,7 +55,6 @@ public class MyGraph {
         StrongConnectivityAlgorithm<String, DefaultEdge> scAlg = new KosarajuStrongConnectivityInspector<>(this.graph);
         this.subGraphStrongConnectly = scAlg.getStronglyConnectedComponents();
 
-        log("\n\n*** Disegno il grafo ***\n");
         for (Graph<String, DefaultEdge> stringDefaultEdgeGraph : this.subGraphStrongConnectly) {
             System.out.println(stringDefaultEdgeGraph);
         }

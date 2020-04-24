@@ -9,10 +9,10 @@ import java.util.concurrent.TimeUnit;
 
 public class WikipediaExecutor {
 
-    private ExecutorService execMain;
     private final GuiInterface gui;
     private final WikipediaClient wc;
     private final MyGraph graph;
+    private ExecutorService execMain;
 
     public WikipediaExecutor(GuiInterface gui, WikipediaClient wc, MyGraph graph){
 
@@ -26,16 +26,40 @@ public class WikipediaExecutor {
 
         //Creiamo l'executor main
         this.execMain = Executors.newSingleThreadExecutor();
-        execMain.execute(new WikipediaMainTask(this.wc, this.gui, this.graph));
+        this.execMain.execute(new WikipediaMainTask(this.wc, this.gui, this.graph));
 
-        // Fine esecuzione execMain
+        // Attendo la terminazione del execMain
         try {
-            execMain.shutdown();
-            // attendo fine esecuzione
-            execMain.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
-        }catch (Exception ignored){}
+            this.execMain.shutdown();
+            this.execMain.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
 
-        log(execMain.getClass().getName()+" è terminato?: "+execMain.isTerminated());
+        }catch (Exception e){e.printStackTrace();}
+
+    }
+
+    //Facciamo partire gli altri executor dopo il mainExec
+    public void taskExec(){
+
+        //Controlla se è necessario continuare con la ricerca in profondità
+        if (gui.updateLevel()){
+
+            for(int i=0; i <wc.getLenghtLinks(); i++) {
+                ExecutorService exec = Executors.newSingleThreadExecutor();
+
+                WikipediaClient wcExec = new WikipediaClient(this.gui, this.graph);
+                exec.execute(new WikipediaTask(wcExec, graph, wc.getElemArray(i)));
+
+                // Attendo la terminazione del exec
+                try {
+                    exec.shutdown();
+                    exec.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+
+                }catch (Exception e){e.printStackTrace();}
+            }
+
+        } else {
+                log("--> Ho terminato la ricerca. Livello: "+gui.getLevel());
+        }
     }
 
     private void log(String msg){
