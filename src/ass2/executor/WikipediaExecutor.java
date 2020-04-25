@@ -23,8 +23,7 @@ public class WikipediaExecutor {
 
     //Faccio partire execMain (il primo executor)
     public void mainExec() {
-
-        //Creiamo l'executor main
+        // Creiamo l'executor main
         this.execMain = Executors.newSingleThreadExecutor();
         this.execMain.execute(new WikipediaMainTask(this.wc, this.gui, this.graph));
 
@@ -33,8 +32,9 @@ public class WikipediaExecutor {
             this.execMain.shutdown();
             this.execMain.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
 
-        }catch (Exception e){e.printStackTrace();}
-
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     //Facciamo partire gli altri executor dopo il mainExec
@@ -46,7 +46,7 @@ public class WikipediaExecutor {
             for(int i=0; i <wc.getLenghtLinks(); i++) {
                 ExecutorService exec = Executors.newSingleThreadExecutor();
 
-                WikipediaClient wcExec = new WikipediaClient(this.gui, this.graph);
+                WikipediaClient wcExec = new WikipediaClient(this.graph);
                 exec.execute(new WikipediaTask(wcExec, graph, wc.getElemArray(i)));
 
                 // Attendo la terminazione del exec

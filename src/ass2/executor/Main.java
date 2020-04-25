@@ -14,7 +14,7 @@ public class Main {
         MyGraph graph = new MyGraph(gui);
 
         //Wikipedia Client
-        WikipediaClient wc = new WikipediaClient(gui, graph);
+        WikipediaClient wc = new WikipediaClient(graph);
 
         // WikipediaExecutor
         WikipediaExecutor we = new WikipediaExecutor(gui, wc, graph);

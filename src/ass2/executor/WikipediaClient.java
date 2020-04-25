@@ -1,6 +1,5 @@
 package ass2.executor;
 
-import ass2.GuiInterface;
 import ass2.MyGraph;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -13,12 +12,10 @@ import java.net.URL;
 
 public class WikipediaClient {
 
-    private final GuiInterface gui;
     private final MyGraph graph;
     private JsonArray arrayLinks;
 
-    public WikipediaClient(GuiInterface gui, MyGraph graph) {
-        this.gui = gui;
+    public WikipediaClient(MyGraph graph) {
         this.graph = graph;
     }
 
