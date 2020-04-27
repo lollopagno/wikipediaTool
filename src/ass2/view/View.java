@@ -1,7 +1,14 @@
 package ass2.view;
 
-import ass2.model.classes.mygraph.SimpleGraph;
-
 public interface View {
-    void display(SimpleGraph graph);
+    /**
+     * Use this method to add only one node to the main graph.
+     * @param from Name of the node.
+     */
+    void display(String from);
+
+    /**
+     * Use this method to add one node with a edge to another node.
+     */
+    void display(String from, String to);
 }

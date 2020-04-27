@@ -4,12 +4,16 @@ import ass2.model.classes.mygraph.Node;
 import ass2.model.classes.mygraph.SimpleGraph;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.SingleGraph;
+import org.graphstream.ui.swingViewer.ViewPanel;
 import org.graphstream.ui.view.Viewer;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class VisualizerPanel extends JPanel implements View {
+/**
+ * Not used anymore.
+ */
+public class VisualizerPanel extends JPanel {
     private static final int RADIUS = 3;
     private SimpleGraph graph;
 
@@ -22,11 +26,28 @@ public class VisualizerPanel extends JPanel implements View {
     }
 
     public VisualizerPanel(int w, int h) {
-        Graph graphStream = new SingleGraph("graph");
-        Viewer viewer = new Viewer(graphStream, Viewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
-        org.graphstream.ui.view.View view = viewer.addDefaultView(false);
+        // Panel graphics.
         setSize(w, h);
+        setLayout(new GridLayout());
+        setBorder(BorderFactory.createLineBorder(Color.BLUE, 5));
+
+        // Graph stream.
+        Graph graphStream = new SingleGraph("graph", false, true);
+        Viewer viewer = new Viewer(graphStream, Viewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
+        ViewPanel view = viewer.addDefaultView(false);
+        add(view);
+        graphStream.addEdge("AB", "A", "B");
+        org.graphstream.graph.Node a = graphStream.getNode("A");
+        a.setAttribute("xy", 1, 1);
+        org.graphstream.graph.Node b = graphStream.getNode("B");
+        b.setAttribute("xy", -1, -1);
+
         this.graph = null;
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        return new Dimension(640, 480);
     }
 
     public void paint(Graphics g) {
@@ -61,9 +82,15 @@ public class VisualizerPanel extends JPanel implements View {
         g2.drawLine(x0, y0, x1, y1);
     }
 
-    @Override
+
     public void display(SimpleGraph graph) {
         this.graph = graph;
         repaint();
+    }
+
+
+    public void display(Node from, Node to) {
+        this.graph.addNode(to.getTitle());
+        this.graph.addEdge(from.getTitle(), to.getTitle());
     }
 }

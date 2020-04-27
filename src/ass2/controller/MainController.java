@@ -30,8 +30,13 @@ public class MainController implements Controller {
     }
 
     @Override
-    public void modelUpdated() {
-        SwingUtilities.invokeLater(() -> this.view.display(graph));
+    public void modelUpdated(String from) {
+        SwingUtilities.invokeLater(() -> this.view.display(from));
+    }
+
+    @Override
+    public void modelUpdated(String from, String to) {
+        SwingUtilities.invokeLater(() -> this.view.display(from, to));
     }
 
     private void startRecursion(String concept, int entry) {
