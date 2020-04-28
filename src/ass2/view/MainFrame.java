@@ -17,16 +17,16 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 public class MainFrame extends JFrame implements ActionListener, View {
+    private static final int WIDTH = 640;
+    private static final int HEIGHT = 480;
     private Controller controller;
     private JTextField conceptText, entryText;
-    Graph graph;
+    private Graph graph;
 
-    public MainFrame() {
+    public MainFrame(String title, Controller controller) {
         // Set some defaults.
-        int width = 640;
-        int height = 480;
-        this.setTitle("Wikipedia tool");
-        this.setSize(width, height);
+        this.setTitle(title);
+        this.setSize(WIDTH, HEIGHT);
         this.setResizable(true);
         this.setLayout(new BorderLayout());
         this.addWindowListener(new WindowAdapter() {
@@ -41,7 +41,7 @@ public class MainFrame extends JFrame implements ActionListener, View {
 
         // Set controls.
         JPanel controlPanel = new JPanel(new FlowLayout());
-        controlPanel.setSize(width, (int) (height * 0.1));
+        controlPanel.setSize(WIDTH, (int) (HEIGHT * 0.1));
         this.conceptText = new JTextField(10);
         controlPanel.add(conceptText);
         this.entryText = new JTextField(10);
@@ -51,28 +51,31 @@ public class MainFrame extends JFrame implements ActionListener, View {
         controlPanel.add(btnStart);
 
         // Set contentPanel.
-        JPanel panel = new JPanel(new GridLayout()) {
+        JPanel graphPanel = new JPanel(new GridLayout()) {
             @Override
             public Dimension getPreferredSize() {
-                return new Dimension(640, 480);
+                return new Dimension(WIDTH, (int)(HEIGHT * 0.9));
             }
         };
-        panel.setBorder(BorderFactory.createLineBorder(Color.blue, 5));
+        graphPanel.setSize(WIDTH, (int) (HEIGHT * 0.9));
+        graphPanel.setBorder(BorderFactory.createLineBorder(Color.blue, 1));
         graph = new SingleGraph("Tutorial");
         graph.setStrict(false);
         graph.setAutoCreate(true);
         Viewer viewer = new Viewer(graph, Viewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
         viewer.enableAutoLayout();
         ViewPanel viewPanel = viewer.addDefaultView(false);
-        panel.add(viewPanel);
+        graphPanel.add(viewPanel);
 
         // Set controller.
-        controller = new MainController(this);
+        this.controller = controller;
 
         // Compose view.
         this.getContentPane().add(controlPanel, BorderLayout.PAGE_START);
-        this.getContentPane().add(panel, BorderLayout.CENTER);
-        this.pack();
+        this.getContentPane().add(graphPanel, BorderLayout.CENTER);
+
+        // This may cause problems.
+        // this.pack();
     }
 
     @Override

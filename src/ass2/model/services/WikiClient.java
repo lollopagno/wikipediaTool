@@ -35,7 +35,7 @@ public class WikiClient {
 
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
-        InputStream input = null;
+        InputStream input;
         try {
             input = conn.getInputStream();
         } catch (IOException e) {
@@ -50,19 +50,19 @@ public class WikiClient {
         rd.close();
 
         // Parse del URL per estrarre i link
-        return this.extractLink(result.toString());
+        return this.extractLink(result.toString(), concept);
     }
 
     /**
      * Estrae i links del URL parsato.
      */
-    private Set<WikiLink> extractLink(String result) {
+    private Set<WikiLink> extractLink(String result, String concept) {
         Set<WikiLink> links = new HashSet<>();
         JsonObject json = new Gson().fromJson(result, JsonObject.class);
         json = json.get("parse").getAsJsonObject();
         for (JsonElement elem : json.get("links").getAsJsonArray()) {
             if(elem.getAsJsonObject().get("exists") != null) {
-                links.add(new WikiLink(elem));
+                links.add(new WikiLink(elem, concept));
             }
         }
         return links;

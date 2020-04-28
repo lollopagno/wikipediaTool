@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 public class WikiLink {
     private int ns;
     private boolean exists;
-    private String text;
+    private String text, concept;
 
     public WikiLink(JsonElement element) {
         JsonObject elem = element.getAsJsonObject();
@@ -15,7 +15,16 @@ public class WikiLink {
         this.text = elem.get("*").getAsString();
     }
 
+    public WikiLink(JsonElement element, String concept) {
+        this(element);
+        this.concept = concept;
+    }
+
     public String getText() {
         return text;
+    }
+
+    public String getConcept() {
+        return concept;
     }
 }
