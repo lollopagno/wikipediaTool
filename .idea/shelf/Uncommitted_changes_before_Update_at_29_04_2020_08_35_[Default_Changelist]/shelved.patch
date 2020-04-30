@@ -1,0 +1,38 @@
+Index: src/ass2/TentoniMainProgram.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ass2;\r\n\r\nimport ass2.controller.Controller;\r\nimport ass2.controller.MainController;\r\nimport ass2.view.MainFrame;\r\n\r\npublic class TentoniMainProgram {\r\n    public static void main(String[] args) {\r\n        // View\r\n        MainFrame frame = new MainFrame();\r\n        frame.setVisible(true);\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/ass2/TentoniMainProgram.java	(revision a3b28b3fc701f9430f11f4d0094ecc0d38a6bd43)
++++ src/ass2/TentoniMainProgram.java	(date 1587971009296)
+@@ -1,11 +1,11 @@
+ package ass2;
+ 
+-import ass2.controller.Controller;
+-import ass2.controller.MainController;
+ import ass2.view.MainFrame;
+ 
+ public class TentoniMainProgram {
+     public static void main(String[] args) {
++
++
+         // View
+         MainFrame frame = new MainFrame();
+         frame.setVisible(true);
+Index: .idea/encodings.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/encodings.xml	(date 1587969586150)
++++ .idea/encodings.xml	(date 1587969586150)
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="Encoding">
++    <file url="PROJECT" charset="UTF-8" />
++  </component>
++</project>
+\ No newline at end of file
