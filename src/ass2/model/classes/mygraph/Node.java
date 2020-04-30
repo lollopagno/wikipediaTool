@@ -6,27 +6,10 @@ import java.util.Set;
 public class Node {
     private String title;
     private Set<Node> edges;
-    private double x, y;
 
     public Node(String title) {
         this.title = title;
         this.edges = new HashSet<>();
-    }
-
-    public double getX() {
-        return x;
-    }
-
-    public void setX(double x) {
-        this.x = x;
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    public void setY(double y) {
-        this.y = y;
     }
 
     public String getTitle() {

@@ -2,18 +2,22 @@ package ass2.reactive;
 
 import ass2.controller.Controller;
 import ass2.model.classes.WikiLink;
+import ass2.model.classes.mygraph.AssignmentGraph;
 import ass2.model.classes.mygraph.SimpleGraph;
 import ass2.model.services.WikiClient;
 import ass2.view.MainFrame;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
+import javax.swing.*;
+import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 
 public class ReactiveController implements Controller {
     private MainFrame view;
-    private SimpleGraph graphModel;
+    private AssignmentGraph graphModel;
 
     public ReactiveController() {
         // Generate the view.
@@ -26,7 +30,6 @@ public class ReactiveController implements Controller {
 
     @Override
     public void fetchConcept(String concept, int entry) {
-        // log("Create source.");
         reset();
         this.graphModel.addNode(concept);
         Observable<WikiLink> source =
@@ -36,24 +39,22 @@ public class ReactiveController implements Controller {
                             fetchRecursivly(concept, entry, emitter::onNext);
                             log("Computation terminated.");
                         }).start());
-        // log("Created source.");
-        // log("Subscribing source.");
+
         source
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.computation())
                 .subscribe(s -> {
-                            // Manage the new link.
-                            log("Result: " + s.getText());
-                            this.graphModel.addNode(s.getText());
-                            this.graphModel.addEdge(s.getConcept(), s.getText());
-                        }, (Throwable t) -> {
-                    if(t instanceof IllegalArgumentException){
+                    // Manage the new link.
+                    this.graphModel.addNode(s.getText());
+                    this.graphModel.addEdge(s.getConcept(), s.getText());
+                }, (Throwable t) -> {
+                    if (t instanceof IllegalArgumentException) {
                         log("IllegalArgumentException thrown " + t.getMessage());
                     } else {
                         t.printStackTrace();
                     }
-                        });
-        // log("Subscribed source.");
+                });
+
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
@@ -63,12 +64,12 @@ public class ReactiveController implements Controller {
 
     @Override
     public void modelUpdated(String from) {
-        this.view.display(from);
+        SwingUtilities.invokeLater(() -> this.view.display(from));
     }
 
     @Override
     public void modelUpdated(String from, String to) {
-        this.view.display(from, to);
+        SwingUtilities.invokeLater(() -> this.view.display(from, to));
     }
 
     public static void log(String msg) {
@@ -83,20 +84,26 @@ public class ReactiveController implements Controller {
 
     private void fetchRecursivly(String concept, int entry, Consumer<WikiLink> consumer) {
         // Fetch Wikipedia.
-        try {
-            WikiClient client = new WikiClient();
-            Set<WikiLink> set = client.parseURL(concept);
-            set.forEach(element -> {
-                consumer.accept(element);
+        WikiClient client = new WikiClient();
 
-                // Check if recursion needed.
-                if (entry > 1) {
-                    log("Recursion needed for " + element.getText() + " and " + entry);
-                    fetchRecursivly(element.getText(), entry - 1, consumer);
-                }
-            });
+        Set<WikiLink> set = new HashSet<>();
+        try {
+            set = client.parseURL(concept);
+        } catch (IOException ioException) {
+            log("IOException in source: " + ioException.getMessage());
         } catch (Exception e) {
             log("Exception in source: " + e.getMessage());
+            e.printStackTrace();
         }
+
+        set.forEach(element -> {
+            consumer.accept(element);
+
+            // Check if recursion needed.
+            if (entry > 1) {
+                // log("Recursion needed for " + element.getText() + " and " + entry);
+                fetchRecursivly(element.getText(), entry - 1, consumer);
+            }
+        });
     }
 }

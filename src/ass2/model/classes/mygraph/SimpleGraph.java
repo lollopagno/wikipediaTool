@@ -5,7 +5,7 @@ import ass2.controller.Controller;
 import java.util.LinkedList;
 import java.util.List;
 
-public class SimpleGraph {
+public class SimpleGraph implements AssignmentGraph {
     private List<Node> nodes;
     private Controller controller;
 
@@ -17,7 +17,7 @@ public class SimpleGraph {
     public synchronized void addNode(String title) throws IllegalArgumentException {
 
         if (this.getNode(title) != null)
-            throw new IllegalArgumentException();
+            return;
 
         Node node = new Node(title);
         this.nodes.add(node);
@@ -56,7 +56,7 @@ public class SimpleGraph {
 
         // Check if those nodes are present or not.
         if (checkFrom == null || checkTo == null) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Missing one node of the edge.");
         } else {
             checkFrom.addEdge(checkTo);
             this.controller.modelUpdated(from, to);

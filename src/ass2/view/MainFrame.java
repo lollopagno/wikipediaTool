@@ -60,7 +60,7 @@ public class MainFrame extends JFrame implements ActionListener, View {
             }
         };
         graphPanel.setSize(WIDTH, (int) (HEIGHT * 0.9));
-        graphPanel.setBorder(BorderFactory.createLineBorder(Color.blue, 1));
+        graphPanel.setBorder(BorderFactory.createLineBorder(Color.blue, 2));
         graph = new SingleGraph("Tutorial");
         graph.setStrict(false);
         graph.setAutoCreate(true);
@@ -107,7 +107,7 @@ public class MainFrame extends JFrame implements ActionListener, View {
 
     /**
      * Draw an edge on the main graph.
-     * @param title Node title.ì
+     * @param title Node title.
      * @return Edge drawed.
      */
     public Node drawNode(final String title){
@@ -150,7 +150,9 @@ public class MainFrame extends JFrame implements ActionListener, View {
                     "ui.style",
                     "fill-color: rgb(" + color + "," + color + "," + color + ");");
         } catch (NullPointerException e) {
-            System.out.println(e.getLocalizedMessage());
+            synchronized (System.out) {
+                System.out.println(e.getLocalizedMessage());
+            }
         }
     }
 

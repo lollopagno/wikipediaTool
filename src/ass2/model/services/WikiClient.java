@@ -25,7 +25,7 @@ public class WikiClient {
     /**
      * Fa la GET dell'URL passato
      */
-    public Set<WikiLink> parseURL(String concept) throws Exception {
+    public Set<WikiLink> parseURL(String concept) throws IOException {
 
         // TODO mettere Retrofit per la GET dell'URL
 
@@ -49,7 +49,7 @@ public class WikiClient {
         }
         rd.close();
 
-        // Parse del URL per estrarre i link
+        // Parse del URL per estrarre i link.
         return this.extractLink(result.toString(), concept);
     }
 
