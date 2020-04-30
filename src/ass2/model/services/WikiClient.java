@@ -35,13 +35,7 @@ public class WikiClient {
 
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
-        InputStream input;
-        try {
-            input = conn.getInputStream();
-        } catch (Exception e) {
-            this.log("Nessun concetto per " + concept);
-            return null;
-        }
+        InputStream input = conn.getInputStream();
         BufferedReader rd = new BufferedReader(new InputStreamReader(input));
         String line;
         while ((line = rd.readLine()) != null) {

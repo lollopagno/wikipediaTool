@@ -96,6 +96,9 @@ public class ReactiveController implements Controller {
             e.printStackTrace();
         }
 
+        if (set == null || set.isEmpty())
+            return;
+
         set.forEach(element -> {
             consumer.accept(element);
 
