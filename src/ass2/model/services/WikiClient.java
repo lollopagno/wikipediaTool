@@ -38,8 +38,8 @@ public class WikiClient {
         InputStream input;
         try {
             input = conn.getInputStream();
-        } catch (IOException e) {
-            this.log("No concept for " + concept);
+        } catch (Exception e) {
+            this.log("Nessun concetto per " + concept);
             return null;
         }
         BufferedReader rd = new BufferedReader(new InputStreamReader(input));
@@ -59,13 +59,29 @@ public class WikiClient {
     private Set<WikiLink> extractLink(String result, String concept) {
         Set<WikiLink> links = new HashSet<>();
         JsonObject json = new Gson().fromJson(result, JsonObject.class);
-        json = json.get("parse").getAsJsonObject();
+
+        if (getLinks(json)){
+            json = json.get("parse").getAsJsonObject();
+        }else{
+            return null;
+        }
+
         for (JsonElement elem : json.get("links").getAsJsonArray()) {
             if(elem.getAsJsonObject().get("exists") != null) {
                 links.add(new WikiLink(elem, concept));
             }
         }
         return links;
+    }
+
+    // Verifica se, dopo aver fatto il parse del URL, ci sono riferimenti per il concetto dato
+    private boolean getLinks(JsonObject json) {
+        try {
+            json.get("error").getAsJsonObject();
+        }catch(Exception e){
+            return true;
+        }
+        return false;
     }
 
     private void log(String msg) {

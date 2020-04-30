@@ -2,13 +2,19 @@ package ass2.executor;
 
 import ass2.GuiInterface;
 import ass2.MyGraph;
+import ass2.controller.Controller;
+import ass2.reactive.ReactiveController;
 
-public class Main {
+public class ExecutorMainProgram {
 
     public static void main(String[] args) {
 
-        //Gui
-        GuiInterface gui = new GuiInterface();
+        new ExecutorController();
+    }
+}
+
+//Gui
+        /*GuiInterface gui = new GuiInterface();
 
         //Graph
         MyGraph graph = new MyGraph(gui);
@@ -21,7 +27,4 @@ public class Main {
 
         //Faccio partire il primo executor
         we.mainExec();
-        we.taskExec();
-
-    }
-}
+        we.taskExec();*/

@@ -22,6 +22,8 @@ public class MainFrame extends JFrame implements ActionListener, View {
     private Controller controller;
     private JTextField conceptText, entryText;
     private Graph graph;
+    public int entryView;
+
 
     public MainFrame(String title, Controller controller) {
         // Set some defaults.
@@ -83,8 +85,12 @@ public class MainFrame extends JFrame implements ActionListener, View {
         this.graph.clear();
         if (e.getActionCommand().equals("Start")) {
             String concept = this.conceptText.getText();
-            String entry = this.entryText.getText();
-            this.controller.fetchConcept(concept, Integer.parseInt(entry));
+            try {
+                this.entryView = Integer.parseInt(this.entryText.getText());
+                this.controller.fetchConcept(concept, entryView);
+            }catch(Exception ex){
+                log("Non è stato digitato un intero come livello di profondità nella ricerca!");
+            }
         }
     }
 
@@ -145,6 +151,17 @@ public class MainFrame extends JFrame implements ActionListener, View {
                     "fill-color: rgb(" + color + "," + color + "," + color + ");");
         } catch (NullPointerException e) {
             System.out.println(e.getLocalizedMessage());
+        }
+    }
+
+    public int getEntryView(){
+        return this.entryView;
+    }
+
+    private void log(String msg){
+        synchronized (System.out)
+        {
+            System.out.println("[" + Thread.currentThread().getName() + "] " + msg);
         }
     }
 }

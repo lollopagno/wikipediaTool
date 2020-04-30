@@ -14,8 +14,8 @@ public class SimpleGraph {
         this.controller = controller;
     }
 
-    public void addNode(String title) throws IllegalArgumentException {
-        // Check if I've already added that node.
+    public synchronized void addNode(String title) throws IllegalArgumentException {
+
         if (this.getNode(title) != null)
             throw new IllegalArgumentException();
 
@@ -24,11 +24,11 @@ public class SimpleGraph {
         this.controller.modelUpdated(title);
     }
 
-    public List<Node> getNodes() {
+    public synchronized List<Node> getNodes() {
         return this.nodes;
     }
 
-    public Node getNode(String title) {
+    public synchronized Node getNode(String title) {
         for (Node e : this.nodes)
             if (e.getTitle().equals(title))
                 return e;
@@ -41,8 +41,10 @@ public class SimpleGraph {
         return this.nodes.get(index);
     }
 
-    public void addEdge(String from, String to) throws IllegalArgumentException {
+    public synchronized void addEdge(String from, String to) throws IllegalArgumentException {
+
         Node checkFrom = null, checkTo = null;
+
         for (Node e : this.nodes) {
             // Fetch all nodes for from and to nodes.
             // We make only one cycle on all nodes.
