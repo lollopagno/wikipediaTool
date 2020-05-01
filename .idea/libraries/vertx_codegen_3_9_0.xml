@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="vertx-codegen-3.9.0">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../Jar/lib/vertx-codegen-3.9.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

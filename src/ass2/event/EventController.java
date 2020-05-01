@@ -7,10 +7,12 @@ import ass2.model.services.WikiClient;
 import ass2.view.MainFrame;
 
 import java.util.Set;
+
 import io.vertx.core.*;
 
 public class EventController implements Controller {
     private MainFrame view;
+    public WikiClient wikiClient;
     private SimpleGraph graph;
     private Vertx vertx;
 
@@ -21,7 +23,7 @@ public class EventController implements Controller {
         this.view.setVisible(true);
 
         this.vertx = Vertx.vertx();
-
+        this.wikiClient = new WikiClient();
         // Generate the model.
         //this.graph = new SimpleGraph(this);
     }
@@ -32,17 +34,8 @@ public class EventController implements Controller {
         // Crea il grafo
         this.reset();
 
-        //this.graph.addNode(concept);
-
-        // Inizio della ricorsione
+        // Inizia la ricorsione
         this.startRecursion(concept, entry);
-
-        //.onComplete(v -> log(v.result() + "Computation terminated."+ v.toString()));
-        /*steps.onComplete(s-> {
-            log("Result: " + s.getText());
-            this.graphModel.addNode(s.getText());
-            this.graphModel.addEdge(s.getConcept(), s.getText());
-        });*/
     }
 
     @Override
@@ -58,10 +51,11 @@ public class EventController implements Controller {
 
     private void reset() { this.graph = new SimpleGraph(this);}
 
-    private void  startRecursion(String concept, int entry) {
+    // Parse del concetto e crea nuovi executor per le successive ricorsioni
+    private void startRecursion(String concept, int entry) {
 
         // 1- Termina ricorsione
-        if(entry == -1) {
+        if (entry == -1) {
             return;
         }
 
@@ -70,31 +64,66 @@ public class EventController implements Controller {
 
             //Creo il primo vertice per il concetto dato in input nella view
             this.graph.addNode(concept);
-            this.log("Ho aggiunto il nodo: " + concept );
+            this.log("Ho aggiunto il nodo: " + concept);
 
         }
 
         // 3- Parse e ricorsione
-        if (entry-1 != -1) {
+        if (entry - 1 != -1) {
 
+            WorkerExecutor executor = vertx.createSharedWorkerExecutor("my-worker-pool");
+            executor.executeBlocking(promise -> {
+                try {
 
-            Promise<Void> promise = Promise.promise();
-
-            try {
-                WikiClient client = new WikiClient();
-                Set<WikiLink> set = client.parseURL(concept);
-                set.forEach(element -> {
-                    // Check if recursion needed.
-                    if (entry > 1) {
-                        //successivi al primi da 3 in poi
-                        log("Recursion needed for " + element.getText() + " and " + entry);
-                        startRecursion(element.getText(), entry - 1);
+                    // Parse
+                    Set<WikiLink> links = null;
+                    try {
+                        links = this.wikiClient.parseURL(concept);
+                    } catch (Exception e) {
+                        log(e.getMessage());
                     }
-                });
-            } catch (Exception e) {
-                log("Exception in source: " + e.getMessage());
+
+                    if (links == null) return;
+
+                    // Ricorsione per ogni riferimento trovato
+                    for (WikiLink elem : links) {
+
+                        try {
+
+                            //Creo il vertice per il nuovo concetto
+                            this.graph.addNode(elem.getText());
+                            this.log("Ho aggiunto il nodo: " + elem.getText());
+
+                            try {
+
+                                //Creo l'arco e aggancio il vertice al grafo
+                                this.graph.addEdge(concept, elem.getText());
+
+                                // Parto con la ricorsione
+                                this.startRecursion(elem.getText(), entry - 1);
+
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+
+                        } catch (IllegalArgumentException e) {
+                            this.log("Il concetto " + elem.getText() + " è già presente.");
+                        }
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                // Call some blocking API that takes a significant amount of time to return
+                promise.complete();
+            }, res -> {
+                System.out.println("The result is: " + res.result());
+            });
+            // Creo l'executor
+
+            if (!(Thread.currentThread().getName().equals("AWT-EventQueue-0"))) {
+                executor.close();
             }
-            //return promise.future();
 
         }
     }
