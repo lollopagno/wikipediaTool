@@ -7,7 +7,6 @@ import ass2.view.MainFrame;
 import ass2.model.services.WikiClient;
 
 import javax.swing.*;
-import java.util.LinkedList;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -36,7 +35,7 @@ public class ExecutorController implements Controller {
 
     public void fetchConcept(String concept, int entry) {
 
-        // Crea il grafo per il concetto corrente da agganciare al grafo già presente
+        // Crea il grafo
         this.reset();
 
         // Inizia la ricorsione
@@ -70,34 +69,32 @@ public class ExecutorController implements Controller {
 
         }
 
-        // 3- Parse e eseguo una ricorsione
+        // 3- Parse e ricorsione
         if (entry-1 != -1) {
 
-            try {
-                // Parse
-                Set<WikiLink> links = null;
-                try {
-                    links = this.wikiClient.parseURL(concept);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            // Creo l'executor
+            this.exec = Executors.newSingleThreadExecutor();
 
-                if (links == null) {
-                    return;
-                }
+            exec.execute(() -> {
 
-                log("ho creato "+links.size()+ " executor");
+                try{
 
-                // Ricorsione
-                for (WikiLink elem : links) {
+                    // Parse
+                    Set<WikiLink> links = null;
+                    try {
+                        links = this.wikiClient.parseURL(concept);
+                    } catch (Exception e) {
+                        log(e.getMessage());
+                    }
 
-                    this.exec = Executors.newSingleThreadExecutor();
+                    if (links == null) return;
 
-                    exec.execute(() -> {
+                    // Ricorsione per ogni riferimento trovato
+                    for (WikiLink elem : links) {
 
                         try {
 
-                            //Creo un vertice per il concetto
+                            //Creo il vertice per il nuovo concetto
                             this.graph.addNode(elem.getText());
                             this.log("Ho aggiunto il nodo: " + elem.getText());
 
@@ -110,24 +107,29 @@ public class ExecutorController implements Controller {
                                 this.startRecursion(elem.getText(), entry - 1);
 
                             } catch (Exception ex) {
-                                //ex.printStackTrace();
+                                ex.printStackTrace();
                             }
 
                         } catch (IllegalArgumentException e) {
-                            this.log("Il concetto " + concept + " è già presente.");
+                            this.log("Il concetto " + elem.getText() + " è già presente.");
                         }
-                    });
-
-                    if(!(Thread.currentThread().getName().equals("AWT-EventQueue-0"))) {
-                        exec.shutdown();
-                        exec.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
-                        log("f");
                     }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
 
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            });
+
+            if(!(Thread.currentThread().getName().equals("AWT-EventQueue-0"))) {
+                exec.shutdown();
+
+                try {
+                    exec.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                log(" si è fermato");
+            }
         }
     }
 

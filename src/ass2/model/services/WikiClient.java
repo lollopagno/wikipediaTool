@@ -54,7 +54,7 @@ public class WikiClient {
         Set<WikiLink> links = new HashSet<>();
         JsonObject json = new Gson().fromJson(result, JsonObject.class);
 
-        if (getLinks(json)){
+        if (checkResponse(json)){
             json = json.get("parse").getAsJsonObject();
         }else{
             return null;
@@ -69,13 +69,13 @@ public class WikiClient {
     }
 
     // Verifica se, dopo aver fatto il parse del URL, ci sono riferimenti per il concetto dato
-    private boolean getLinks(JsonObject json) {
+    private boolean checkResponse(JsonObject json) {
         try {
             json.get("error").getAsJsonObject();
         }catch(Exception e){
             return true;
         }
-        return false;
+        return false;   
     }
 
     private void log(String msg) {
