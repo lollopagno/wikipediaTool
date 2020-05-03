@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="vertx-core-3.9.0">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../../Jar/lib/vertx-core-3.9.0.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

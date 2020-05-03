@@ -121,6 +121,7 @@ public class ExecutorController implements Controller {
             });
 
             if(!(Thread.currentThread().getName().equals("AWT-EventQueue-0"))) {
+                log("si sta fermando....");
                 exec.shutdown();
 
                 try {

@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: io.vertx:vertx-sync:3.9.0">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.vertx/vertx-sync/3.9.0/f40f25073737c0ea87186793ea14e71153407257/vertx-sync-3.9.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.vertx/vertx-sync/3.9.0/97b13a1e809c66bd307085e1f005db11421ba929/vertx-sync-3.9.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: io.vertx:vertx-bridge-common:3.9.0">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.vertx/vertx-bridge-common/3.9.0/68ef5f61900867267a5e7585aa83df6f667bc246/vertx-bridge-common-3.9.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.vertx/vertx-bridge-common/3.9.0/a7265e54cee010709ba63191eb96554dcfc8e3b6/vertx-bridge-common-3.9.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

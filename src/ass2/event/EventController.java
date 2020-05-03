@@ -8,6 +8,8 @@ import ass2.view.MainFrame;
 
 import java.util.Set;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import io.vertx.core.*;
 
 public class EventController implements Controller {
@@ -73,17 +75,25 @@ public class EventController implements Controller {
 
             WorkerExecutor executor = vertx.createSharedWorkerExecutor("my-worker-pool");
             executor.executeBlocking(promise -> {
+
+                // Parse
+                Set<WikiLink> links = null;
                 try {
+                    links = this.wikiClient.parseURL(concept);
+                } catch (Exception e) {
+                    promise.fail("exception.....");
+                }
 
-                    // Parse
-                    Set<WikiLink> links = null;
-                    try {
-                        links = this.wikiClient.parseURL(concept);
-                    } catch (Exception e) {
-                        log(e.getMessage());
-                    }
+                if (links == null) return;
 
-                    if (links == null) return;
+                promise.complete(links);
+
+            }, res -> {
+
+                // Se ha successo
+                if (res.succeeded()) {
+
+                   Set<WikiLink> links = (Set<WikiLink>) res.result();
 
                     // Ricorsione per ogni riferimento trovato
                     for (WikiLink elem : links) {
@@ -110,21 +120,10 @@ public class EventController implements Controller {
                             this.log("Il concetto " + elem.getText() + " è già presente.");
                         }
                     }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
+                }else if(res.failed()){
+                    log("Nessun riferimento per " + concept);
                 }
-                // Call some blocking API that takes a significant amount of time to return
-                promise.complete();
-            }, res -> {
-                System.out.println("The result is: " + res.result());
             });
-            // Creo l'executor
-
-            if (!(Thread.currentThread().getName().equals("AWT-EventQueue-0"))) {
-                executor.close();
-            }
-
         }
     }
 

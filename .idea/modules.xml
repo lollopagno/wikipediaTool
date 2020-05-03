@@ -2,6 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/gradleTry.main.iml" filepath="$PROJECT_DIR$/.idea/modules/gradleTry.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/gradleTry.test.iml" filepath="$PROJECT_DIR$/.idea/modules/gradleTry.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/org.example.gradleTry.iml" filepath="$PROJECT_DIR$/.idea/modules/org.example.gradleTry.iml" />
       <module fileurl="file://$PROJECT_DIR$/wikipediaTool.iml" filepath="$PROJECT_DIR$/wikipediaTool.iml" />
     </modules>
   </component>
