@@ -19,9 +19,10 @@ import java.awt.event.WindowEvent;
 public class MainFrame extends JFrame implements ActionListener, View {
     private static final int WIDTH = 640;
     private static final int HEIGHT = 480;
-    private Controller controller;
-    private JTextField conceptText, entryText;
-    private Graph graph;
+    private final Controller controller;
+    private final JTextField conceptText;
+    private final JTextField entryText;
+    private final Graph graph;
     public int entryView;
 
 
