@@ -8,9 +8,9 @@ import ass2.view.MainFrame;
 
 import java.util.Set;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import io.vertx.core.*;
+
+import javax.swing.*;
 
 public class EventController implements Controller {
     private MainFrame view;
@@ -32,7 +32,6 @@ public class EventController implements Controller {
 
     @Override
     public void fetchConcept(String concept, int entry) {
-
         // Crea il grafo
         this.reset();
 
@@ -42,40 +41,34 @@ public class EventController implements Controller {
 
     @Override
     public void modelUpdated(String from) {
-        this.view.display(from);
+        SwingUtilities.invokeLater(() -> this.view.display(from));
     }
 
     @Override
     public void modelUpdated(String from, String to) {
-        this.view.display(from, to);
+        SwingUtilities.invokeLater(() -> this.view.display(from, to));
     }
-
 
     private void reset() { this.graph = new SimpleGraph(this);}
 
     // Parse del concetto e crea nuovi executor per le successive ricorsioni
     private void startRecursion(String concept, int entry) {
 
-        // 1- Termina ricorsione
         if (entry == -1) {
+            // 1- Termina ricorsione
             return;
-        }
-
-        // 2- Crea solo il primo nodo: entry == 0
-        else if (entry == this.view.getEntryView()) {
-
-            //Creo il primo vertice per il concetto dato in input nella view
+        } else if (entry == this.view.getEntryView()) {
+            // 2- Crea solo il primo nodo: entry == 0
+            // Creo il primo vertice per il concetto dato in input nella view
             this.graph.addNode(concept);
             this.log("Ho aggiunto il nodo: " + concept);
-
         }
 
         // 3- Parse e ricorsione
-        if (entry - 1 != -1) {
-
-            WorkerExecutor executor = vertx.createSharedWorkerExecutor("my-worker-pool");
-            executor.executeBlocking(promise -> {
-
+        if (entry != 0) {
+            // WorkerExecutor executor = vertx.createSharedWorkerExecutor("my-worker-pool");
+            // executor.executeBlocking(promise -> {
+            this.vertx.executeBlocking(promise -> {
                 // Parse
                 Set<WikiLink> links = null;
                 try {
@@ -87,35 +80,27 @@ public class EventController implements Controller {
                 if (links == null) return;
 
                 promise.complete(links);
-
             }, res -> {
-
                 // Se ha successo
                 if (res.succeeded()) {
-
                    Set<WikiLink> links = (Set<WikiLink>) res.result();
 
                     // Ricorsione per ogni riferimento trovato
                     for (WikiLink elem : links) {
-
                         try {
-
                             //Creo il vertice per il nuovo concetto
                             this.graph.addNode(elem.getText());
                             this.log("Ho aggiunto il nodo: " + elem.getText());
 
                             try {
-
                                 //Creo l'arco e aggancio il vertice al grafo
                                 this.graph.addEdge(concept, elem.getText());
 
                                 // Parto con la ricorsione
                                 this.startRecursion(elem.getText(), entry - 1);
-
                             } catch (Exception ex) {
                                 ex.printStackTrace();
                             }
-
                         } catch (IllegalArgumentException e) {
                             this.log("Il concetto " + elem.getText() + " è già presente.");
                         }
