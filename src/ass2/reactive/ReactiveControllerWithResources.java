@@ -87,6 +87,8 @@ public class ReactiveControllerWithResources implements Controller {
     private void fetchRecursivly(String concept, int entry, Consumer<WikiLink> consumer) {
         // Fetch Wikipedia.
         WikiClient client = new WikiClient();
+
+        // Comunico alla view che c'è una risorsa in più da utilizzare.
         SwingUtilities.invokeLater(() -> this.resourcesView.putResources(1));
 
         Set<WikiLink> set = new HashSet<>();
@@ -99,6 +101,7 @@ public class ReactiveControllerWithResources implements Controller {
             e.printStackTrace();
         }
 
+        // Comunico alla view che ho utilizzato una risorsa.
         SwingUtilities.invokeLater(() -> this.resourcesView.useResources(1));
 
         if (set == null || set.isEmpty())

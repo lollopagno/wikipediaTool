@@ -9,7 +9,8 @@ import java.util.Random;
 public class ResourcesFrame extends JFrame implements ResourcesView, ActionListener {
     private static final int WIDTH = 320;
     private static final int HEIGHT = 240;
-    private JLabel resources, reactiveness;
+    private final JLabel resources;
+    private final JLabel reactiveness;
     private int number;
 
     public ResourcesFrame() {
