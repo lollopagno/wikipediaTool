@@ -49,6 +49,11 @@ public class EventController implements Controller {
         SwingUtilities.invokeLater(() -> this.view.display(from, to));
     }
 
+    @Override
+    public void displayNumber() {
+        SwingUtilities.invokeLater(() -> this.view.displayNumber(this.graph.getNumberNode()));
+    }
+
     private void reset() { this.graph = new SimpleGraph(this);}
 
     // Parse del concetto e crea nuovi executor per le successive ricorsioni
