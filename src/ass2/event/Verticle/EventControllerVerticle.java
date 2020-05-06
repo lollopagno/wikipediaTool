@@ -1,4 +1,4 @@
-package ass2.event;
+package ass2.event.Verticle;
 
 import ass2.controller.Controller;
 import ass2.model.classes.WikiLink;
@@ -7,18 +7,18 @@ import ass2.model.services.WikiClient;
 import ass2.view.MainFrame;
 
 import java.util.Set;
-
 import io.vertx.core.*;
+import io.vertx.core.json.JsonObject;
 
 import javax.swing.*;
 
-public class EventController implements Controller {
+public class EventControllerVerticle implements Controller {
     private MainFrame view;
     public WikiClient wikiClient;
     private SimpleGraph graph;
     private Vertx vertx;
 
-    public EventController() {
+    public EventControllerVerticle() {
 
         // Generate the view.
         this.view = new MainFrame("Event programming", this);
@@ -54,9 +54,11 @@ public class EventController implements Controller {
         SwingUtilities.invokeLater(() -> this.view.displayNumber(this.graph.getNumberNode()));
     }
 
-    private void reset() { this.graph = new SimpleGraph(this);}
+    private void reset() {
+        this.graph = new SimpleGraph(this);
+    }
 
-    // Parse del concetto e crea nuovi executor per le successive ricorsioni
+
     private void startRecursion(String concept, int entry) {
 
         // 1- Termina ricorsione
@@ -71,50 +73,47 @@ public class EventController implements Controller {
             this.log("Ho aggiunto il nodo: " + concept);
         }
 
-        // 3- Parse e ricorsione
-        if (entry != 0) {
+        if (entry-1 != -1 ){
 
-            this.vertx.executeBlocking(promise -> {
-                // Parse
-                Set<WikiLink> links = null;
-                try {
-                    links = this.wikiClient.parseURL(concept);
-                } catch (Exception e) {
-                    promise.fail("exception.....");
-                }
+            JsonObject config = new JsonObject().put("concept", concept);
+            DeploymentOptions options = new DeploymentOptions().setConfig(config);
 
-                if (links == null) return;
-
-                promise.complete(links);
-            }, res -> {
-                // Se ha successo
+            vertx.deployVerticle(new MyVerticle(), options, res -> {
                 if (res.succeeded()) {
-                   Set<WikiLink> links = (Set<WikiLink>) res.result();
 
-                    // Ricorsione per ogni riferimento trovato
-                    for (WikiLink elem : links) {
+                    String rif = res.result();
+                    String[] array = rif.split("_");
+
+                    for (String elem : array) {
+
                         try {
+
                             //Creo il vertice per il nuovo concetto
-                            this.graph.addNode(elem.getText());
-                            this.log("Ho aggiunto il nodo: " + elem.getText());
+                            this.graph.addNode(elem);
+                            this.log("Ho aggiunto il nodo: " + elem);
 
                             try {
                                 //Creo l'arco e aggancio il vertice al grafo
-                                this.graph.addEdge(concept, elem.getText());
+                                this.graph.addEdge(concept, elem);
 
                                 // Parto con la ricorsione
-                                this.startRecursion(elem.getText(), entry - 1);
+                                //this.startRecursion(elem.getText(), entry - 1);
+
                             } catch (Exception ex) {
                                 ex.printStackTrace();
                             }
                         } catch (IllegalArgumentException e) {
-                            this.log("Il concetto " + elem.getText() + " è già presente.");
+                            this.log("Il concetto " + elem + " è già presente.");
                         }
                     }
-                }else if(res.failed()){
-                    log("Nessun riferimento per " + concept);
+
+                    System.out.println("Deployment id is: " + res.result());
+                } else {
+                    System.out.println("Risultato fallito!");
                 }
             });
+
+
         }
     }
 
