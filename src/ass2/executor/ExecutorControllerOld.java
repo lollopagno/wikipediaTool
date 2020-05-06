@@ -12,13 +12,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class ExecutorController implements Controller {
+public class ExecutorControllerOld implements Controller {
     private ExecutorService exec;
     public WikiClient wikiClient;
     public SimpleGraph graph;
     public MainFrame view;
 
-    public ExecutorController(){
+    public ExecutorControllerOld(){
 
         // Crea la view
         this.view = new MainFrame("Executor programming", this);
@@ -77,65 +77,61 @@ public class ExecutorController implements Controller {
         // 3- Parse e ricorsione
         if (entry-1 != -1) {
 
-            // Creo l'executor
-            this.exec = Executors.newSingleThreadExecutor();
-
-            exec.execute(() -> {
-
-                try{
-
-                    // Parse
-                    Set<WikiLink> links = null;
-                    try {
-                        links = this.wikiClient.parseURL(concept);
-                    } catch (Exception e) {
-                        log(e.getMessage());
-                    }
-
-                    if (links == null) return;
-
-                    // Ricorsione per ogni riferimento trovato
-                    for (WikiLink elem : links) {
-
-                        try {
-
-                            //Creo il vertice per il nuovo concetto
-                            this.graph.addNode(elem.getText());
-                            this.log("Ho aggiunto il nodo: " + elem.getText());
-
-                            try {
-
-                                //Creo l'arco e aggancio il vertice al grafo
-                                this.graph.addEdge(concept, elem.getText());
-
-                                // Parto con la ricorsione
-                                this.startRecursion(elem.getText(), entry - 1);
-
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                            }
-
-                        } catch (IllegalArgumentException e) {
-                            this.log("Il concetto " + elem.getText() + " è già presente.");
-                        }
-                    }
-
-                }catch(Exception e){
-                    e.printStackTrace();
-                }
-            });
-
-            if(!(Thread.currentThread().getName().equals("AWT-EventQueue-0"))) {
-                log("si sta fermando....");
-                exec.shutdown();
-
-                try {
-                    exec.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-                log(" si è fermato");
+            // Parse
+            Set<WikiLink> links = null;
+            try {
+                links = this.wikiClient.parseURL(concept);
+            } catch (Exception e) {
+                log(e.getMessage());
             }
+
+            if (links == null) return;
+
+            // Ricorsione per ogni riferimento trovato
+            for (WikiLink elem : links) {
+
+                // Creo l'executor
+                this.exec = Executors.newSingleThreadExecutor();
+
+                exec.execute(() -> {
+
+                    try {
+
+                        //Creo il vertice per il nuovo concetto
+                        this.graph.addNode(elem.getText());
+                        this.log("Ho aggiunto il nodo: " + elem.getText());
+
+                        //try {
+
+                           //Creo l'arco e aggancio il vertice al grafo
+                           this.graph.addEdge(concept, elem.getText());
+
+                           // Parto con la ricorsione
+                           this.startRecursion(elem.getText(), entry - 1);
+
+                        /*} catch (Exception ex) {
+                            ex.printStackTrace();
+                        }*/
+
+                    } catch (IllegalArgumentException e) {
+                        this.log("Il concetto " + elem.getText() + " è già presente.");
+                    }
+                });
+
+                // Commentata poichè da eccezzione su alcuni task che dovrebbero fermarsi ma ancora al lavoro
+                /*if(!(Thread.currentThread().getName().equals("AWT-EventQueue-0"))) {
+                    log("si sta fermando....");
+                    exec.shutdown();
+
+                    try {
+                        exec.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+                    }catch (Exception e){
+                        //e.printStackTrace();
+                    }
+                    log(" si è fermato");
+                }*/
+            }
+
         }
     }
 

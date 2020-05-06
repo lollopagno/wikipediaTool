@@ -19,7 +19,7 @@ import java.util.function.Consumer;
 public class ReactiveControllerWithResources implements Controller {
     private final MainFrame view;
     private final ResourcesFrame resourcesView;
-    private AssignmentGraph graphModel;
+    private SimpleGraph graphModel;
 
     public ReactiveControllerWithResources(){
         this.view = new MainFrame("Reactive Programming", this);
@@ -39,6 +39,7 @@ public class ReactiveControllerWithResources implements Controller {
     }
 
     public void generateEmitter(String concept, int entry) {
+
         Observable<WikiLink> source =
                 Observable.create(emitter ->
                         new Thread(() -> {
@@ -72,6 +73,11 @@ public class ReactiveControllerWithResources implements Controller {
     @Override
     public void modelUpdated(String from, String to) {
         SwingUtilities.invokeLater(() -> this.view.display(from, to));
+    }
+
+    @Override
+    public void displayNumber() {
+        SwingUtilities.invokeLater(() -> this.view.displayNumber(this.graphModel.getNumberNode()));
     }
 
     public static void log(String msg) {

@@ -17,7 +17,7 @@ import java.util.function.Consumer;
 
 public class ReactiveController implements Controller {
     private MainFrame view;
-    private AssignmentGraph graphModel;
+    private SimpleGraph graphModel;
 
     public ReactiveController() {
         // Generate the view.
@@ -70,6 +70,11 @@ public class ReactiveController implements Controller {
     @Override
     public void modelUpdated(String from, String to) {
         SwingUtilities.invokeLater(() -> this.view.display(from, to));
+    }
+
+    @Override
+    public void displayNumber() {
+        SwingUtilities.invokeLater(() -> this.view.displayNumber(this.graphModel.getNumberNode()));
     }
 
     public static void log(String msg) {

@@ -20,4 +20,6 @@ public interface Controller {
      * @param to Title of the to node.
      */
     void modelUpdated(String from, String to);
+
+    void displayNumber();
 }

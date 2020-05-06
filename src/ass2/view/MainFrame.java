@@ -1,6 +1,7 @@
 package ass2.view;
 
 import ass2.controller.*;
+import ass2.model.classes.mygraph.SimpleGraph;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Element;
 import org.graphstream.graph.Graph;
@@ -23,8 +24,9 @@ public class MainFrame extends JFrame implements ActionListener, View {
     private final JTextField conceptText;
     private final JTextField entryText;
     private final Graph graph;
-    public int entryView;
 
+    private JLabel number;
+    public int entryView;
 
     public MainFrame(String title, Controller controller) {
         // Set some defaults.
@@ -52,6 +54,9 @@ public class MainFrame extends JFrame implements ActionListener, View {
         JButton btnStart = new JButton("Start");
         btnStart.addActionListener(this);
         controlPanel.add(btnStart);
+
+        this.number = new JLabel();
+        controlPanel.add(number);
 
         // Set contentPanel.
         JPanel graphPanel = new JPanel(new GridLayout()) {
@@ -166,5 +171,9 @@ public class MainFrame extends JFrame implements ActionListener, View {
         {
             System.out.println("[" + Thread.currentThread().getName() + "] " + msg);
         }
+    }
+
+    public void displayNumber(int n) {
+        SwingUtilities.invokeLater(() -> this.number.setText("Number Node " + n));
     }
 }

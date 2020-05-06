@@ -9,6 +9,7 @@ import ass2.view.MainFrame;
 import java.util.Set;
 
 import io.vertx.core.*;
+import javafx.scene.chart.ScatterChart;
 
 import javax.swing.*;
 
@@ -49,38 +50,49 @@ public class EventController implements Controller {
         SwingUtilities.invokeLater(() -> this.view.display(from, to));
     }
 
+    @Override
+    public void displayNumber() {
+        SwingUtilities.invokeLater(() -> this.view.displayNumber(this.graph.getNumberNode()));
+    }
+
     private void reset() { this.graph = new SimpleGraph(this);}
 
     // Parse del concetto e crea nuovi executor per le successive ricorsioni
     private void startRecursion(String concept, int entry) {
 
+        // 1- Termina ricorsione
         if (entry == -1) {
-            // 1- Termina ricorsione
             return;
+
+        // 2- Crea solo il primo nodo: entry == 0
+        // Creo il primo vertice per il concetto dato in input nella view
         } else if (entry == this.view.getEntryView()) {
-            // 2- Crea solo il primo nodo: entry == 0
-            // Creo il primo vertice per il concetto dato in input nella view
+
             this.graph.addNode(concept);
             this.log("Ho aggiunto il nodo: " + concept);
         }
 
         // 3- Parse e ricorsione
         if (entry != 0) {
+
             // WorkerExecutor executor = vertx.createSharedWorkerExecutor("my-worker-pool");
             // executor.executeBlocking(promise -> {
             this.vertx.executeBlocking(promise -> {
+
                 // Parse
                 Set<WikiLink> links = null;
                 try {
                     links = this.wikiClient.parseURL(concept);
                 } catch (Exception e) {
-                    promise.fail("exception.....");
+                    promise.fail("Exception");
                 }
 
                 if (links == null) return;
 
                 promise.complete(links);
+
             }, res -> {
+
                 // Se ha successo
                 if (res.succeeded()) {
                    Set<WikiLink> links = (Set<WikiLink>) res.result();
@@ -98,6 +110,7 @@ public class EventController implements Controller {
 
                                 // Parto con la ricorsione
                                 this.startRecursion(elem.getText(), entry - 1);
+
                             } catch (Exception ex) {
                                 ex.printStackTrace();
                             }
@@ -105,7 +118,8 @@ public class EventController implements Controller {
                             this.log("Il concetto " + elem.getText() + " è già presente.");
                         }
                     }
-                }else if(res.failed()){
+
+                } else if (res.failed()){
                     log("Nessun riferimento per " + concept);
                 }
             });

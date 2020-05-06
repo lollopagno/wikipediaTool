@@ -8,20 +8,24 @@ import java.util.List;
 public class SimpleGraph implements AssignmentGraph {
     private List<Node> nodes;
     private Controller controller;
+    public int numberNode;
 
     public SimpleGraph(Controller controller) {
         this.nodes = new LinkedList<>();
         this.controller = controller;
+        this.numberNode = 0;
     }
 
-    public synchronized void addNode(String title) throws IllegalArgumentException {
+     public synchronized void addNode(String title) throws IllegalArgumentException {
 
         if (this.getNode(title) != null)
             return;
 
         Node node = new Node(title);
         this.nodes.add(node);
+        this.incNode();
         this.controller.modelUpdated(title);
+        this.controller.displayNumber();
     }
 
     public synchronized List<Node> getNodes() {
@@ -62,4 +66,15 @@ public class SimpleGraph implements AssignmentGraph {
             this.controller.modelUpdated(from, to);
         }
     }
+
+    //Incrementa il numero di Nodi del grafo
+    private void incNode(){
+        this.numberNode += 1;
+    }
+
+    // Ritorna il numeor di nodi del grafo
+    public int getNumberNode(){
+        return this.numberNode;
+    }
+
 }
