@@ -66,8 +66,8 @@ public class EventController implements Controller {
 
         // 3- Parse e ricorsione
         if (entry != 0) {
-            // WorkerExecutor executor = vertx.createSharedWorkerExecutor("my-worker-pool");
-            // executor.executeBlocking(promise -> {
+            //WorkerExecutor executor = vertx.createSharedWorkerExecutor("my-worker-pool");
+            //executor.executeBlocking(promise -> {
             this.vertx.executeBlocking(promise -> {
                 // Parse
                 Set<WikiLink> links = null;
@@ -84,7 +84,6 @@ public class EventController implements Controller {
                 // Se ha successo
                 if (res.succeeded()) {
                    Set<WikiLink> links = (Set<WikiLink>) res.result();
-
                     // Ricorsione per ogni riferimento trovato
                     for (WikiLink elem : links) {
                         try {
@@ -114,7 +113,7 @@ public class EventController implements Controller {
 
     private void log(String msg) {
         synchronized (System.out) {
-            System.out.println("[" + Thread.currentThread().getName() + "]: " + msg);
+            System.out.println(/*"[" + Thread.currentThread().getName() + "]: "+*/ msg);
         }
     }
 }
