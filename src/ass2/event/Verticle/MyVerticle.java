@@ -17,9 +17,9 @@ public class MyVerticle extends AbstractVerticle {
 
     public void start(Promise promise){
 
-        /*String concept = config().getString("concept");
+        //String concept = config().getString("concept");
 
-        log("sono partito con "+concept);*/
+        //log("sono partito con "+concept);
 
         // Parse
         /*Set<WikiLink> links = null;
@@ -31,15 +31,15 @@ public class MyVerticle extends AbstractVerticle {
 
         if (links == null) return;
 
-        /*String text = "";
+        String text = "";
         for (WikiLink elem : links) {
 
             text += elem.getText()+"_";
 
-        }*/
-        //log(text);*/
+        }
+        //log(text);
+        promise.complete(text);*/
         promise.complete();
-        //promise.complete(text);
     }
 
 

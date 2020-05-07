@@ -78,13 +78,13 @@ public class EventControllerVerticle implements Controller {
             JsonObject config = new JsonObject().put("concept", concept);
             DeploymentOptions options = new DeploymentOptions().setConfig(config);
 
-            vertx.deployVerticle(new MyVerticle(), options, res -> {
+            //vertx.deployVerticle(new MyVerticle(), options, res -> {
                 //System.out.println(res.succeeded());
-            //vertx.deployVerticle("MyVerticle", res -> {
+            vertx.deployVerticle(new MyVerticle(), res -> {
                 if (res.succeeded()) {
                     String deploymentID = res.result();
 
-                    System.out.println("Other verticle deployed ok, deploymentID = " + deploymentID);
+                    System.out.println("Nuovo verticle: " + deploymentID);
                     Set<WikiLink> links = null;
                     try {
                         links = this.wikiClient.parseURL(concept);
@@ -105,7 +105,7 @@ public class EventControllerVerticle implements Controller {
                                 try {
                                     //Creo il vertice per il nuovo concetto
                                     this.graph.addNode(elem.getText());
-                                    this.log("Ho aggiunto il nodo: " + elem.getText());
+                                    this.log(deploymentID+ " Ha aggiunto il nodo: " + elem.getText());
 
                                     try {
 
@@ -124,12 +124,12 @@ public class EventControllerVerticle implements Controller {
                                 }
                             }
                         } else {
+
                             res2.cause().printStackTrace();
                         }
                     });
                 } else {
                     res.cause().printStackTrace();
-                    System.out.println("Risultato fallito!");
                 }
             });
 
