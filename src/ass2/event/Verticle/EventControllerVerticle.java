@@ -88,7 +88,29 @@ public class EventControllerVerticle implements Controller {
                 }
                 if (links == null) return;
                 if (res.succeeded()) {
-                    System.out.println("daje");
+                    for (WikiLink elem : links) {
+                        try {
+                            //Creo il vertice per il nuovo concetto
+                            this.graph.addNode(elem.getText());
+                            this.log(deploymentID+ " Ha aggiunto il nodo: " + elem.getText());
+
+                            try {
+
+                                //Creo l'arco e aggancio il vertice al grafo
+                                this.graph.addEdge(concept, elem.getText());
+
+                                // Parto con la ricorsione
+                                this.startRecursion(elem.getText(), entry - 1);
+
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+
+                        } catch (IllegalArgumentException e) {
+                            this.log("Il concetto " + elem.getText() + " è già presente.");
+                        }
+                    }
+
                 } else {
                     res.cause().printStackTrace();
                 }
