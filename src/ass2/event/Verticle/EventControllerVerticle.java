@@ -79,36 +79,56 @@ public class EventControllerVerticle implements Controller {
             DeploymentOptions options = new DeploymentOptions().setConfig(config);
 
             vertx.deployVerticle(new MyVerticle(), options, res -> {
+                //System.out.println(res.succeeded());
+            //vertx.deployVerticle("MyVerticle", res -> {
                 if (res.succeeded()) {
+                    String deploymentID = res.result();
 
-                    String rif = res.result();
-                    String[] array = rif.split("_");
-
-                    for (String elem : array) {
-
-                        try {
-
-                            //Creo il vertice per il nuovo concetto
-                            this.graph.addNode(elem);
-                            this.log("Ho aggiunto il nodo: " + elem);
-
-                            try {
-                                //Creo l'arco e aggancio il vertice al grafo
-                                this.graph.addEdge(concept, elem);
-
-                                // Parto con la ricorsione
-                                //this.startRecursion(elem.getText(), entry - 1);
-
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                            }
-                        } catch (IllegalArgumentException e) {
-                            this.log("Il concetto " + elem + " è già presente.");
-                        }
+                    System.out.println("Other verticle deployed ok, deploymentID = " + deploymentID);
+                    Set<WikiLink> links = null;
+                    try {
+                        links = this.wikiClient.parseURL(concept);
+                    } catch (Exception e) {
+                        log("error");
                     }
+                    if (links == null) return;
+                    System.out.println(links);
+                    Set<WikiLink> finalLinks = links;
+                    log(finalLinks.toString());
+                    vertx.undeploy(deploymentID,res2 -> {
+                        if (res2.succeeded()) {
+                            //String rif = res.result();
+                            //String[] array = rif.split("_");
+                            // Ricorsione per ogni riferimento trovato
+                            //for (WikiLink elem : finalLinks) {
+                            for (WikiLink elem : finalLinks) {
+                                try {
+                                    //Creo il vertice per il nuovo concetto
+                                    this.graph.addNode(elem.getText());
+                                    this.log("Ho aggiunto il nodo: " + elem.getText());
 
-                    System.out.println("Deployment id is: " + res.result());
+                                    try {
+
+                                        //Creo l'arco e aggancio il vertice al grafo
+                                        this.graph.addEdge(concept, elem.getText());
+
+                                        // Parto con la ricorsione
+                                        this.startRecursion(elem.getText(), entry - 1);
+
+                                    } catch (Exception ex) {
+                                        ex.printStackTrace();
+                                    }
+
+                                } catch (IllegalArgumentException e) {
+                                    this.log("Il concetto " + elem.getText() + " è già presente.");
+                                }
+                            }
+                        } else {
+                            res2.cause().printStackTrace();
+                        }
+                    });
                 } else {
+                    res.cause().printStackTrace();
                     System.out.println("Risultato fallito!");
                 }
             });
