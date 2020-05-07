@@ -174,6 +174,6 @@ public class MainFrame extends JFrame implements ActionListener, View {
     }
 
     public void displayNumber(int n) {
-        SwingUtilities.invokeLater(() -> this.number.setText("Number Node " + n));
+        SwingUtilities.invokeLater(() -> this.number.setText("Number Node: " + n));
     }
 }

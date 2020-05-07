@@ -12,13 +12,13 @@ import io.vertx.core.*;
 
 import javax.swing.*;
 
-public class EventController implements Controller {
+public class EventController2 implements Controller {
     private MainFrame view;
     public WikiClient wikiClient;
     private SimpleGraph graph;
     private Vertx vertx;
 
-    public EventController() {
+    public EventController2() {
 
         // Generate the view.
         this.view = new MainFrame("Event programming", this);
@@ -63,7 +63,7 @@ public class EventController implements Controller {
         if (entry == -1) {
             return;
 
-        // 2- Crea solo il primo nodo: entry == 0
+            // 2- Crea solo il primo nodo: entry == 0
         } else if (entry == this.view.getEntryView()) {
 
             // Creo il primo vertice per il concetto dato in input nella view
@@ -74,55 +74,46 @@ public class EventController implements Controller {
         // 3- Parse e ricorsione
         if (entry != 0) {
 
-            WorkerExecutor ex = this.vertx.createSharedWorkerExecutor(concept);
-            ex.executeBlocking(promise -> {
+            // Parse
+            Set<WikiLink> links = null;
+            try {
+                links = this.wikiClient.parseURL(concept);
+            } catch (Exception e) {
+                e.getMessage();
+            }
 
-                log(" sono un nuovo executor di vertx");
+            if (links == null) return;
 
-                // Parse
-                Set<WikiLink> links = null;
+
+            // Ricorsione per ogni riferimento trovato
+            for (WikiLink elem : links) {
+
                 try {
-                    links = this.wikiClient.parseURL(concept);
-                } catch (Exception e) {
-                    promise.fail(e.getMessage());
-                }
 
-                if (links == null) return;
+                    //Creo il vertice per il nuovo concetto
+                    this.graph.addNode(elem.getText());
+                    this.log("Ho aggiunto il nodo: " + elem.getText());
 
-                promise.complete(links);
+                    try {
+                        //Creo l'arco e aggancio il vertice al grafo
+                        this.graph.addEdge(concept, elem.getText());
 
-            }, res -> {
+                        WorkerExecutor ex = this.vertx.createSharedWorkerExecutor(elem.getText());
+                        ex.executeBlocking(promise -> {
 
-                // Se ha successo
-                if (res.succeeded()) {
+                            // Parto con la ricorsione
+                            this.startRecursion(elem.getText(), entry - 1);
 
-                   Set<WikiLink> links = (Set<WikiLink>) res.result();
+                        });
 
-                    // Ricorsione per ogni riferimento trovato
-                    for (WikiLink elem : links) {
-
-                        try {
-                            //Creo il vertice per il nuovo concetto
-                            this.graph.addNode(elem.getText());
-                            this.log("Ho aggiunto il nodo: " + elem.getText());
-
-                            try {
-                                //Creo l'arco e aggancio il vertice al grafo
-                                this.graph.addEdge(concept, elem.getText());
-
-                                // Parto con la ricorsione
-                                this.startRecursion(elem.getText(), entry - 1);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        } catch (IllegalArgumentException e) {
-                            this.log("Il concetto " + elem.getText() + " è già presente.");
-                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                }else if(res.failed()){
-                    log("Nessun riferimento per " + concept);
+
+                } catch (IllegalArgumentException e) {
+                    this.log("Il concetto " + elem.getText() + " è già presente.");
                 }
-            });
+            }
         }
     }
 
