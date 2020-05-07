@@ -75,59 +75,20 @@ public class EventControllerVerticle implements Controller {
 
         if (entry-1 != -1 ){
 
-            JsonObject config = new JsonObject().put("concept", concept);
-            DeploymentOptions options = new DeploymentOptions().setConfig(config);
-
-            //vertx.deployVerticle(new MyVerticle(), options, res -> {
-                //System.out.println(res.succeeded());
+            //JsonObject config = new JsonObject().put("concept", concept);
+            //DeploymentOptions options = new DeploymentOptions().setConfig(config);
             vertx.deployVerticle(new MyVerticle(), res -> {
+                String deploymentID = res.result();
+                System.out.println("Nuovo verticle: " + deploymentID);
+                Set<WikiLink> links = null;
+                try {
+                    links = this.wikiClient.parseURL(concept);
+                } catch (Exception e) {
+                    log("error -- finish check");
+                }
+                if (links == null) return;
                 if (res.succeeded()) {
-                    String deploymentID = res.result();
-
-                    System.out.println("Nuovo verticle: " + deploymentID);
-                    Set<WikiLink> links = null;
-                    try {
-                        links = this.wikiClient.parseURL(concept);
-                    } catch (Exception e) {
-                        log("error");
-                    }
-                    if (links == null) return;
-                    System.out.println(links);
-                    Set<WikiLink> finalLinks = links;
-                    log(finalLinks.toString());
-                    vertx.undeploy(deploymentID,res2 -> {
-                        if (res2.succeeded()) {
-                            //String rif = res.result();
-                            //String[] array = rif.split("_");
-                            // Ricorsione per ogni riferimento trovato
-                            //for (WikiLink elem : finalLinks) {
-                            for (WikiLink elem : finalLinks) {
-                                try {
-                                    //Creo il vertice per il nuovo concetto
-                                    this.graph.addNode(elem.getText());
-                                    this.log(deploymentID+ " Ha aggiunto il nodo: " + elem.getText());
-
-                                    try {
-
-                                        //Creo l'arco e aggancio il vertice al grafo
-                                        this.graph.addEdge(concept, elem.getText());
-
-                                        // Parto con la ricorsione
-                                        this.startRecursion(elem.getText(), entry - 1);
-
-                                    } catch (Exception ex) {
-                                        ex.printStackTrace();
-                                    }
-
-                                } catch (IllegalArgumentException e) {
-                                    this.log("Il concetto " + elem.getText() + " è già presente.");
-                                }
-                            }
-                        } else {
-
-                            res2.cause().printStackTrace();
-                        }
-                    });
+                    System.out.println("daje");
                 } else {
                     res.cause().printStackTrace();
                 }

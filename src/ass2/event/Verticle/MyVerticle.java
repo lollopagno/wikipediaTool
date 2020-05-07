@@ -9,6 +9,7 @@ import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
 import sun.swing.plaf.synth.StyleAssociation;
 
+import javax.sound.midi.SysexMessage;
 import java.util.Set;
 
 public class MyVerticle extends AbstractVerticle {
@@ -16,29 +17,7 @@ public class MyVerticle extends AbstractVerticle {
     private final WikiClient wikiClient = new WikiClient();
 
     public void start(Promise promise){
-
-        //String concept = config().getString("concept");
-
-        //log("sono partito con "+concept);
-
-        // Parse
-        /*Set<WikiLink> links = null;
-        try {
-            links = this.wikiClient.parseURL(concept);
-        } catch (Exception e) {
-            promise.fail("error");
-        }
-
-        if (links == null) return;
-
-        String text = "";
-        for (WikiLink elem : links) {
-
-            text += elem.getText()+"_";
-
-        }
-        //log(text);
-        promise.complete(text);*/
+        //System.out.println("Prima o dopo della stampa del nuovo verticle??");
         promise.complete();
     }
 
