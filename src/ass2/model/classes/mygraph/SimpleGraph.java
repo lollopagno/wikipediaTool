@@ -4,41 +4,32 @@ import ass2.controller.Controller;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 public class SimpleGraph implements AssignmentGraph {
-    private List<Node> nodes;
-    private Controller controller;
-    public int numberNode;
+    private final List<Node> nodes;
+    private final Controller controller;
 
     public SimpleGraph(Controller controller) {
         this.nodes = new LinkedList<>();
         this.controller = controller;
-        this.numberNode = 0;
     }
 
-     public synchronized void addNode(String title) throws IllegalArgumentException {
-
-        if (this.getNode(title) != null)
-           throw new IllegalArgumentException();
+    public synchronized void addNode(String title) throws IllegalArgumentException {
+        if (this.getOptionalNode(title).isPresent())
+            throw new IllegalArgumentException(title);
 
         Node node = new Node(title);
         this.nodes.add(node);
-        this.incNode();
         this.controller.modelUpdated(title);
-        this.controller.displayNumber();
     }
 
-    public synchronized Node getNode(String title) {
-        for (Node e : this.nodes)
-            if (e.getTitle().equals(title))
-                return e;
-        return null;
+    public synchronized Optional<Node> getOptionalNode(String title) {
+        return this.nodes.stream().filter(elem -> elem.getTitle().equals(title)).findAny();
     }
 
     public synchronized void addEdge(String from, String to) throws IllegalArgumentException {
-
         Node checkFrom = null, checkTo = null;
-
         for (Node e : this.nodes) {
 
             if (e.getTitle().equals(from))
@@ -55,14 +46,8 @@ public class SimpleGraph implements AssignmentGraph {
         }
     }
 
-    //Incrementa il numero di Nodi del grafo
-    private synchronized void incNode(){
-        this.numberNode += 1;
+    @Override
+    public int getNodeNumber() {
+        return this.nodes.size();
     }
-
-    // Ritorna il numeor di nodi del grafo
-    public synchronized int getNumberNode(){
-        return this.numberNode;
-    }
-
 }

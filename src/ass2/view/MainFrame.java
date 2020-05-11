@@ -1,7 +1,6 @@
 package ass2.view;
 
-import ass2.controller.*;
-import ass2.model.classes.mygraph.SimpleGraph;
+import ass2.controller.Controller;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Element;
 import org.graphstream.graph.Graph;
@@ -25,7 +24,7 @@ public class MainFrame extends JFrame implements ActionListener, View {
     private final JTextField entryText;
     private final Graph graph;
 
-    private JLabel number;
+    private final JLabel number;
     public int entryView;
 
     public MainFrame(String title, Controller controller) {

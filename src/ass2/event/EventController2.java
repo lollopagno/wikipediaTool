@@ -2,6 +2,7 @@ package ass2.event;
 
 import ass2.controller.Controller;
 import ass2.model.classes.WikiLink;
+import ass2.model.classes.mygraph.AssignmentGraph;
 import ass2.model.classes.mygraph.SimpleGraph;
 import ass2.model.services.WikiClient;
 import ass2.view.MainFrame;
@@ -13,10 +14,10 @@ import io.vertx.core.*;
 import javax.swing.*;
 
 public class EventController2 implements Controller {
-    private MainFrame view;
+    private final MainFrame view;
     public WikiClient wikiClient;
-    private SimpleGraph graph;
-    private Vertx vertx;
+    private AssignmentGraph graph;
+    private final Vertx vertx;
 
     public EventController2() {
 
@@ -41,17 +42,18 @@ public class EventController2 implements Controller {
 
     @Override
     public void modelUpdated(String from) {
-        SwingUtilities.invokeLater(() -> this.view.display(from));
+        SwingUtilities.invokeLater(() -> {
+            this.view.display(from);
+            this.view.displayNumber(this.graph.getNodeNumber());
+        });
     }
 
     @Override
     public void modelUpdated(String from, String to) {
-        SwingUtilities.invokeLater(() -> this.view.display(from, to));
-    }
-
-    @Override
-    public void displayNumber() {
-        SwingUtilities.invokeLater(() -> this.view.displayNumber(this.graph.getNumberNode()));
+        SwingUtilities.invokeLater(() -> {
+            this.view.display(from, to);
+            this.view.displayNumber(this.graph.getNodeNumber());
+        });
     }
 
     private void reset() { this.graph = new SimpleGraph(this);}

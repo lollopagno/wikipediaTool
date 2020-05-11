@@ -12,7 +12,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ExecutorControllerOld implements Controller {
-    private ExecutorService exec;
     public WikiClient wikiClient;
     public SimpleGraph graph;
     public MainFrame view;
@@ -43,17 +42,18 @@ public class ExecutorControllerOld implements Controller {
 
     @Override
     public void modelUpdated(String from) {
-        SwingUtilities.invokeLater(() -> this.view.display(from));
+        SwingUtilities.invokeLater(() -> {
+            this.view.display(from);
+            this.view.displayNumber(this.graph.getNodeNumber());
+        });
     }
 
     @Override
     public void modelUpdated(String from, String to) {
-        SwingUtilities.invokeLater(() -> this.view.display(from, to));
-    }
-
-    @Override
-    public void displayNumber() {
-        SwingUtilities.invokeLater(() -> this.view.displayNumber(this.graph.getNumberNode()));
+        SwingUtilities.invokeLater(() -> {
+            this.view.display(from, to);
+            this.view.displayNumber(this.graph.getNodeNumber());
+        });
     }
 
     // Parse del concetto e crea nuovi executor per le successive ricorsioni
@@ -90,7 +90,7 @@ public class ExecutorControllerOld implements Controller {
             for (WikiLink elem : links) {
 
                 // Creo l'executor
-                this.exec = Executors.newSingleThreadExecutor();
+                ExecutorService exec = Executors.newSingleThreadExecutor();
 
                 exec.execute(() -> {
 

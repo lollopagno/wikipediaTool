@@ -2,24 +2,22 @@ package ass2.event.Verticle;
 
 import ass2.controller.Controller;
 import ass2.model.classes.WikiLink;
+import ass2.model.classes.mygraph.AssignmentGraph;
 import ass2.model.classes.mygraph.SimpleGraph;
 import ass2.model.services.WikiClient;
 import ass2.view.MainFrame;
-
-import java.util.Set;
-import io.vertx.core.*;
-import io.vertx.core.json.JsonObject;
+import io.vertx.core.Vertx;
 
 import javax.swing.*;
+import java.util.Set;
 
 public class EventControllerVerticle implements Controller {
-    private MainFrame view;
+    private final MainFrame view;
     public WikiClient wikiClient;
-    private SimpleGraph graph;
-    private Vertx vertx;
+    private AssignmentGraph graph;
+    private final Vertx vertx;
 
     public EventControllerVerticle() {
-
         // Generate the view.
         this.view = new MainFrame("Event programming", this);
         this.view.setVisible(true);
@@ -41,17 +39,18 @@ public class EventControllerVerticle implements Controller {
 
     @Override
     public void modelUpdated(String from) {
-        SwingUtilities.invokeLater(() -> this.view.display(from));
+        SwingUtilities.invokeLater(() -> {
+            this.view.display(from);
+            this.view.displayNumber(this.graph.getNodeNumber());
+        });
     }
 
     @Override
     public void modelUpdated(String from, String to) {
-        SwingUtilities.invokeLater(() -> this.view.display(from, to));
-    }
-
-    @Override
-    public void displayNumber() {
-        SwingUtilities.invokeLater(() -> this.view.displayNumber(this.graph.getNumberNode()));
+        SwingUtilities.invokeLater(() -> {
+            this.view.display(from, to);
+            this.view.displayNumber(this.graph.getNodeNumber());
+        });
     }
 
     private void reset() {

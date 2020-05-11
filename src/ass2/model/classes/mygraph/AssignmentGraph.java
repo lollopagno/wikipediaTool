@@ -14,4 +14,10 @@ public interface AssignmentGraph {
      * @param to Destination node.
      */
     void addEdge(String from, String to);
+
+    /**
+     * Get the number of nodes.
+     * @return Number of nodes.
+     */
+    int getNodeNumber();
 }

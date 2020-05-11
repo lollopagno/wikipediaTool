@@ -3,23 +3,20 @@ package ass2.executor;
 import ass2.controller.Controller;
 import ass2.model.classes.WikiLink;
 import ass2.model.classes.mygraph.SimpleGraph;
-import ass2.view.MainFrame;
 import ass2.model.services.WikiClient;
+import ass2.view.MainFrame;
 
 import javax.swing.*;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 public class ExecutorController implements Controller {
-    private ExecutorService exec;
     public WikiClient wikiClient;
     public SimpleGraph graph;
     public MainFrame view;
 
     public ExecutorController(){
-
         // Crea la view
         this.view = new MainFrame("Executor programming", this);
         this.view.setVisible(true);
@@ -44,17 +41,18 @@ public class ExecutorController implements Controller {
 
     @Override
     public void modelUpdated(String from) {
-        SwingUtilities.invokeLater(() -> this.view.display(from));
+        SwingUtilities.invokeLater(() -> {
+            this.view.display(from);
+            this.view.displayNumber(this.graph.getNodeNumber());
+        });
     }
 
     @Override
     public void modelUpdated(String from, String to) {
-        SwingUtilities.invokeLater(() -> this.view.display(from, to));
-    }
-
-    @Override
-    public void displayNumber() {
-        SwingUtilities.invokeLater(() -> this.view.displayNumber(this.graph.getNumberNode()));
+        SwingUtilities.invokeLater(() -> {
+            this.view.display(from, to);
+            this.view.displayNumber(this.graph.getNodeNumber());
+        });
     }
 
     // Parse del concetto e crea nuovi executor per le successive ricorsioni
@@ -78,7 +76,7 @@ public class ExecutorController implements Controller {
         if (entry-1 != -1) {
 
             // Creo l'executor
-            this.exec = Executors.newSingleThreadExecutor();
+            ExecutorService exec = Executors.newSingleThreadExecutor();
 
             exec.execute(() -> {
 
