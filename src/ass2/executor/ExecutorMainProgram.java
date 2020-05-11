@@ -4,7 +4,7 @@ public class ExecutorMainProgram {
 
     public static void main(String[] args) {
 
-        new ExecutorController();
+        new ExecutorControllerOld();
     }
 }
 

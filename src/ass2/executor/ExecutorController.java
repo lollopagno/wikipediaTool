@@ -124,18 +124,6 @@ public class ExecutorController implements Controller {
                     e.printStackTrace();
                 }
             });
-
-            if(!(Thread.currentThread().getName().equals("AWT-EventQueue-0"))) {
-                log("si sta fermando....");
-                exec.shutdown();
-
-                try {
-                    exec.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-                log(" si è fermato");
-            }
         }
     }
 

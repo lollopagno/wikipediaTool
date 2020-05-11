@@ -78,6 +78,7 @@ public class EventController2 implements Controller {
             Set<WikiLink> links = null;
             try {
                 links = this.wikiClient.parseURL(concept);
+
             } catch (Exception e) {
                 e.getMessage();
             }
@@ -88,31 +89,35 @@ public class EventController2 implements Controller {
             // Ricorsione per ogni riferimento trovato
             for (WikiLink elem : links) {
 
-                try {
+                WorkerExecutor ex = this.vertx.createSharedWorkerExecutor(elem.getText());
+                ex.executeBlocking(promise -> {
 
-                    //Creo il vertice per il nuovo concetto
-                    this.graph.addNode(elem.getText());
-                    this.log("Ho aggiunto il nodo: " + elem.getText());
+                    try{
 
-                    try {
+                        //Creo il vertice per il nuovo concetto
+                        this.graph.addNode(elem.getText());
+                        this.log("Ho aggiunto il nodo: " + elem.getText());
+
                         //Creo l'arco e aggancio il vertice al grafo
                         this.graph.addEdge(concept, elem.getText());
 
-                        WorkerExecutor ex = this.vertx.createSharedWorkerExecutor(elem.getText());
-                        ex.executeBlocking(promise -> {
+                        promise.complete();
 
-                            // Parto con la ricorsione
-                            this.startRecursion(elem.getText(), entry - 1);
-
-                        });
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    } catch (IllegalArgumentException e) {
+                        promise.fail("Concept is already present!");
                     }
 
-                } catch (IllegalArgumentException e) {
-                    this.log("Il concetto " + elem.getText() + " è già presente.");
-                }
+                }, res -> {
+
+                    if (res.succeeded()) {
+
+                        // Parto con la ricorsione
+                        this.startRecursion(elem.getText(), entry - 1);
+
+                    }else{
+                        log("Il concetto " + elem.getText() + " è già presente.");
+                    }
+                });
             }
         }
     }

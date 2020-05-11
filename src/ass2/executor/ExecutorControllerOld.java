@@ -10,7 +10,6 @@ import javax.swing.*;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 public class ExecutorControllerOld implements Controller {
     private ExecutorService exec;
@@ -101,37 +100,17 @@ public class ExecutorControllerOld implements Controller {
                         this.graph.addNode(elem.getText());
                         this.log("Ho aggiunto il nodo: " + elem.getText());
 
-                        //try {
+                        //Creo l'arco e aggancio il vertice al grafo
+                        this.graph.addEdge(concept, elem.getText());
 
-                           //Creo l'arco e aggancio il vertice al grafo
-                           this.graph.addEdge(concept, elem.getText());
-
-                           // Parto con la ricorsione
-                           this.startRecursion(elem.getText(), entry - 1);
-
-                        /*} catch (Exception ex) {
-                            ex.printStackTrace();
-                        }*/
+                        // Parto con la ricorsione
+                        this.startRecursion(elem.getText(), entry - 1);
 
                     } catch (IllegalArgumentException e) {
                         this.log("Il concetto " + elem.getText() + " è già presente.");
                     }
                 });
-
-                // Commentata poichè da eccezzione su alcuni task che dovrebbero fermarsi ma ancora al lavoro
-                /*if(!(Thread.currentThread().getName().equals("AWT-EventQueue-0"))) {
-                    log("si sta fermando....");
-                    exec.shutdown();
-
-                    try {
-                        exec.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
-                    }catch (Exception e){
-                        //e.printStackTrace();
-                    }
-                    log(" si è fermato");
-                }*/
             }
-
         }
     }
 

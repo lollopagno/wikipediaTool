@@ -19,17 +19,13 @@ public class SimpleGraph implements AssignmentGraph {
      public synchronized void addNode(String title) throws IllegalArgumentException {
 
         if (this.getNode(title) != null)
-            return;
+           throw new IllegalArgumentException();
 
         Node node = new Node(title);
         this.nodes.add(node);
         this.incNode();
         this.controller.modelUpdated(title);
         this.controller.displayNumber();
-    }
-
-    public synchronized List<Node> getNodes() {
-        return this.nodes;
     }
 
     public synchronized Node getNode(String title) {
@@ -39,26 +35,18 @@ public class SimpleGraph implements AssignmentGraph {
         return null;
     }
 
-    public Node getNode(int index) throws IllegalArgumentException {
-        if (index > this.nodes.size())
-            throw new IllegalArgumentException();
-        return this.nodes.get(index);
-    }
-
     public synchronized void addEdge(String from, String to) throws IllegalArgumentException {
 
         Node checkFrom = null, checkTo = null;
 
         for (Node e : this.nodes) {
-            // Fetch all nodes for from and to nodes.
-            // We make only one cycle on all nodes.
+
             if (e.getTitle().equals(from))
                 checkFrom = e;
             if (e.getTitle().equals(to))
                 checkTo = e;
         }
 
-        // Check if those nodes are present or not.
         if (checkFrom == null || checkTo == null) {
             throw new IllegalArgumentException("Missing one node of the edge.");
         } else {
@@ -68,12 +56,12 @@ public class SimpleGraph implements AssignmentGraph {
     }
 
     //Incrementa il numero di Nodi del grafo
-    private void incNode(){
+    private synchronized void incNode(){
         this.numberNode += 1;
     }
 
     // Ritorna il numeor di nodi del grafo
-    public int getNumberNode(){
+    public synchronized int getNumberNode(){
         return this.numberNode;
     }
 
