@@ -39,7 +39,7 @@ public class SimpleGraph implements AssignmentGraph {
         }
 
         if (checkFrom == null || checkTo == null) {
-            throw new IllegalArgumentException("Missing one node of the edge.");
+            throw new IllegalArgumentException("Missing one node in " + from + " or " + to + ".");
         } else {
             checkFrom.addEdge(checkTo);
             this.controller.modelUpdated(from, to);

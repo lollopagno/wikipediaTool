@@ -16,8 +16,8 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 public class ReactiveController implements Controller {
-    private MainFrame view;
-    private SimpleGraph graphModel;
+    private final MainFrame view;
+    private AssignmentGraph graphModel;
 
     public ReactiveController() {
         // Generate the view.
@@ -37,7 +37,6 @@ public class ReactiveController implements Controller {
                         new Thread(() -> {
                             // Access to wikipedia.
                             fetchRecursivly(concept, entry, emitter::onNext);
-                            log("Computation terminated.");
                         }).start());
 
         source
@@ -64,17 +63,18 @@ public class ReactiveController implements Controller {
 
     @Override
     public void modelUpdated(String from) {
-        SwingUtilities.invokeLater(() -> this.view.display(from));
+        SwingUtilities.invokeLater(() -> {
+            this.view.display(from);
+            this.view.displayNumber(this.graphModel.getNodeNumber());
+        });
     }
 
     @Override
     public void modelUpdated(String from, String to) {
-        SwingUtilities.invokeLater(() -> this.view.display(from, to));
-    }
-
-    @Override
-    public void displayNumber() {
-        SwingUtilities.invokeLater(() -> this.view.displayNumber(this.graphModel.getNumberNode()));
+        SwingUtilities.invokeLater(() -> {
+            this.view.display(from, to);
+            this.view.displayNumber(this.graphModel.getNodeNumber());
+        });
     }
 
     public static void log(String msg) {
@@ -95,7 +95,7 @@ public class ReactiveController implements Controller {
         try {
             set = client.parseURL(concept);
         } catch (IOException ioException) {
-            log("IOException in source: " + ioException.getMessage());
+            // log("IOException in source: " + ioException.getMessage());
         } catch (Exception e) {
             log("Exception in source: " + e.getMessage());
             e.printStackTrace();
@@ -104,14 +104,11 @@ public class ReactiveController implements Controller {
         if (set == null || set.isEmpty())
             return;
 
-        set.forEach(element -> {
-            consumer.accept(element);
+        set.forEach(consumer);
 
-            // Check if recursion needed.
-            if (entry > 1) {
-                // log("Recursion needed for " + element.getText() + " and " + entry);
-                fetchRecursivly(element.getText(), entry - 1, consumer);
-            }
-        });
+        // Check if recursion needed.
+        if (entry > 1) {
+            set.forEach(elem -> fetchRecursivly(elem.getText(), entry - 1, consumer));
+        }
     }
 }

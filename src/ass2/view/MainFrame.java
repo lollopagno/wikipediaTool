@@ -61,7 +61,7 @@ public class MainFrame extends JFrame implements ActionListener, View {
         JPanel graphPanel = new JPanel(new GridLayout()) {
             @Override
             public Dimension getPreferredSize() {
-                return new Dimension(WIDTH, (int)(HEIGHT * 0.9));
+                return new Dimension(WIDTH, (int) (HEIGHT * 0.9));
             }
         };
         graphPanel.setSize(WIDTH, (int) (HEIGHT * 0.9));
@@ -93,7 +93,7 @@ public class MainFrame extends JFrame implements ActionListener, View {
             try {
                 this.entryView = Integer.parseInt(this.entryText.getText());
                 this.controller.fetchConcept(concept, entryView);
-            }catch(Exception ex){
+            } catch (Exception ex) {
                 log("Non è stato digitato un intero come livello di profondità nella ricerca!");
             }
         }
@@ -112,10 +112,11 @@ public class MainFrame extends JFrame implements ActionListener, View {
 
     /**
      * Draw an edge on the main graph.
+     *
      * @param title Node title.
      * @return Edge drawed.
      */
-    public Node drawNode(final String title){
+    public Node drawNode(final String title) {
         this.graph.addNode(title);
         Node node = this.graph.getNode(title);
         node.addAttribute("ui.label", title);
@@ -124,14 +125,15 @@ public class MainFrame extends JFrame implements ActionListener, View {
 
     /**
      * Draw an edge on the main graph.
+     *
      * @param from Node from.
-     * @param to Node to.
+     * @param to   Node to.
      * @return Edge drawed.
      */
     public Edge drawEdge(final String from, final String to) {
         this.graph.addEdge(from + to, from, to);
         Edge element = this.graph.getEdge(from + to);
-        if(element == null) {
+        if (element == null) {
             // This maybe cause when an edge is already placed before with another direction.
             element = this.graph.getEdge(to + from);
         }
@@ -140,7 +142,8 @@ public class MainFrame extends JFrame implements ActionListener, View {
 
     /**
      * Color an element based on the master concept.
-     * @param master String of the master concept.
+     *
+     * @param master  String of the master concept.
      * @param element Element to decorate.
      */
     public void colorElement(final String master, final Element element) {
@@ -161,18 +164,17 @@ public class MainFrame extends JFrame implements ActionListener, View {
         }
     }
 
-    public int getEntryView(){
+    public int getEntryView() {
         return this.entryView;
     }
 
-    private void log(String msg){
-        synchronized (System.out)
-        {
+    private void log(String msg) {
+        synchronized (System.out) {
             System.out.println("[" + Thread.currentThread().getName() + "] " + msg);
         }
     }
 
     public void displayNumber(int n) {
-        SwingUtilities.invokeLater(() -> this.number.setText("Number Node: " + n));
+        this.number.setText("Number Node: " + n);
     }
 }

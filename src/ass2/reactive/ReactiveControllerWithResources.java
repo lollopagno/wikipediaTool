@@ -8,20 +8,22 @@ import ass2.model.services.WikiClient;
 import ass2.view.MainFrame;
 import ass2.view.ResourcesFrame;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.internal.schedulers.ExecutorScheduler;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 import javax.swing.*;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 public class ReactiveControllerWithResources implements Controller {
     private final MainFrame view;
     private final ResourcesFrame resourcesView;
-    private SimpleGraph graphModel;
+    private AssignmentGraph graphModel;
 
-    public ReactiveControllerWithResources(){
+    public ReactiveControllerWithResources() {
         this.view = new MainFrame("Reactive Programming", this);
         this.resourcesView = new ResourcesFrame();
 
@@ -39,21 +41,18 @@ public class ReactiveControllerWithResources implements Controller {
     }
 
     public void generateEmitter(String concept, int entry) {
-
         Observable<WikiLink> source =
                 Observable.create(emitter ->
-                        new Thread(() -> {
+                        Executors.newSingleThreadExecutor().execute(() -> {
                             // Access to wikipedia.
                             fetchRecursivly(concept, entry, emitter::onNext);
-                            log("Computation terminated.");
-                        }).start());
+                        }));
 
         source
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.computation())
                 .subscribe(s -> {
                     // Manage the new link.
-                    log("Add node for " + s.getText());
                     this.graphModel.addNode(s.getText());
                     this.graphModel.addEdge(s.getConcept(), s.getText());
                 }, (Throwable t) -> {
@@ -67,17 +66,18 @@ public class ReactiveControllerWithResources implements Controller {
 
     @Override
     public void modelUpdated(String from) {
-        SwingUtilities.invokeLater(() -> this.view.display(from));
+        SwingUtilities.invokeLater(() -> {
+            this.view.display(from);
+            this.view.displayNumber(this.graphModel.getNodeNumber());
+        });
     }
 
     @Override
     public void modelUpdated(String from, String to) {
-        SwingUtilities.invokeLater(() -> this.view.display(from, to));
-    }
-
-    @Override
-    public void displayNumber() {
-        SwingUtilities.invokeLater(() -> this.view.displayNumber(this.graphModel.getNumberNode()));
+        SwingUtilities.invokeLater(() -> {
+            this.view.display(from, to);
+            this.view.displayNumber(this.graphModel.getNodeNumber());
+        });
     }
 
     public static void log(String msg) {
@@ -101,7 +101,7 @@ public class ReactiveControllerWithResources implements Controller {
         try {
             set = client.parseURL(concept);
         } catch (IOException ioException) {
-            log("IOException in source: " + ioException.getMessage());
+            // log("IOException in source: " + ioException.getMessage());
         } catch (Exception e) {
             log("Exception in source: " + e.getMessage());
             e.printStackTrace();
