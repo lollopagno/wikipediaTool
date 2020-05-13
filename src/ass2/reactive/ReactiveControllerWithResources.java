@@ -3,18 +3,19 @@ package ass2.reactive;
 import ass2.controller.Controller;
 import ass2.model.classes.WikiLink;
 import ass2.model.classes.mygraph.AssignmentGraph;
+import ass2.model.classes.mygraph.NodeAlreadyPresent;
 import ass2.model.classes.mygraph.SimpleGraph;
 import ass2.model.services.WikiClient;
 import ass2.view.MainFrame;
 import ass2.view.ResourcesFrame;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.internal.schedulers.ExecutorScheduler;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 import javax.swing.*;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
@@ -22,15 +23,30 @@ public class ReactiveControllerWithResources implements Controller {
     private final MainFrame view;
     private final ResourcesFrame resourcesView;
     private AssignmentGraph graphModel;
+    private ExecutorService service;
 
     public ReactiveControllerWithResources() {
+        // Generate the views.
         this.view = new MainFrame("Reactive Programming", this);
-        this.resourcesView = new ResourcesFrame();
-
         this.view.setVisible(true);
+
+        this.resourcesView = new ResourcesFrame();
         this.resourcesView.setVisible(true);
 
+        // Generate the model.
         this.graphModel = new SimpleGraph(this);
+    }
+
+    public static void log(String msg) {
+        synchronized (System.out) {
+            System.out.println("[" + Thread.currentThread().getName() + "]: " + msg);
+        }
+    }
+
+    private void reset() {
+        this.graphModel = new SimpleGraph(this);
+        int NTHREADS = Runtime.getRuntime().availableProcessors();
+        this.service = Executors.newFixedThreadPool(NTHREADS);
     }
 
     @Override
@@ -43,7 +59,7 @@ public class ReactiveControllerWithResources implements Controller {
     public void generateEmitter(String concept, int entry) {
         Observable<WikiLink> source =
                 Observable.create(emitter ->
-                        Executors.newSingleThreadExecutor().execute(() -> {
+                        this.service.execute(() -> {
                             // Access to wikipedia.
                             fetchRecursivly(concept, entry, emitter::onNext);
                         }));
@@ -53,8 +69,14 @@ public class ReactiveControllerWithResources implements Controller {
                 .observeOn(Schedulers.computation())
                 .subscribe(s -> {
                     // Manage the new link.
-                    this.graphModel.addNode(s.getText());
-                    this.graphModel.addEdge(s.getConcept(), s.getText());
+                    try {
+                        this.graphModel.addNode(s.getText());
+                        this.graphModel.addEdge(s.getConcept(), s.getText());
+                    } catch (NodeAlreadyPresent n) {
+                        // log("Node already present " + n.getMessage());
+                    } catch (Exception e) {
+                        log("IllegalArgumentException thrown " + e.getMessage());
+                    }
                 }, (Throwable t) -> {
                     if (t instanceof IllegalArgumentException) {
                         log("IllegalArgumentException thrown " + t.getMessage());
@@ -80,16 +102,6 @@ public class ReactiveControllerWithResources implements Controller {
         });
     }
 
-    public static void log(String msg) {
-        synchronized (System.out) {
-            System.out.println("[" + Thread.currentThread().getName() + "]: " + msg);
-        }
-    }
-
-    private void reset() {
-        this.graphModel = new SimpleGraph(this);
-    }
-
     private void fetchRecursivly(String concept, int entry, Consumer<WikiLink> consumer) {
         // Fetch Wikipedia.
         WikiClient client = new WikiClient();
@@ -113,12 +125,11 @@ public class ReactiveControllerWithResources implements Controller {
         if (set == null || set.isEmpty())
             return;
 
-        set.forEach(element -> {
-            consumer.accept(element);
+        set.forEach(consumer);
 
-            // Check if recursion needed.
-            if (entry > 1)
-                this.generateEmitter(element.getText(), entry - 1);
-        });
+        // Check if recursion needed.
+        if (entry > 1) {
+            set.forEach(elem -> generateEmitter(elem.getText(), entry - 1));
+        }
     }
 }

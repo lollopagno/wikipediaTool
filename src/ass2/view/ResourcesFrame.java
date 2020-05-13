@@ -7,8 +7,8 @@ import java.awt.event.ActionListener;
 import java.util.Random;
 
 public class ResourcesFrame extends JFrame implements ResourcesView, ActionListener {
-    private static final int WIDTH = 320;
-    private static final int HEIGHT = 240;
+    private static final int WIDTH = 240;
+    private static final int HEIGHT = 160;
     private final JLabel resources;
     private final JLabel reactiveness;
     private int number;
