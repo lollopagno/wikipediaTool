@@ -17,7 +17,7 @@ public class SimpleGraph implements AssignmentGraph {
 
     public synchronized void addNode(String title) throws IllegalArgumentException {
         if (this.getOptionalNode(title).isPresent())
-            throw new IllegalArgumentException(title);
+            throw new NodeAlreadyPresent(title);
 
         Node node = new Node(title);
         this.nodes.add(node);
