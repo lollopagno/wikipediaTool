@@ -10,8 +10,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class JudgeActor extends AbstractActor {
-    private MyView view;
-    private List<PlayerInfo> players;
+    private final MyView view;
+    private final List<PlayerInfo> players;
 
     public JudgeActor(MyView view){
         this.view = view;
