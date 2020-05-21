@@ -1,10 +1,14 @@
 package actors.messages;
 
-public class StartMsg {
-    private int length;
-    private int players;
+import info.PlayerInfo;
 
-    public StartMsg(int length, int players)
+import java.util.List;
+
+public class StartMsg implements Message {
+    private final int length;
+    private final List<PlayerInfo> players;
+
+    public StartMsg(int length, List<PlayerInfo> players)
     {
         this.length = length;
         this.players = players;
@@ -14,7 +18,7 @@ public class StartMsg {
         return length;
     }
 
-    public int getPlayers() {
+    public List<PlayerInfo> getPlayers() {
         return players;
     }
 }

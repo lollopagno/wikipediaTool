@@ -1,19 +1,26 @@
 package info;
 
-import java.util.ArrayList;
-import java.util.Random;
+import actors.PlayerActor;
+import actors.messages.Message;
+import akka.actor.Actor;
+import akka.actor.ActorContext;
+import akka.actor.ActorRef;
+import akka.actor.Props;
 
 public class PlayerInfo {
-    public ArrayList<MastermindNumber> number;
+    private String name;
+    private ActorRef reference;
 
-    public ArrayList<Integer> getSequence(){
-        ArrayList<Integer> sequence = new ArrayList<>();
-        Random r = new Random();
-        number.forEach(elem -> {
-            if(!elem.getOk())
-                elem.setNumber(r.nextInt(10));
-            sequence.add(elem.getNumber());
-        });
-        return null;// Di una nuova sequenza generata dinamicamente in base alla precedente.
+    public PlayerInfo(String name, ActorContext context) {
+        this.name = name;
+        this.reference = context.actorOf(Props.create(PlayerActor.class), name);
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public ActorRef getReference() {
+        return reference;
     }
 }

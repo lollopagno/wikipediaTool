@@ -25,21 +25,21 @@ public class GameView extends JFrame implements ItemListener, MyView {
 
     @Override
     public void playerReady(String player) {
-
+        SwingUtilities.invokeLater(() -> System.out.println(player));
     }
 
     @Override
     public void solutionUpdated(String from, String to, ArrayList<Integer> sequence) {
-
+        SwingUtilities.invokeLater(() -> System.out.println(from));
     }
 
     @Override
     public void solutionFound(String from, String to) {
-
+        SwingUtilities.invokeLater(() -> System.out.println(from));
     }
 
     @Override
     public void playerWin(String player) {
-
+        SwingUtilities.invokeLater(() -> System.out.println(player));
     }
 }
