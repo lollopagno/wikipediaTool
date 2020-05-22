@@ -2,20 +2,24 @@ package actors;
 
 import actors.messages.StartGameMsg;
 import actors.messages.StartMsg;
-import akka.actor.AbstractActor;
 import info.PlayerInfo;
 import views.MyView;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class JudgeActor extends AbstractActor {
-    private final MyView view;
+public class JudgeActor extends MastermindActorImpl {
+    private MyView view;
     private final List<PlayerInfo> players;
 
-    public JudgeActor(MyView view){
-        this.view = view;
+    public JudgeActor(){
         this.players = new LinkedList<>();
+    }
+
+    @Override
+    public void preStart() throws Exception {
+        super.preStart();
+        this.log("Arbitro creato");
     }
 
     @Override
@@ -28,7 +32,7 @@ public class JudgeActor extends AbstractActor {
         // TODO END_TURN
         // Invia il messaggio all'attore successivo.
         return receiveBuilder().match(StartGameMsg.class, msg -> {
-            System.out.println("START GAME Received:");
+            this.log("Judge START GAME Received:");
             this.startGame(msg.getPlayers(), msg.getLength());
         }).build();
     }
@@ -37,7 +41,7 @@ public class JudgeActor extends AbstractActor {
         // TODO: Generare tutti gli altri players.
         for(int i = 0; i < players; i++) {
             PlayerInfo player =
-                    new PlayerInfo("Player " + i, this.getContext());
+                    new PlayerInfo("player_" + i, this.getContext());
             this.players.add(player);
         }
 
