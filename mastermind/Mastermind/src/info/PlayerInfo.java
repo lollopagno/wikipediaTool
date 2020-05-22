@@ -1,8 +1,6 @@
 package info;
 
 import actors.PlayerActor;
-import actors.messages.Message;
-import akka.actor.Actor;
 import akka.actor.ActorContext;
 import akka.actor.ActorRef;
 import akka.actor.Props;

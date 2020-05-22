@@ -6,19 +6,22 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class StartView extends JFrame implements ActionListener {
+    private final JTextField actorsText;
+    private final JTextField lengthText;
+
     public StartView() {
         this.setTitle("Start");
         this.setSize(320, 240);
 
         JLabel actorsLabel = new JLabel("Actors number");
-        JTextField actorsText = new JTextField(10);
+        actorsText = new JTextField(10);
         JPanel actors = new JPanel(new FlowLayout());
         actors.setSize(320, 30);
         actors.add(actorsLabel);
         actors.add(actorsText);
 
         JLabel lengthLabel = new JLabel("Length number");
-        JTextField lengthText = new JTextField(10);
+        lengthText = new JTextField(10);
         JPanel length = new JPanel(new FlowLayout());
         length.setSize(320, 30);
         length.add(lengthLabel);
@@ -38,7 +41,10 @@ public class StartView extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         System.out.println(e.getActionCommand());
-        JFrame game = new GameView(12);
+        String sl = this.lengthText.getText();
+        int length = Integer.parseInt(sl);
+        int nPlayers = Integer.parseInt(this.actorsText.getText());
+        JFrame game = new GameView(length, nPlayers);
         game.setVisible(true);
     }
 
