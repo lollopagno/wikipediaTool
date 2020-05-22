@@ -17,7 +17,7 @@ Attore Player:
 		
 
 Arbitro:
-	1) Riceve il messaggio START_GAME dalla View per capire quando iniziare il gioco oppure no.
+	1) Riceve il messaggio START_GAME dalla View per capire quando iniziare il gioco oppure no. Invia start ai players
 	2) Quando tutti i player sono pronti (deve avere un contatore interno), quindi quando riceve da tutti un messaggio "READY" che sono pronti, fa partire il primo turno (altro contatore)
 	3) Genera l'ordine casuale dei player e invia il messaggio di tentativo al player stabilito
 	4) Riceve il messaggio di FineTurno dal player che aveva svegliato e sveglia il prossimo
