@@ -6,7 +6,7 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import views.MyView;
-import views.PlayerView;
+import views.player.PlayerView;
 import views.components.PlayerSolution;
 
 import javax.swing.*;
@@ -21,14 +21,14 @@ public class GameView extends JFrame implements MyView, ActionListener, KeyListe
     private final Set<PlayerView> players;
     private final ActorRef judgeRef;
     private final JPanel panel;
-    private final int length, nplayers;
+    private final int length, nPlayers, time;
 
-    public GameView(int length, int nplayers) {
-        // Inizializza le variabili.
+    public GameView(int length, int nPlayers, int time) {
         this.setTitle("Game");
         this.setPreferredSize(new Dimension(600, 480));
         this.length = length;
-        this.nplayers = nplayers;
+        this.nPlayers = nPlayers;
+        this.time = time;
         this.players = new HashSet<>();
         this.panel = new JPanel();
         this.panel.setPreferredSize(new Dimension(580, 600));
@@ -148,7 +148,7 @@ public class GameView extends JFrame implements MyView, ActionListener, KeyListe
      * Invia il messaggio di inizio gioco all'arbitro.
      */
     private void startGame(){
-        StartGameMsg msg = new StartGameMsg(this.length, this.nplayers);
+        StartGameMsg msg = new StartGameMsg(this.length, this.nPlayers, this.time);
         this.judgeRef.tell(msg, ActorRef.noSender());
     }
 }

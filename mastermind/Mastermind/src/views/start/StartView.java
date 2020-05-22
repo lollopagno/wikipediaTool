@@ -3,7 +3,6 @@ package views.start;
 import views.game.GameView;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -11,9 +10,9 @@ import java.awt.event.KeyListener;
 import java.util.Optional;
 
 public class StartView extends JFrame implements ActionListener, KeyListener {
-    private final ActorPanel actors;
-    private final JTextField lengthText;
-    private final JTextField timeText;
+    private final InputPanel actors;
+    private final InputPanel length;
+    private final InputPanel time;
 
     public StartView() {
         this.setTitle("Start");
@@ -21,26 +20,16 @@ public class StartView extends JFrame implements ActionListener, KeyListener {
         this.setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
 
         // Actors.
-        actors = new ActorPanel();
-        this.add(actors);
+        this.actors = new InputPanel("Actor number");
+        this.add(this.actors);
 
         // Sequence length.
-        JLabel lengthLabel = new JLabel("Length number");
-        this.lengthText = new JTextField(10);
-        JPanel length = new JPanel(new FlowLayout());
-        length.setSize(320, 30);
-        length.add(lengthLabel);
-        length.add(lengthText);
-        this.add(length);
+        this.length = new InputPanel("Length number");
+        this.add(this.length);
 
         // Time between each turn.
-        JLabel timeLabel = new JLabel("Time between each turn");
-        this.timeText = new JTextField(10);
-        JPanel time = new JPanel(new FlowLayout());
-        time.setSize(320, 30);
-        time.add(timeLabel);
-        time.add(timeText);
-        this.add(time);
+        this.time = new InputPanel("Time per turn");
+        this.add(this.time);
 
         // Button start.
         JButton start = new JButton("Start");
@@ -64,7 +53,6 @@ public class StartView extends JFrame implements ActionListener, KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e) {
-
     }
 
     @Override
@@ -76,20 +64,19 @@ public class StartView extends JFrame implements ActionListener, KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
-
     }
 
     /**
      * Prepare the next view where the game runs.
      */
     private void generateGameView() {
-        String sl = this.lengthText.getText();
-        int length = Integer.parseInt(sl);
-        Optional<Integer> actors = this.actors.getActors();
-        actors.ifPresent(actNumber -> {
-            JFrame game = new GameView(length, actNumber);
+        Optional<Integer> actors = this.actors.getValue();
+        Optional<Integer> length = this.length.getValue();
+        Optional<Integer> time = this.time.getValue();
+        actors.ifPresent(a -> length.ifPresent(l -> time.ifPresent(t -> {
+            JFrame game = new GameView(a, l, t);
             game.setVisible(true);
             this.setVisible(false);
-        });
+        })));
     }
 }

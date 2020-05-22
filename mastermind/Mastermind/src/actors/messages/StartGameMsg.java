@@ -1,20 +1,24 @@
 package actors.messages;
 
 public class StartGameMsg {
-    private int length;
-    private int players;
+    private final int length, players, time;
 
-    public StartGameMsg(int length, int players)
+    public StartGameMsg(int length, int players, int time)
     {
         this.length = length;
         this.players = players;
+        this.time = time;
     }
 
     public int getLength() {
-        return length;
+        return this.length;
     }
 
     public int getPlayers() {
-        return players;
+        return this.players;
+    }
+
+    public int getTime() {
+        return this.time;
     }
 }

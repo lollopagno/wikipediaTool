@@ -6,9 +6,9 @@ import java.util.ArrayList;
 
 public interface MyView {
     /**
-     * Aggiunge alla view un nuovo player che si è registrato
-     * con successo presso un arbitro con nome e sequenza.
-     * @param player Player che si è registrato.
+     * Add a new registered player to the view.
+     * Show the name and the generated sequence.
+     * @param player Registered player.
      */
     void playerReady(String player, ArrayList<Integer> sequence);
 

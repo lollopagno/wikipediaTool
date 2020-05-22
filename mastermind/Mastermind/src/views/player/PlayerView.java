@@ -1,4 +1,4 @@
-package views;
+package views.player;
 
 import views.components.PlayerSolution;
 import views.components.SequenceSolutions;
