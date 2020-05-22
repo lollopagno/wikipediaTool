@@ -1,4 +1,6 @@
-package views;
+package views.start;
+
+import views.game.GameView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -6,9 +8,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Optional;
 
 public class StartView extends JFrame implements ActionListener, KeyListener {
-    private final JTextField actorsText;
+    private final ActorPanel actors;
     private final JTextField lengthText;
     private final JTextField timeText;
 
@@ -18,12 +21,7 @@ public class StartView extends JFrame implements ActionListener, KeyListener {
         this.setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
 
         // Actors.
-        JLabel actorsLabel = new JLabel("Actors number");
-        this.actorsText = new JTextField(10);
-        JPanel actors = new JPanel(new FlowLayout());
-        actors.setSize(320, 30);
-        actors.add(actorsLabel);
-        actors.add(actorsText);
+        actors = new ActorPanel();
         this.add(actors);
 
         // Sequence length.
@@ -71,9 +69,7 @@ public class StartView extends JFrame implements ActionListener, KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        JButton source = (JButton) e.getSource();
-        if (e.getKeyCode() == KeyEvent.VK_ENTER &&
-                source.getActionCommand().equals("Start")) {
+        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
             this.generateGameView();
         }
     }
@@ -89,9 +85,11 @@ public class StartView extends JFrame implements ActionListener, KeyListener {
     private void generateGameView() {
         String sl = this.lengthText.getText();
         int length = Integer.parseInt(sl);
-        int nPlayers = Integer.parseInt(this.actorsText.getText());
-        JFrame game = new GameView(length, nPlayers);
-        game.setVisible(true);
-        this.setVisible(false);
+        Optional<Integer> actors = this.actors.getActors();
+        actors.ifPresent(actNumber -> {
+            JFrame game = new GameView(length, actNumber);
+            game.setVisible(true);
+            this.setVisible(false);
+        });
     }
 }
