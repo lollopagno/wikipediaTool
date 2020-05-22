@@ -10,6 +10,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Optional;
@@ -29,8 +31,11 @@ public class GameView extends JFrame implements MyView, ActionListener {
         this.nplayers = nplayers;
         this.players = new HashSet<>();
         this.panel = new JScrollPane();
+        this.panel.setPreferredSize(this.getPreferredSize());
         ActorSystem system = ActorSystem.create("Mastermind");
         this.judgeRef = system.actorOf(Props.create(JudgeActor.class), "judge");
+
+        this.panel.add(new PlayerView("player_0"));
 
         JPanel commands = new JPanel();
         JButton addP = new JButton("Add*");
@@ -42,6 +47,18 @@ public class GameView extends JFrame implements MyView, ActionListener {
         this.getContentPane().add(commands, BorderLayout.PAGE_START);
         this.getContentPane().add(panel, BorderLayout.CENTER);
         this.pack();
+
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                System.exit(-1);
+            }
+
+            @Override
+            public void windowClosed(WindowEvent e) {
+                System.exit(-1);
+            }
+        });
     }
 
     @Override
