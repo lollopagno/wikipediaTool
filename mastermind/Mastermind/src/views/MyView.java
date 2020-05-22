@@ -1,5 +1,7 @@
 package views;
 
+import views.components.PlayerSolution;
+
 import java.util.ArrayList;
 
 public interface MyView {
@@ -10,7 +12,7 @@ public interface MyView {
      */
     void playerReady(String player, ArrayList<Integer> sequence);
 
-    void solutionUpdated(String from, String to, ArrayList<Integer> sequence);
+    void solutionUpdated(String from, PlayerSolution solution);
 
     void solutionFound(String from, String to);
 

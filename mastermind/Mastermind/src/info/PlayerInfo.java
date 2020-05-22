@@ -6,8 +6,8 @@ import akka.actor.ActorRef;
 import akka.actor.Props;
 
 public class PlayerInfo {
-    private String name;
-    private ActorRef reference;
+    private final String name;
+    private final ActorRef reference;
 
     public PlayerInfo(String name, ActorContext context) {
         this.name = name;

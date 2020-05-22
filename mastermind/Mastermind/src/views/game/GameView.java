@@ -1,42 +1,44 @@
-package views;
+package views.game;
 
 import actors.JudgeActor;
 import actors.messages.StartGameMsg;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
+import views.MyView;
+import views.PlayerView;
+import views.components.PlayerSolution;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-public class GameView extends JFrame implements MyView, ActionListener {
+public class GameView extends JFrame implements MyView, ActionListener, KeyListener {
     private final Set<PlayerView> players;
     private final ActorRef judgeRef;
-    private final JScrollPane panel;
+    private final JPanel panel;
     private final int length, nplayers;
 
     public GameView(int length, int nplayers) {
+        // Inizializza le variabili.
         this.setTitle("Game");
-        this.setPreferredSize(new Dimension(800, 600));
-
+        this.setPreferredSize(new Dimension(600, 480));
         this.length = length;
         this.nplayers = nplayers;
         this.players = new HashSet<>();
-        this.panel = new JScrollPane();
-        this.panel.setPreferredSize(this.getPreferredSize());
-        ActorSystem system = ActorSystem.create("Mastermind");
-        this.judgeRef = system.actorOf(Props.create(JudgeActor.class), "judge");
+        this.panel = new JPanel();
+        this.panel.setPreferredSize(new Dimension(580, 600));
 
+        // Genera il pannello dei giocatori.
         this.panel.add(new PlayerView("player_0"));
+        JScrollPane pane = new JScrollPane(this.panel);
+        this.getContentPane().add(pane, BorderLayout.CENTER);
 
+        // Genera il pannello dei comandi.
         JPanel commands = new JPanel();
         JButton addP = new JButton("Add*");
         addP.addActionListener(this);
@@ -45,9 +47,8 @@ public class GameView extends JFrame implements MyView, ActionListener {
         commands.add(addP);
         commands.add(start);
         this.getContentPane().add(commands, BorderLayout.PAGE_START);
-        this.getContentPane().add(panel, BorderLayout.CENTER);
-        this.pack();
 
+        this.pack();
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -59,6 +60,12 @@ public class GameView extends JFrame implements MyView, ActionListener {
                 System.exit(-1);
             }
         });
+        this.addKeyListener(this);
+
+        // Genero l'arbitro.
+        ActorSystem system = ActorSystem.create("Mastermind");
+        this.judgeRef = system.actorOf(Props.create(JudgeActor.class), "judge");
+        this.requestFocus();
     }
 
     @Override
@@ -67,15 +74,16 @@ public class GameView extends JFrame implements MyView, ActionListener {
             PlayerView view = new PlayerView(player);
             view.setSequence(info);
             this.players.add(view);
-            this.panel.add(view);
+            this.panel.add(view, BorderLayout.CENTER);
+            this.panel.updateUI();
         });
     }
 
     @Override
-    public void solutionUpdated(String from, String to, ArrayList<Integer> sequence) {
+    public void solutionUpdated(String from, PlayerSolution solution) {
         SwingUtilities.invokeLater(() -> {
             Optional<PlayerView> view = this.getPlayerViewByName(from);
-            view.ifPresent(playerView -> playerView.setOperation("Solution updated"));
+            view.ifPresent(playerView -> playerView.inputSolution(solution));
         });
     }
 
@@ -89,7 +97,7 @@ public class GameView extends JFrame implements MyView, ActionListener {
 
     @Override
     public void playerWin(String player) {
-        SwingUtilities.invokeLater(() -> System.out.println(player));
+        SwingUtilities.invokeLater(() -> System.out.println(player + "win"));
     }
 
     @Override
@@ -101,12 +109,29 @@ public class GameView extends JFrame implements MyView, ActionListener {
                 this.playerReady("Player", new ArrayList<>());
                 break;
             case "Start":
-                // Invia il messaggio al judge di iniziare il gioco.
-                StartGameMsg msg = new StartGameMsg(this.length, this.nplayers);
-                this.judgeRef.tell(msg, ActorRef.noSender());
+                this.startGame();
                 break;
         }
     }
+
+    @Override
+    public void keyTyped(KeyEvent e) {}
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_S:
+                this.startGame();
+                break;
+            case KeyEvent.VK_A:
+                // TODO: Questo non deve esserci.
+                this.playerReady("Player", new ArrayList<>());
+                break;
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {}
 
     /**
      * Filtra il set dei players.
@@ -117,5 +142,13 @@ public class GameView extends JFrame implements MyView, ActionListener {
         return this.players.stream()
                 .filter(f -> f.getName().equals(name))
                 .findFirst();
+    }
+
+    /**
+     * Invia il messaggio di inizio gioco all'arbitro.
+     */
+    private void startGame(){
+        StartGameMsg msg = new StartGameMsg(this.length, this.nplayers);
+        this.judgeRef.tell(msg, ActorRef.noSender());
     }
 }
