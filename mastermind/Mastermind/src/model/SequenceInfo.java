@@ -1,19 +1,19 @@
 package model;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class SequenceInfo {
-    private ArrayList<Integer> numbers;
-    private int rightPlaceNumbers;
-    private int rightNumbers;
+    private final List<Integer> numbers;
+    private final int rightPlaceNumbers;
+    private final int rightNumbers;
 
-    public SequenceInfo(ArrayList<Integer> numbers, int rightNumbers, int rightPlaceNumbers){
+    public SequenceInfo(List<Integer> numbers, int rightNumbers, int rightPlaceNumbers){
         this.numbers = numbers;
         this.rightNumbers = rightNumbers;
         this.rightPlaceNumbers = rightPlaceNumbers;
     }
 
-    public ArrayList<Integer> getNumbers() {
+    public List<Integer> getNumbers() {
         return numbers;
     }
 

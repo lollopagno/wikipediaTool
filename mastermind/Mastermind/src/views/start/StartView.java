@@ -3,6 +3,7 @@ package views.start;
 import views.game.GameView;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -34,16 +35,15 @@ public class StartView extends JFrame implements ActionListener, KeyListener {
         // Button start.
         JButton start = new JButton("Start");
         start.addActionListener(this);
-        this.add(start);
+        start.addKeyListener(this);
+        this.add(start, BorderLayout.CENTER);
 
-        this.pack();
-        this.addKeyListener(this);
+        // this.pack();
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        System.out.println(e.getActionCommand());
-        generateGameView();
+        SwingUtilities.invokeLater(this::generateGameView);
     }
 
     public static void main(String[] args) {
@@ -52,19 +52,17 @@ public class StartView extends JFrame implements ActionListener, KeyListener {
     }
 
     @Override
-    public void keyTyped(KeyEvent e) {
-    }
+    public void keyTyped(KeyEvent e) {}
 
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-            this.generateGameView();
+            SwingUtilities.invokeLater(this::generateGameView);
         }
     }
 
     @Override
-    public void keyReleased(KeyEvent e) {
-    }
+    public void keyReleased(KeyEvent e) {}
 
     /**
      * Prepare the next view where the game runs.

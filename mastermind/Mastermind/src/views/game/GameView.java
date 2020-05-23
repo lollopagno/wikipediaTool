@@ -2,25 +2,28 @@ package views.game;
 
 import actors.JudgeActor;
 import actors.messages.StartGameMsg;
+import actors.messages.StopGameMsg;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
-import views.MyView;
-import views.player.PlayerView;
-import views.components.PlayerSolution;
+import model.SequenceInfo;
+import views.player.PlayersPanel;
+import views.player.PlayersView;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 
-public class GameView extends JFrame implements MyView, ActionListener, KeyListener {
-    private final Set<PlayerView> players;
+public class GameView extends JFrame implements ActionListener {
     private final ActorRef judgeRef;
-    private final JPanel panel;
+    private final PlayersView players;
     private final int length, nPlayers, time;
 
     public GameView(int length, int nPlayers, int time) {
@@ -29,26 +32,34 @@ public class GameView extends JFrame implements MyView, ActionListener, KeyListe
         this.length = length;
         this.nPlayers = nPlayers;
         this.time = time;
-        this.players = new HashSet<>();
-        this.panel = new JPanel();
-        this.panel.setPreferredSize(new Dimension(580, 600));
 
         // Genera il pannello dei giocatori.
-        this.panel.add(new PlayerView("player_0"));
-        JScrollPane pane = new JScrollPane(this.panel);
-        this.getContentPane().add(pane, BorderLayout.CENTER);
+        this.players = new PlayersPanel();
+        this.getContentPane().add((Component) this.players, BorderLayout.CENTER);
 
         // Genera il pannello dei comandi.
         JPanel commands = new JPanel();
-        JButton addP = new JButton("Add*");
+
+        JButton addP = new JButton("Add P*");
         addP.addActionListener(this);
+        commands.add(addP);
+
+        JButton addS = new JButton("Add S*");
+        addS.addActionListener(this);
+        commands.add(addS);
+
         JButton start = new JButton("Start");
         start.addActionListener(this);
-        commands.add(addP);
         commands.add(start);
+
+        JButton stop = new JButton("Stop");
+        stop.addActionListener(this);
+        commands.add(stop);
+
         this.getContentPane().add(commands, BorderLayout.PAGE_START);
 
         this.pack();
+        this.requestFocus();
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -60,95 +71,60 @@ public class GameView extends JFrame implements MyView, ActionListener, KeyListe
                 System.exit(-1);
             }
         });
-        this.addKeyListener(this);
 
         // Genero l'arbitro.
         ActorSystem system = ActorSystem.create("Mastermind");
         this.judgeRef = system.actorOf(Props.create(JudgeActor.class), "judge");
-        this.requestFocus();
-    }
-
-    @Override
-    public void playerReady(String player, ArrayList<Integer> info) {
-        SwingUtilities.invokeLater(() -> {
-            PlayerView view = new PlayerView(player);
-            view.setSequence(info);
-            this.players.add(view);
-            this.panel.add(view, BorderLayout.CENTER);
-            this.panel.updateUI();
-        });
-    }
-
-    @Override
-    public void solutionUpdated(String from, PlayerSolution solution) {
-        SwingUtilities.invokeLater(() -> {
-            Optional<PlayerView> view = this.getPlayerViewByName(from);
-            view.ifPresent(playerView -> playerView.inputSolution(solution));
-        });
-    }
-
-    @Override
-    public void solutionFound(String from, String to) {
-        SwingUtilities.invokeLater(() -> {
-            Optional<PlayerView> view = this.getPlayerViewByName(from);
-            view.ifPresent(player -> player.setOperation("Solution found!"));
-        });
-    }
-
-    @Override
-    public void playerWin(String player) {
-        SwingUtilities.invokeLater(() -> System.out.println(player + "win"));
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        System.out.println(e.getActionCommand());
+        // TODO: Questo non dove servire. Sono tutti bottoni di test.
         switch (e.getActionCommand()){
-            case "Add*":
-                // TODO: Questo non dove servire.
+            case "Add P*":
                 this.playerReady("Player", new ArrayList<>());
+                break;
+            case "Add S*":
+                List<Integer> seq = new LinkedList<>();
+                Random r = new Random();
+                for(int i = 0; i < length; i++) {
+                    seq.add(r.nextInt(10));
+                }
+                SequenceInfo info = new SequenceInfo(seq, 2, 2);
+                this.players.inputSolution("player_0", "player_1", info);
                 break;
             case "Start":
                 this.startGame();
                 break;
-        }
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e) {}
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-        switch (e.getKeyCode()) {
-            case KeyEvent.VK_S:
-                this.startGame();
-                break;
-            case KeyEvent.VK_A:
-                // TODO: Questo non deve esserci.
-                this.playerReady("Player", new ArrayList<>());
+            case "Stop":
+                this.stopGame();
                 break;
         }
     }
-
-    @Override
-    public void keyReleased(KeyEvent e) {}
 
     /**
-     * Filtra il set dei players.
-     * @param name Nome del giocatore da scegliere
-     * @return Player scelto.
+     * Add a new player to the panel.
+     * TODO: Remove this.
+     * @param player Player name.
+     * @param info Player infos.
      */
-    private Optional<PlayerView> getPlayerViewByName(String name) {
-        return this.players.stream()
-                .filter(f -> f.getName().equals(name))
-                .findFirst();
+    private void playerReady(String player, ArrayList<Integer> info) {
+        SwingUtilities.invokeLater(() -> this.players.addPlayer(player, info));
     }
 
     /**
-     * Send the message of start game this the view too at the judge actor ref.
+     * Send the message of start game with this the view too at the judge actor ref.
      */
     private void startGame(){
         StartGameMsg msg = new StartGameMsg(this.length, this.nPlayers, this.time, this.players);
+        this.judgeRef.tell(msg, ActorRef.noSender());
+    }
+
+    /**
+     * Send the message of stop game to judge to stop all players too.
+     */
+    private void stopGame(){
+        StopGameMsg msg = new StopGameMsg();
         this.judgeRef.tell(msg, ActorRef.noSender());
     }
 }
