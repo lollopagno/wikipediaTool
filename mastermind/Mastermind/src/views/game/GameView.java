@@ -16,10 +16,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
-import java.util.Random;
 
 public class GameView extends JFrame implements ActionListener {
     private final ActorRef judgeRef;
@@ -80,14 +78,17 @@ public class GameView extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         // TODO: Questo non dove servire. Sono tutti bottoni di test.
-        switch (e.getActionCommand()){
+        List<Integer> seq = new LinkedList<>();
+        Random r = new Random();
+        switch (e.getActionCommand()) {
             case "Add P*":
-                this.playerReady("Player", new ArrayList<>());
+                for (int i = 0; i < length; i++) {
+                    seq.add(r.nextInt(10));
+                }
+                this.playerReady("Player", seq);
                 break;
             case "Add S*":
-                List<Integer> seq = new LinkedList<>();
-                Random r = new Random();
-                for(int i = 0; i < length; i++) {
+                for (int i = 0; i < length; i++) {
                     seq.add(r.nextInt(10));
                 }
                 SequenceInfo info = new SequenceInfo(seq, 2, 2);
@@ -105,17 +106,18 @@ public class GameView extends JFrame implements ActionListener {
     /**
      * Add a new player to the panel.
      * TODO: Remove this.
+     *
      * @param player Player name.
-     * @param info Player infos.
+     * @param info   Player infos.
      */
-    private void playerReady(String player, ArrayList<Integer> info) {
+    private void playerReady(String player, List<Integer> info) {
         SwingUtilities.invokeLater(() -> this.players.addPlayer(player, info));
     }
 
     /**
      * Send the message of start game with this the view too at the judge actor ref.
      */
-    private void startGame(){
+    private void startGame() {
         StartGameMsg msg = new StartGameMsg(this.length, this.nPlayers, this.time, this.players);
         this.judgeRef.tell(msg, ActorRef.noSender());
     }
@@ -123,7 +125,7 @@ public class GameView extends JFrame implements ActionListener {
     /**
      * Send the message of stop game to judge to stop all players too.
      */
-    private void stopGame(){
+    private void stopGame() {
         StopGameMsg msg = new StopGameMsg();
         this.judgeRef.tell(msg, ActorRef.noSender());
     }

@@ -1,5 +1,6 @@
 package views.player;
 
+import javafx.application.Application;
 import model.SequenceInfo;
 
 import javax.swing.*;
@@ -45,6 +46,7 @@ public class PlayersPanel extends JPanel implements PlayersView {
 
     /**
      * Filtra il set dei players.
+     *
      * @param name Nome del giocatore da scegliere
      * @return Player scelto.
      */

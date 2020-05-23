@@ -1,47 +1,18 @@
 package views.player;
 
-import views.components.PlayerSolution;
-import views.components.SequenceSolutions;
+import model.SequenceInfo;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.ArrayList;
+/**
+ * The single player view interface.
+ */
+public interface PlayerView {
+    String getName();
 
-public class PlayerView extends JPanel {
-    private final JLabel name;
-    private final JLabel sequence;
-    private final JLabel operation;
-    private final SequenceSolutions solutions;
-
-    public PlayerView(String name) {
-        this.name = new JLabel(name);
-        this.add(this.name);
-
-        this.sequence = new JLabel("");
-        this.add(this.sequence);
-
-        this.operation = new JLabel("operation");
-        this.add(this.operation);
-
-        this.solutions = new SequenceSolutions();
-        this.add(this.solutions);
-
-        this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-    }
-
-    public String getName(){
-        return this.name.getText();
-    }
-
-    public void setSequence(ArrayList<Integer> sequence){
-        this.sequence.setText(sequence.toString());
-    }
-
-    public void setOperation(String operation){
-        this.operation.setText(operation);
-    }
-
-    public void inputSolution(PlayerSolution solution){
-        this.solutions.setSolution(solution);
-    }
+    /**
+     * Show the guess made to another player.
+     *
+     * @param to       Guess Player Target.
+     * @param sequence Guess Tried.
+     */
+    void inputSolution(String to, SequenceInfo sequence);
 }
