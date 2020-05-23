@@ -145,10 +145,10 @@ public class GameView extends JFrame implements MyView, ActionListener, KeyListe
     }
 
     /**
-     * Invia il messaggio di inizio gioco all'arbitro.
+     * Send the message of start game this the view too at the judge actor ref.
      */
     private void startGame(){
-        StartGameMsg msg = new StartGameMsg(this.length, this.nPlayers, this.time);
+        StartGameMsg msg = new StartGameMsg(this.length, this.nPlayers, this.time, this.players);
         this.judgeRef.tell(msg, ActorRef.noSender());
     }
 }

@@ -4,13 +4,13 @@ import actors.messages.ReadyMsg;
 import actors.messages.StartGameMsg;
 import actors.messages.StartMsg;
 import info.PlayerInfo;
-import views.MyView;
+import views.player.PlayersView;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public class JudgeActor extends MastermindActorImpl {
-    private MyView view;
+    private PlayersView view;
     private final List<PlayerInfo> players;
     private int readyMex = 0;
 
@@ -29,6 +29,7 @@ public class JudgeActor extends MastermindActorImpl {
         return receiveBuilder()
                 .match(StartGameMsg.class, msg -> {  // startGame che arriva dalla wiew
                     this.log("Judge START GAME Received:");
+                    this.view = msg.getView();
                     this.startGame(msg.getPlayers(), msg.getLength());
                 }).match(ReadyMsg.class, msg -> { // ready che arriva dai giocatori
                     //contatore per tutti i messaggi di ready // Aspettare tutti i player
