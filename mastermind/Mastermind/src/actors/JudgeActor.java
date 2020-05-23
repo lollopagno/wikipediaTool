@@ -3,15 +3,17 @@ package actors;
 import actors.messages.ReadyMsg;
 import actors.messages.StartGameMsg;
 import actors.messages.StartMsg;
+import actors.messages.StartTurn;
 import info.PlayerInfo;
 import views.player.PlayersView;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class JudgeActor extends MastermindActorImpl {
     private PlayersView view;
     private final List<PlayerInfo> players;
+    private List<PlayerInfo> playersTemporary;
+    private ArrayList<Integer> order;
     private int readyMex = 0;
 
     public JudgeActor() {
@@ -40,6 +42,15 @@ public class JudgeActor extends MastermindActorImpl {
                     }
                     //crea un ordine per i turni // Quando sono tutti pronti
                     // TODO CONTATORI, ORDINE CASUALE E INVIO TENTATIVO
+                    this.playersTemporary = this.players;
+                    for(int i=0; i < players.size(); i++){
+                        order.add(getRandomElement(playersTemporary));
+                    }
+                    for(int i=0; i < order.size(); i++){
+                        getSelf().tell(new StartTurn());
+                    }
+
+
                     //invio tentativo // startTurn // Generi sequenza e invii messaggio al primo
                     // TODO END_TURN
                     // Invia il messaggio all'attore successivo.
@@ -51,8 +62,9 @@ public class JudgeActor extends MastermindActorImpl {
         // TODO: Generare tutti gli altri players.
         for (int i = 0; i < players; i++) {
             PlayerInfo player =
-                    new PlayerInfo("player_" + i, this.getContext());
+                    new PlayerInfo("player_" + i, this.getContext(), players);
             this.players.add(player);
+            this.view.addPlayer("player_"+i, //lista di interi);
         }
 
         this.players.forEach(elem ->
@@ -65,5 +77,12 @@ public class JudgeActor extends MastermindActorImpl {
 
     private int getreadyNmex() {
         return readyMex++;
+    }
+    public PlayerInfo getRandomElement(List<PlayerInfo> list)
+    {
+        Random rand = new Random();
+        PlayerInfo number = list.get(rand.nextInt(list.size()));
+        list.remove(number);
+        return number;
     }
 }

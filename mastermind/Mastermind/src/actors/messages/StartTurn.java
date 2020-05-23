@@ -15,8 +15,9 @@ public class StartTurn implements Message {
     }
 
     public int getLength() {
-        return length;
+        return this.length;
     }
+
 
     public List<PlayerInfo> getPlayers() {
         return players;
