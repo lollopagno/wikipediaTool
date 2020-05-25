@@ -72,7 +72,7 @@ public class StartView extends JFrame implements ActionListener, KeyListener {
         Optional<Integer> length = this.length.getValue();
         Optional<Integer> time = this.time.getValue();
         actors.ifPresent(a -> length.ifPresent(l -> time.ifPresent(t -> {
-            JFrame game = new GameView(a, l, t);
+            JFrame game = new GameView(l, a, t);
             game.setVisible(true);
             this.setVisible(false);
         })));
