@@ -8,6 +8,7 @@ import java.util.Random;
 
 public class PlayerActor extends MastermindActorImpl {
 
+
     @Override
     public void preStart() throws Exception {
         super.preStart();
@@ -25,9 +26,11 @@ public class PlayerActor extends MastermindActorImpl {
                 .match(StartMsg.class, msg -> {
                     this.log("Player START MSG Received:");
                     int myNumber = createNumber(msg.getLength());
-                    getSelf().tell(new ReadyMsg(), getSelf());
+                    getSender().tell(new ReadyMsg(msg.getPlayers(), msg.getLength()), getSelf());
                 }).match(StartTurn.class, msg -> {
                     this.log("Player START TURN Received:");
+                    //genera stringa random da inviare ad un altro player
+
                 }).build();
     }
 

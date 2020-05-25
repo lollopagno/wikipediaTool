@@ -4,6 +4,7 @@ import actors.messages.ReadyMsg;
 import actors.messages.StartGameMsg;
 import actors.messages.StartMsg;
 import actors.messages.StartTurn;
+import akka.actor.ActorContext;
 import info.PlayerInfo;
 import views.player.PlayersView;
 
@@ -35,6 +36,7 @@ public class JudgeActor extends MastermindActorImpl {
                     this.startGame(msg.getPlayers(), msg.getLength());
                 }).match(ReadyMsg.class, msg -> { // ready che arriva dai giocatori
                     //contatore per tutti i messaggi di ready // Aspettare tutti i player
+                    this.log("Judge Ready Message Received:");
                     int number = getreadyNmex();
                     while (number < players.size()) {
                         //Thread.sleep(1);
@@ -43,12 +45,13 @@ public class JudgeActor extends MastermindActorImpl {
                     //crea un ordine per i turni // Quando sono tutti pronti
                     // TODO CONTATORI, ORDINE CASUALE E INVIO TENTATIVO
                     this.playersTemporary = this.players;
-                    for(int i=0; i < players.size(); i++){
-                        order.add(getRandomElement(playersTemporary));
-                    }
-                    for(int i=0; i < order.size(); i++){
-                        getSelf().tell(new StartTurn());
-                    }
+                    // TODO ORDINE RANDOM DEI PLAYERS --> sequenceInfoJudge
+                    // lista che dovrebbe essere random
+                    this.playersTemporary.forEach(elem ->
+                            elem.getReference().tell(
+                                    new StartTurn(msg.getPlayers(), msg.getLength()),
+                                    getSelf()));
+
 
 
                     //invio tentativo // startTurn // Generi sequenza e invii messaggio al primo
@@ -73,6 +76,7 @@ public class JudgeActor extends MastermindActorImpl {
                 elem.getReference().tell(
                         new StartMsg(length, this.players),
                         getSelf()));
+
     }
 
     private int getreadyNmex() {
