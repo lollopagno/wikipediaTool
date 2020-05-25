@@ -1,6 +1,6 @@
 package views.player;
 
-import model.SequenceInfo;
+import model.SequenceInfoGuess;
 
 import java.util.List;
 
@@ -20,7 +20,7 @@ public interface PlayersView {
      * @param to       Player that received the guess.
      * @param sequence Sequence info tried.
      */
-    void inputSolution(String from, String to, SequenceInfo sequence);
+    void inputSolution(String from, String to, SequenceInfoGuess sequence);
 
     /**
      * Show when a player win.

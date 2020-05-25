@@ -6,7 +6,7 @@ import actors.messages.StopGameMsg;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
-import model.SequenceInfo;
+import model.SequenceInfoGuess;
 import views.player.PlayersPanel;
 import views.player.PlayersView;
 
@@ -91,7 +91,7 @@ public class GameView extends JFrame implements ActionListener {
                 for (int i = 0; i < length; i++) {
                     seq.add(r.nextInt(10));
                 }
-                SequenceInfo info = new SequenceInfo(seq, 2, 2);
+                SequenceInfoGuess info = new SequenceInfoGuess(seq, 2, 2);
                 this.players.inputSolution("player_0", "player_1", info);
                 break;
             case "Start":

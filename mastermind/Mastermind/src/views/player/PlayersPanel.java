@@ -1,7 +1,6 @@
 package views.player;
 
-import javafx.application.Application;
-import model.SequenceInfo;
+import model.SequenceInfoGuess;
 
 import javax.swing.*;
 import java.awt.*;
@@ -34,7 +33,7 @@ public class PlayersPanel extends JPanel implements PlayersView {
     }
 
     @Override
-    public void inputSolution(String from, String to, SequenceInfo sequence) {
+    public void inputSolution(String from, String to, SequenceInfoGuess sequence) {
         Optional<PlayerView> view = this.getPlayerViewByName(from);
         view.ifPresent(v -> v.inputSolution(to, sequence));
     }

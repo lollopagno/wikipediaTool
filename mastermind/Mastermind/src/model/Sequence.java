@@ -7,5 +7,5 @@ public interface Sequence {
 
     void setSequence(ArrayList<Integer> numbers);
 
-    SequenceInfo tryNumbers(ArrayList<Integer> numbers);
+    SequenceInfoGuess tryNumbers(ArrayList<Integer> numbers);
 }

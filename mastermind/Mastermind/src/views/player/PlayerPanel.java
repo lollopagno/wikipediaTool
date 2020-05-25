@@ -1,6 +1,6 @@
 package views.player;
 
-import model.SequenceInfo;
+import model.SequenceInfoGuess;
 
 import javax.swing.*;
 import java.awt.*;
@@ -37,7 +37,7 @@ public class PlayerPanel extends JPanel implements PlayerView {
     }
 
     @Override
-    public void inputSolution(String to, SequenceInfo sequence) {
+    public void inputSolution(String to, SequenceInfoGuess sequence) {
         Optional<SolutionDetailPanel> panel = this.solutions.stream().filter(f -> f.getName().equals(to)).findFirst();
         if (panel.isPresent()) {
             panel.ifPresent(i -> {

@@ -17,7 +17,7 @@ public class JudgeActor extends MastermindActorImpl {
     private int readyMex = 0;
 
     public JudgeActor() {
-        this.players = new LinkedList<>();
+        this.players = new ArrayList<PlayerInfo>();
     }
 
     @Override
@@ -29,7 +29,7 @@ public class JudgeActor extends MastermindActorImpl {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                .match(StartGameMsg.class, msg -> {  // startGame che arriva dalla wiew
+                .match(StartGameMsg.class, msg -> {  // startGame che arriva dalla view
                     this.log("Judge START GAME Received:");
                     this.view = msg.getView();
                     this.startGame(msg.getPlayers(), msg.getLength());
