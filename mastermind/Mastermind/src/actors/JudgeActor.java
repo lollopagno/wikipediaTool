@@ -4,16 +4,16 @@ import actors.messages.ReadyMsg;
 import actors.messages.StartGameMsg;
 import actors.messages.StartMsg;
 import actors.messages.StartTurn;
-import akka.actor.ActorContext;
+import model.SequenceInfoJudge;
 import info.PlayerInfo;
 import views.player.PlayersView;
 
 import java.util.*;
 
 public class JudgeActor extends MastermindActorImpl {
+    private SequenceInfoJudge sequenceInfoJudge;
     private PlayersView view;
     private final List<PlayerInfo> players;
-    private List<PlayerInfo> playersTemporary;
     private ArrayList<Integer> order;
     private int readyMex = 0;
 
@@ -44,10 +44,10 @@ public class JudgeActor extends MastermindActorImpl {
                     }
                     //crea un ordine per i turni // Quando sono tutti pronti
                     // TODO CONTATORI, ORDINE CASUALE E INVIO TENTATIVO
-                    this.playersTemporary = this.players;
                     // TODO ORDINE RANDOM DEI PLAYERS --> sequenceInfoJudge
                     // lista che dovrebbe essere random
-                    this.playersTemporary.forEach(elem ->
+                    this.sequenceInfoJudge.newOrderTurn();
+                    this.players.forEach(elem ->
                             elem.getReference().tell(
                                     new StartTurn(msg.getPlayers(), msg.getLength()),
                                     getSelf()));
