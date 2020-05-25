@@ -1,11 +1,11 @@
 package views.player;
 
+import model.Sequence;
 import model.SequenceInfoGuess;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -21,11 +21,12 @@ public class PlayersPanel extends JPanel implements PlayersView {
         this.panel = new JPanel();
         this.panel.setPreferredSize(new Dimension(630, 480));
         JScrollPane pane = new JScrollPane(this.panel);
-        this.add(pane);
+        this.setLayout(new BorderLayout());
+        this.add(BorderLayout.CENTER, pane);
     }
 
     @Override
-    public void addPlayer(String player, List<Integer> sequence) {
+    public void addPlayer(String player, Sequence sequence) {
         PlayerView view = new PlayerPanel(player, sequence);
         this.players.add(view);
         this.panel.add((Component) view, BorderLayout.CENTER);

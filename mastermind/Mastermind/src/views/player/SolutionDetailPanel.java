@@ -1,7 +1,8 @@
 package views.player;
 
+import model.Sequence;
+
 import javax.swing.*;
-import java.util.List;
 
 public class SolutionDetailPanel extends JPanel {
     private final JLabel name, sequence, otherInfo;
@@ -25,11 +26,9 @@ public class SolutionDetailPanel extends JPanel {
         this.name.setText(name);
     }
 
-    public void setSequence(List<Integer> sequence) {
-        this.sequence.setText(String.valueOf(sequence.stream()
-                .map(Object::toString)
-                .reduce(String::concat)
-        ));
+    public void setSequence(Sequence sequence) {
+        this.sequence.setText(sequence.toString());
+        System.out.println("Impostato il valore a " + sequence.toString());
         this.updateUI();
     }
 

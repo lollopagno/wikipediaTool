@@ -1,11 +1,11 @@
 package views.player;
 
+import model.Sequence;
 import model.SequenceInfoGuess;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -17,19 +17,18 @@ public class PlayerPanel extends JPanel implements PlayerView {
     private final JPanel solutionsPanel;
     private final Set<SolutionDetailPanel> solutions;
 
-    public PlayerPanel(String name, List<Integer> sequence) {
+    public PlayerPanel(String name, Sequence sequence) {
         this.name = name;
-        this.add(new JLabel(name));
-        Optional<String> value = sequence.stream()
-                .map(Object::toString)
-                .reduce(String::concat);
-        value.ifPresent(v -> this.add(new JLabel(v)));
+        this.add(new JLabel(name), BorderLayout.PAGE_START);
+        this.add(new JLabel(sequence.toString()));
 
         this.solutions = new HashSet<>();
         this.solutionsPanel = new JPanel();
-        this.add(this.solutionsPanel);
+        JScrollPane pane = new JScrollPane(this.solutionsPanel);
+        this.add(pane, BorderLayout.CENTER);
 
         this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        this.setSize(300, 400);
     }
 
     public String getName() {
@@ -38,7 +37,10 @@ public class PlayerPanel extends JPanel implements PlayerView {
 
     @Override
     public void inputSolution(String to, SequenceInfoGuess sequence) {
-        Optional<SolutionDetailPanel> panel = this.solutions.stream().filter(f -> f.getName().equals(to)).findFirst();
+        Optional<SolutionDetailPanel> panel =
+                this.solutions.stream()
+                        .filter(f -> f.getName().equals(to))
+                        .findFirst();
         if (panel.isPresent()) {
             panel.ifPresent(i -> {
                 i.setSequence(sequence.getNumbers());

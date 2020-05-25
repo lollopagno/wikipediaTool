@@ -6,6 +6,8 @@ import actors.messages.StopGameMsg;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
+import model.Sequence;
+import model.SequenceImpl;
 import model.SequenceInfoGuess;
 import views.player.PlayersPanel;
 import views.player.PlayersView;
@@ -26,7 +28,7 @@ public class GameView extends JFrame implements ActionListener {
 
     public GameView(int length, int nPlayers, int time) {
         this.setTitle("Game");
-        this.setPreferredSize(new Dimension(600, 480));
+        this.setPreferredSize(new Dimension(600, 800));
         this.length = length;
         this.nPlayers = nPlayers;
         this.time = time;
@@ -85,14 +87,20 @@ public class GameView extends JFrame implements ActionListener {
                 for (int i = 0; i < length; i++) {
                     seq.add(r.nextInt(10));
                 }
-                this.playerReady("Player", seq);
+                for(int i = 0; i < nPlayers; i++) {
+                    Sequence sequence = new SequenceImpl(seq);
+                    this.playerReady("player_" + i, sequence);
+                }
                 break;
             case "Add S*":
                 for (int i = 0; i < length; i++) {
                     seq.add(r.nextInt(10));
                 }
-                SequenceInfoGuess info = new SequenceInfoGuess(seq, 2, 2);
-                this.players.inputSolution("player_0", "player_1", info);
+                Sequence sequence = new SequenceImpl(seq);
+                SequenceInfoGuess info = new SequenceInfoGuess(sequence, 2, 2);
+                int from = r.nextInt(nPlayers);
+                int to = r.nextInt(nPlayers);
+                this.players.inputSolution("player_" + from, "player_" + to, info);
                 break;
             case "Start":
                 this.startGame();
@@ -110,7 +118,7 @@ public class GameView extends JFrame implements ActionListener {
      * @param player Player name.
      * @param info   Player infos.
      */
-    private void playerReady(String player, List<Integer> info) {
+    private void playerReady(String player, Sequence info) {
         SwingUtilities.invokeLater(() -> this.players.addPlayer(player, info));
     }
 
