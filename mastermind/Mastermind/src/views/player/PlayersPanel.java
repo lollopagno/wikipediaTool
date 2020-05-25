@@ -37,6 +37,7 @@ public class PlayersPanel extends JPanel implements PlayersView {
     public void inputSolution(String from, String to, SequenceInfoGuess sequence) {
         Optional<PlayerView> view = this.getPlayerViewByName(from);
         view.ifPresent(v -> v.inputSolution(to, sequence));
+        this.updateUI();
     }
 
     @Override

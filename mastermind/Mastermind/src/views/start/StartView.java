@@ -11,11 +11,11 @@ import java.awt.event.KeyListener;
 import java.util.Optional;
 
 public class StartView extends JFrame implements ActionListener, KeyListener {
-    private final InputPanel actors;
-    private final InputPanel length;
-    private final InputPanel time;
+    private final InputPanel actors, length, time;
+    private boolean busy;
 
     public StartView() {
+        this.busy = false;
         this.setTitle("Start");
         this.setSize(320, 240);
         this.setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
@@ -37,8 +37,6 @@ public class StartView extends JFrame implements ActionListener, KeyListener {
         start.addActionListener(this);
         start.addKeyListener(this);
         this.add(start, BorderLayout.CENTER);
-
-        // this.pack();
     }
 
     @Override
@@ -68,13 +66,25 @@ public class StartView extends JFrame implements ActionListener, KeyListener {
      * Prepare the next view where the game runs.
      */
     private void generateGameView() {
-        Optional<Integer> actors = this.actors.getValue();
-        Optional<Integer> length = this.length.getValue();
-        Optional<Integer> time = this.time.getValue();
-        actors.ifPresent(a -> length.ifPresent(l -> time.ifPresent(t -> {
-            JFrame game = new GameView(l, a, t);
-            game.setVisible(true);
-            this.setVisible(false);
-        })));
+        if(this.busy)
+            return;
+        this.busy = true;
+
+        try{
+            Optional<Integer> actors = this.actors.getValue();
+            Optional<Integer> length = this.length.getValue();
+            Optional<Integer> time = this.time.getValue();
+            actors.ifPresent(a -> length.ifPresent(l -> time.ifPresent(t -> {
+                JFrame game = new GameView(l, a, t);
+                game.setVisible(true);
+                this.setVisible(false);
+            })));
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        finally {
+            this.busy = false;
+        }
     }
 }

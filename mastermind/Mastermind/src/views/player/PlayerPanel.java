@@ -24,6 +24,7 @@ public class PlayerPanel extends JPanel implements PlayerView {
 
         this.solutions = new HashSet<>();
         this.solutionsPanel = new JPanel();
+        this.solutionsPanel.setLayout(new BoxLayout(this.solutionsPanel, BoxLayout.PAGE_AXIS));
         JScrollPane pane = new JScrollPane(this.solutionsPanel);
         this.add(pane, BorderLayout.CENTER);
 
@@ -57,6 +58,6 @@ public class PlayerPanel extends JPanel implements PlayerView {
             this.solutionsPanel.add(newPanel);
         }
         this.solutionsPanel.updateUI();
-        // this.updateUI();
+        this.updateUI();
     }
 }

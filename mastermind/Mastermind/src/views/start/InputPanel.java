@@ -26,7 +26,7 @@ public class InputPanel extends JPanel {
         this.setSize(320, 30);
     }
 
-    public Optional<Integer> getValue() {
+    public Optional<Integer> getValue() throws NumberFormatException {
         try {
             int number = Integer.parseInt(this.valueText.getText());
             if (number < 0) {
@@ -38,7 +38,7 @@ public class InputPanel extends JPanel {
             return Optional.of(number);
         } catch (NumberFormatException a) {
             this.showError("Number format exception");
-            return Optional.empty();
+            throw a;
         }
     }
 
