@@ -1,4 +1,4 @@
-package views.player;
+package views.players.player.solutions;
 
 import model.Sequence;
 

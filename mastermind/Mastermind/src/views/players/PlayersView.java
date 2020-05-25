@@ -1,4 +1,4 @@
-package views.player;
+package views.players;
 
 import model.Sequence;
 import model.SequenceInfoGuess;

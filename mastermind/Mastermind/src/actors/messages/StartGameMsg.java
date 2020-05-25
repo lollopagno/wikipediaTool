@@ -1,6 +1,6 @@
 package actors.messages;
 
-import views.player.PlayersView;
+import views.players.PlayersView;
 
 public class StartGameMsg {
     private final int length, players, time;

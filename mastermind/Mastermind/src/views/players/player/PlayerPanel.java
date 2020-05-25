@@ -1,7 +1,8 @@
-package views.player;
+package views.players.player;
 
 import model.Sequence;
 import model.SequenceInfoGuess;
+import views.players.player.solutions.SolutionDetailPanel;
 
 import javax.swing.*;
 import java.awt.*;
