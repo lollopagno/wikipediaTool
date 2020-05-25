@@ -1,19 +1,17 @@
 package model;
 
-import java.util.List;
-
 public class SequenceInfoGuess {
-    private final List<Integer> numbers;
+    private final Sequence numbers;
     private final int rightPlaceNumbers;
     private final int rightNumbers;
 
-    public SequenceInfoGuess(List<Integer> numbers, int rightNumbers, int rightPlaceNumbers){
+    public SequenceInfoGuess(Sequence numbers, int rightNumbers, int rightPlaceNumbers){
         this.numbers = numbers;
         this.rightNumbers = rightNumbers;
         this.rightPlaceNumbers = rightPlaceNumbers;
     }
 
-    public List<Integer> getNumbers() {
+    public Sequence getNumbers() {
         return numbers;
     }
 
