@@ -19,17 +19,29 @@ public class PlayerPanel extends JPanel implements PlayerView {
 
     public PlayerPanel(String name, Sequence sequence) {
         this.name = name;
-        this.add(new JLabel(name), BorderLayout.PAGE_START);
-        this.add(new JLabel(sequence.toString()));
+        this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        JPanel namePanel = new JPanel();
+        JLabel nameTip = new JLabel("Name:");
+        JLabel nameLabel = new JLabel(name);
+        namePanel.add(nameTip, BorderLayout.LINE_START);
+        namePanel.add(nameLabel, BorderLayout.LINE_END);
+        this.add(namePanel);
+
+        JPanel sequencePanel = new JPanel();
+        JLabel sequenceTip = new JLabel("Sequence:");
+        JLabel sequenceLabel = new JLabel(sequence.toString());
+        sequencePanel.add(sequenceTip, BorderLayout.LINE_START);
+        sequencePanel.add(sequenceLabel, BorderLayout.LINE_END);
+        this.add(sequencePanel);
 
         this.solutions = new HashSet<>();
         this.solutionsPanel = new JPanel();
         this.solutionsPanel.setLayout(new BoxLayout(this.solutionsPanel, BoxLayout.PAGE_AXIS));
         JScrollPane pane = new JScrollPane(this.solutionsPanel);
-        this.add(pane, BorderLayout.CENTER);
+        this.add(pane);
 
         this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        this.setSize(300, 400);
+        this.setPreferredSize(new Dimension(300, 400));
     }
 
     public String getName() {
@@ -46,7 +58,7 @@ public class PlayerPanel extends JPanel implements PlayerView {
             panel.ifPresent(i -> {
                 i.setSequence(sequence.getNumbers());
                 i.setInfo(sequence.getRightPlaceNumbers(), sequence.getRightNumbers());
-                i.updateUI();
+                SwingUtilities.invokeLater(i::updateUI);
             });
         } else {
             SolutionDetailPanel newPanel = new SolutionDetailPanel();
@@ -57,7 +69,9 @@ public class PlayerPanel extends JPanel implements PlayerView {
             this.solutions.add(newPanel);
             this.solutionsPanel.add(newPanel);
         }
-        this.solutionsPanel.updateUI();
-        this.updateUI();
+        SwingUtilities.invokeLater(() -> {
+            this.solutionsPanel.updateUI();
+            this.updateUI();
+        });
     }
 }

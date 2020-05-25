@@ -3,12 +3,13 @@ package views.player;
 import model.Sequence;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class SolutionDetailPanel extends JPanel {
     private final JLabel name, sequence, otherInfo;
 
     public SolutionDetailPanel() {
-        this.name = new JLabel("Nome");
+        this.name = new JLabel("Name");
         this.add(name);
 
         this.sequence = new JLabel("Sequence");
@@ -16,6 +17,8 @@ public class SolutionDetailPanel extends JPanel {
 
         this.otherInfo = new JLabel("Other info");
         this.add(this.otherInfo);
+
+        this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
     }
 
     public String getName() {
@@ -28,7 +31,6 @@ public class SolutionDetailPanel extends JPanel {
 
     public void setSequence(Sequence sequence) {
         this.sequence.setText(sequence.toString());
-        System.out.println("Impostato il valore a " + sequence.toString());
         this.updateUI();
     }
 

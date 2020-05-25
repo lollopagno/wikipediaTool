@@ -1,7 +1,9 @@
-package views.player;
+package views.players;
 
 import model.Sequence;
 import model.SequenceInfoGuess;
+import views.players.player.PlayerPanel;
+import views.players.player.PlayerView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,7 +21,7 @@ public class PlayersPanel extends JPanel implements PlayersView {
     public PlayersPanel() {
         this.players = new HashSet<>();
         this.panel = new JPanel();
-        this.panel.setPreferredSize(new Dimension(630, 480));
+        this.panel.setPreferredSize(new Dimension(620, 480));
         JScrollPane pane = new JScrollPane(this.panel);
         this.setLayout(new BorderLayout());
         this.add(BorderLayout.CENTER, pane);

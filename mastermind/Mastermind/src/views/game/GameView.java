@@ -9,8 +9,8 @@ import akka.actor.Props;
 import model.Sequence;
 import model.SequenceImpl;
 import model.SequenceInfoGuess;
-import views.player.PlayersPanel;
-import views.player.PlayersView;
+import views.players.PlayersPanel;
+import views.players.PlayersView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,7 +25,8 @@ import java.util.concurrent.Executors;
 public class GameView extends JFrame implements ActionListener {
     private final ActorRef judgeRef;
     private final PlayersView players;
-    private final int length, nPlayers, time;
+    private final int length, nPlayers;
+    private int time;
 
     public GameView(int length, int nPlayers, int time) {
         this.setTitle("Game");
@@ -62,24 +63,9 @@ public class GameView extends JFrame implements ActionListener {
         ActorSystem system = ActorSystem.create("Mastermind");
         this.judgeRef = system.actorOf(Props.create(JudgeActor.class), "judge");
 
+        // TODO: Remove those after actors implementation.
         this.generatePlayers();
-        Executors.newSingleThreadExecutor().execute(() -> {
-            List<Integer> seq = new LinkedList<>();
-            Random r = new Random();
-            for (int i = 0; i < length; i++) {
-                seq.add(r.nextInt(10));
-            }
-            Sequence sequence = new SequenceImpl(seq);
-            SequenceInfoGuess info = new SequenceInfoGuess(sequence, 2, 2);
-            int from = r.nextInt(nPlayers);
-            int to = r.nextInt(nPlayers);
-            this.players.inputSolution("player_" + from, "player_" + to, info);
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        });
+        this.generateSequences();
     }
 
     @Override
@@ -112,10 +98,32 @@ public class GameView extends JFrame implements ActionListener {
         for (int i = 0; i < length; i++) {
             seq.add(r.nextInt(10));
         }
-        for(int i = 0; i < nPlayers; i++) {
+        for (int i = 0; i < nPlayers; i++) {
             Sequence sequence = new SequenceImpl(seq);
             this.playerReady("player_" + i, sequence);
         }
+    }
+
+    private void generateSequences() {
+        Executors.newSingleThreadExecutor().execute(() -> {
+            while (this.time-- > 0) {
+                List<Integer> seq = new LinkedList<>();
+                Random r = new Random();
+                for (int i = 0; i < length; i++) {
+                    seq.add(r.nextInt(10));
+                }
+                Sequence sequence = new SequenceImpl(seq);
+                SequenceInfoGuess info = new SequenceInfoGuess(sequence, 2, 2);
+                int from = r.nextInt(nPlayers);
+                int to = r.nextInt(nPlayers);
+                SwingUtilities.invokeLater(() -> this.players.inputSolution("player_" + from, "player_" + to, info));
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     /**
