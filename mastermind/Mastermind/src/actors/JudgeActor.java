@@ -6,7 +6,7 @@ import actors.messages.StartMsg;
 import actors.messages.StartTurn;
 import model.SequenceInfoJudge;
 import info.PlayerInfo;
-import views.player.PlayersView;
+import views.players.PlayersView;
 
 import java.util.*;
 
@@ -14,7 +14,6 @@ public class JudgeActor extends MastermindActorImpl {
     private SequenceInfoJudge sequenceInfoJudge;
     private PlayersView view;
     private final List<PlayerInfo> players;
-    private ArrayList<Integer> order;
     private int readyMex = 0;
 
     public JudgeActor() {
@@ -47,12 +46,11 @@ public class JudgeActor extends MastermindActorImpl {
                     // TODO ORDINE RANDOM DEI PLAYERS --> sequenceInfoJudge
                     // lista che dovrebbe essere random
                     this.sequenceInfoJudge.newOrderTurn();
-                    this.players.forEach(elem ->
-                            elem.getReference().tell(
-                                    new StartTurn(msg.getPlayers(), msg.getLength()),
-                                    getSelf()));
-
-
+                    for(int i = 0; i < players.size(); i++){
+                        this.sequenceInfoJudge.getNextPlayers(i);
+                        getSelf().tell(new StartTurn(msg.getPlayers(), msg.getLength()),
+                                getSelf());
+                    }
 
                     //invio tentativo // startTurn // Generi sequenza e invii messaggio al primo
                     // TODO END_TURN
@@ -67,7 +65,7 @@ public class JudgeActor extends MastermindActorImpl {
             PlayerInfo player =
                     new PlayerInfo("player_" + i, this.getContext(), players);
             this.players.add(player);
-            this.view.addPlayer("player_"+i, //lista di interi);
+            //this.view.addPlayer("player_"+i, );
         }
 
         this.players.forEach(elem ->
@@ -82,11 +80,5 @@ public class JudgeActor extends MastermindActorImpl {
     private int getreadyNmex() {
         return readyMex++;
     }
-    public PlayerInfo getRandomElement(List<PlayerInfo> list)
-    {
-        Random rand = new Random();
-        PlayerInfo number = list.get(rand.nextInt(list.size()));
-        list.remove(number);
-        return number;
-    }
+
 }
