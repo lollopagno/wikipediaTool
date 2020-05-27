@@ -36,18 +36,19 @@ public class JudgeActor extends MastermindActorImpl {
                 }).match(ReadyMsg.class, msg -> { // ready che arriva dai giocatori
                     //contatore per tutti i messaggi di ready // Aspettare tutti i player
                     this.log("Judge Ready Message Received:");
+                    // TODO CORRETTO ASPETTARE TUTTI I MESSAGGI DI READY?
                     int number = getreadyNmex();
                     while (number < players.size()) {
                         //Thread.sleep(1);
                         log("wait");
                     }
                     //crea un ordine per i turni // Quando sono tutti pronti
-                    // TODO CONTATORI, ORDINE CASUALE E INVIO TENTATIVO
                     // TODO ORDINE RANDOM DEI PLAYERS --> sequenceInfoJudge
                     // lista che dovrebbe essere random
                     this.sequenceInfoJudge.newOrderTurn();
                     for(int i = 0; i < players.size(); i++){
                         this.sequenceInfoJudge.getNextPlayers(i);
+                        // TODO INVIO A UN ALTRO PLAYER -> COME?
                         getSelf().tell(new StartTurn(msg.getPlayers(), msg.getLength()),
                                 getSelf());
                     }
@@ -60,11 +61,11 @@ public class JudgeActor extends MastermindActorImpl {
     }
 
     private void startGame(int players, int length) {
-        // TODO: Generare tutti gli altri players.
         for (int i = 0; i < players; i++) {
             PlayerInfo player =
                     new PlayerInfo("player_" + i, this.getContext(), players);
             this.players.add(player);
+            // TODO: Generare tutti gli altri players.
             //this.view.addPlayer("player_"+i, );
         }
 
