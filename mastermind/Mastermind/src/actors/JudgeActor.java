@@ -44,9 +44,9 @@ public class JudgeActor extends MastermindActorImpl {
                     // lista che dovrebbe essere random
                     this.sequenceInfoJudge.newOrderTurn();
                     for (int i = 0; i < players.size(); i++) {
-                        this.sequenceInfoJudge.getNextPlayers(i);
+                        PlayerInfo elem = this.sequenceInfoJudge.getNextPlayers(i);
                         // TODO INVIO A UN ALTRO PLAYER -> COME?
-                        getSelf().tell(new StartTurn(msg.getPlayers(), msg.getLength()),
+                        elem.getReference().tell(new StartTurn(msg.getPlayers(), msg.getLength()),
                                 getSelf());
                     }
 

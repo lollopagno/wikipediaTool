@@ -1,6 +1,7 @@
 package actors;
 
 import actors.messages.*;
+import info.PlayerInfo;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -10,6 +11,8 @@ public class PlayerActor extends MastermindActorImpl {
 
 
     private ArrayList<Integer> myNumber;
+    private JudgeActor judgeActor;
+    private PlayerInfo elem;
 
     @Override
     public void preStart() throws Exception {
@@ -22,15 +25,16 @@ public class PlayerActor extends MastermindActorImpl {
                 .match(StartMsg.class, msg -> {
                     this.log("Player START MSG Received:");
                     this.myNumber = createNumber(msg.getLength());
-                    getSender().tell(new ReadyMsg(msg.getPlayers(), msg.getLength()), getSelf());
+                    judgeActor.getSender().tell(new ReadyMsg(msg.getPlayers(), msg.getLength()), getSelf());
                 }).match(StartTurn.class, msg -> {
                     this.log("Player START TURN Received:");
                     //genera stringa random da inviare ad un altro player
                     ArrayList<Integer> tryNumber = createNumber(msg.getLength());
-                    getSender().tell(new GuessMsg(tryNumber),getSelf());
+                    //TODO DEFINIRE A CHI LO INVIA
+                    elem.getReference().tell(new GuessMsg(tryNumber),getSelf());
                 }).match(ReturnGuessMsg.class, msg -> {
                     //TODO AGGIORNARE LE RISPOSTE --> NUMERI CORRETTI E NUM ALLE POS CORRETTE
-                    getSender().tell(new EndTurn(/*boolean*/),getSelf());
+                    judgeActor.getSender().tell(new EndTurn(/*boolean*/),getSelf());
                 }).build();
     }
 
