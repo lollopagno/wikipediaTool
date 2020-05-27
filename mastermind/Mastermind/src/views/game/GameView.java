@@ -9,6 +9,7 @@ import akka.actor.Props;
 import model.Sequence;
 import model.SequenceImpl;
 import model.SequenceInfoGuess;
+import scala.collection.Seq;
 import views.players.PlayersPanel;
 import views.players.PlayersView;
 
@@ -93,7 +94,7 @@ public class GameView extends JFrame implements ActionListener {
 
     private void generatePlayers() {
         // TODO: Remove this after actor implementation.
-        List<Integer> seq = new LinkedList<>();
+        ArrayList<Integer> seq = new ArrayList<>();
         Random r = new Random();
         for (int i = 0; i < length; i++) {
             seq.add(r.nextInt(10));
@@ -107,7 +108,7 @@ public class GameView extends JFrame implements ActionListener {
     private void generateSequences() {
         Executors.newSingleThreadExecutor().execute(() -> {
             while (this.time-- > 0) {
-                List<Integer> seq = new LinkedList<>();
+                ArrayList<Integer> seq = new ArrayList<>();
                 Random r = new Random();
                 for (int i = 0; i < length; i++) {
                     seq.add(r.nextInt(10));

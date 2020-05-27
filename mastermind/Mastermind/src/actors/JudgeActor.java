@@ -84,6 +84,6 @@ public class JudgeActor extends MastermindActorImpl {
         this.sequenceInfoJudge = new SequenceInfoJudge(this.players);
 
         this.players.forEach(elem ->
-                elem.getReference().tell( new StartMsg(length, this.players, elem.getName()), getSelf()));
+                elem.getReference().tell( new StartMsg(length, this.players, elem.getName(), elem), getSelf()));
     }
 }

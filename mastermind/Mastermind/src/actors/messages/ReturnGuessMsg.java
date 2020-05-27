@@ -1,15 +1,17 @@
 package actors.messages;
 
+import model.SequenceInfoGuess;
+
 import java.util.ArrayList;
 
 public final class ReturnGuessMsg {
-    private final ArrayList<Integer> sequence;
+    private final SequenceInfoGuess sequence;
 
-    public ReturnGuessMsg(ArrayList<Integer> sequence) {
+    public ReturnGuessMsg(SequenceInfoGuess sequence) {
         this.sequence = sequence;
     }
 
-    public ArrayList<Integer> getSequence() {
+    public SequenceInfoGuess getSequence() {
         return this.sequence;
     }
 }

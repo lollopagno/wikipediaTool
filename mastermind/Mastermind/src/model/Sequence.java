@@ -1,11 +1,12 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface Sequence {
     List<Integer> getSequence();
 
-    void setSequence(List<Integer> numbers);
+    void setSequence(ArrayList<Integer> numbers);
 
-    SequenceInfoGuess tryNumbers(List<Integer> numbers);
+    SequenceInfoGuess tryNumbers(ArrayList<Integer> numbers);
 }
