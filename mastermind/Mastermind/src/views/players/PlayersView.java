@@ -3,6 +3,8 @@ package views.players;
 import model.Sequence;
 import model.SequenceInfoGuess;
 
+import java.util.ArrayList;
+
 public interface PlayersView {
     /**
      * Add a new registered player to the view.
@@ -10,7 +12,7 @@ public interface PlayersView {
      *
      * @param player Registered player.
      */
-    void addPlayer(String player, Sequence sequence);
+    void addPlayer(String player, ArrayList<Integer> sequence);
 
     /**
      * Show the guess made by a player to another.

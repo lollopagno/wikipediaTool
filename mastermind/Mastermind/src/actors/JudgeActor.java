@@ -10,11 +10,12 @@ import java.util.*;
 public class JudgeActor extends MastermindActorImpl {
     private SequenceInfoJudge sequenceInfoJudge;
     private PlayersView view;
-    private final List<PlayerInfo> players;
-    private int readyMex = 0;
+    private final ArrayList<PlayerInfo> players;
+    private int allReadyMsg = 0;
+    private int currentIndexTurn = 0;
 
     public JudgeActor() {
-        this.players = new ArrayList<PlayerInfo>();
+        this.players = new ArrayList<>();
     }
 
     @Override
@@ -26,55 +27,63 @@ public class JudgeActor extends MastermindActorImpl {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                .match(StartGameMsg.class, msg -> {  // startGame che arriva dalla view
+
+                // Msg dalla View
+                .match(StartGameMsg.class, msg -> {
                     this.log("Judge START GAME Received:");
                     this.view = msg.getView();
                     this.startGame(msg.getPlayers(), msg.getLength());
-                }).match(ReadyMsg.class, msg -> { // ready che arriva dai giocatori
-                    //contatore per tutti i messaggi di ready // Aspettare tutti i player
+
+                // Msg dai player di READY
+                }).match(ReadyMsg.class, msg -> {
+
                     this.log("Judge Ready Message Received:");
-                    // TODO CORRETTO ASPETTARE TUTTI I MESSAGGI DI READY?
-                    int number = getreadyNmex();
-                    while (number < players.size()) {
-                        //Thread.sleep(1);
-                        log("wait");
-                    }
-                    //crea un ordine per i turni // Quando sono tutti pronti
-                    // TODO ORDINE RANDOM DEI PLAYERS --> sequenceInfoJudge
-                    // lista che dovrebbe essere random
-                    this.sequenceInfoJudge.newOrderTurn();
-                    for (int i = 0; i < players.size(); i++) {
-                        PlayerInfo elem = this.sequenceInfoJudge.getNextPlayers(i);
-                        // TODO INVIO A UN ALTRO PLAYER -> COME?
-                        elem.getReference().tell(new StartTurn(msg.getPlayers(), msg.getLength()),
-                                getSelf());
+
+                    this.allReadyMsg ++;
+
+                    while (this.allReadyMsg < players.size()) {
+                        log("wait for count "+this.allReadyMsg);
                     }
 
+                    // Setto il nuovo ordine del turno corrente turno
+                    this.sequenceInfoJudge.newOrderTurn();
+
+                    // Do la parola al giocatore in base all'ordine
+                    PlayerInfo currentPlayer = this.sequenceInfoJudge.getNextPlayers(this.currentIndexTurn);
+                    currentPlayer.getReference().tell(new StartTurn(), getSelf());
+
+                    this.currentIndexTurn ++;
+
+                // Msg dal player di endTurn (è terminato SOLO il suo turno)
                 }).match(EndTurn.class, msg-> {
-                    // TODO COME GESTISCE LA COSA DELLA RICORSIONE DEL TURNO?
+
+                    // Inizio un nuovo turno
+                    if (currentIndexTurn == this.players.size()){
+
+                        this.currentIndexTurn = 0;
+                        this.sequenceInfoJudge.newOrderTurn();
+                    }
+
+                    PlayerInfo currentPlayer = this.sequenceInfoJudge.getNextPlayers(this.currentIndexTurn);
+                    currentPlayer.getReference().tell(new StartTurn(), getSelf());
+
+                    this.currentIndexTurn ++;
+
                 }).build();
     }
 
+    // Crea i player all'inzio del gioco
     private void startGame(int players, int length) {
+
         for (int i = 0; i < players; i++) {
-            PlayerInfo player =
-                    new PlayerInfo("player_" + i, this.getContext(), players);
+            PlayerInfo player = new PlayerInfo("player_" + i, this.getContext(), players);
             this.players.add(player);
-            // TODO: Generare tutti gli altri players.
-            //this.view.addPlayer("player_"+i, );
         }
 
+        // Creo l'istanza per gestire ogni turno di una partita
+        this.sequenceInfoJudge = new SequenceInfoJudge(this.players);
+
         this.players.forEach(elem ->
-                //invia messaggio agli attori con lunghezza  e tutti i giocatori
-                //getSelf è chi lo invia..
-                elem.getReference().tell(
-                        new StartMsg(length, this.players),
-                        getSelf()));
-
+                elem.getReference().tell( new StartMsg(length, this.players, elem.getName()), getSelf()));
     }
-
-    private int getreadyNmex() {
-        return readyMex++;
-    }
-
 }

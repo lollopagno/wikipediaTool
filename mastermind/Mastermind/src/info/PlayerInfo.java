@@ -11,7 +11,8 @@ public class PlayerInfo {
     private final String name;
     private final ActorRef reference;
     private final int player;
-    ArrayList<Integer> sequence;
+
+    ArrayList<Integer> sequence = new ArrayList<>();
 
     public PlayerInfo(String name, ActorContext context, int player ) {
         this.name = name;
@@ -19,11 +20,15 @@ public class PlayerInfo {
         this.player = player;
     }
 
-    private String getName() {
+    public String getName() {
         return this.name;
     }
 
     public ActorRef getReference() {
         return reference;
     }
+
+    public void setSequence(ArrayList<Integer> sequence) {this.sequence = sequence;}
+
+    public ArrayList<Integer> getSequence() {return  this.sequence;}
 }
