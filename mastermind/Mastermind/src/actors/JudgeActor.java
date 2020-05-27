@@ -1,9 +1,6 @@
 package actors;
 
-import actors.messages.ReadyMsg;
-import actors.messages.StartGameMsg;
-import actors.messages.StartMsg;
-import actors.messages.StartTurn;
+import actors.messages.*;
 import model.SequenceInfoJudge;
 import info.PlayerInfo;
 import views.players.PlayersView;
@@ -46,18 +43,16 @@ public class JudgeActor extends MastermindActorImpl {
                     // TODO ORDINE RANDOM DEI PLAYERS --> sequenceInfoJudge
                     // lista che dovrebbe essere random
                     this.sequenceInfoJudge.newOrderTurn();
-                    for(int i = 0; i < players.size(); i++){
+                    for (int i = 0; i < players.size(); i++) {
                         this.sequenceInfoJudge.getNextPlayers(i);
                         // TODO INVIO A UN ALTRO PLAYER -> COME?
                         getSelf().tell(new StartTurn(msg.getPlayers(), msg.getLength()),
                                 getSelf());
                     }
 
-                    //invio tentativo // startTurn // Generi sequenza e invii messaggio al primo
-                    // TODO END_TURN
-                    // Invia il messaggio all'attore successivo.
-                })
-                .build();
+                }).match(EndTurn.class, msg-> {
+                    // TODO COME GESTISCE LA COSA DELLA RICORSIONE DEL TURNO?
+                }).build();
     }
 
     private void startGame(int players, int length) {
