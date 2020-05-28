@@ -64,8 +64,8 @@ public class GameView extends JFrame implements ActionListener {
         this.judgeRef = system.actorOf(Props.create(JudgeActor.class), "judge");
 
         // TODO: Remove those after actors implementation.
-        this.generatePlayers();
-        this.generateSequences();
+        //this.generatePlayers();
+        //this.generateSequences();
     }
 
     @Override

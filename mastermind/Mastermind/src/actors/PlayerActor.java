@@ -31,9 +31,7 @@ public class PlayerActor extends MastermindActorImpl {
         return receiveBuilder()
 
                 .match(StartMsg.class, msg -> {
-                    // StartMsg dal Judge
-                    this.log("Player START MSG Received:");
-
+                    this.view = msg.getView();
                     // Lunghezza della stringa
                     this.stringLength = msg.getLength();
                     // Tutti i giocatori
@@ -43,17 +41,19 @@ public class PlayerActor extends MastermindActorImpl {
                     this.sequence = createNumber(this.stringLength);
 
                     this.iAm = msg.getPlayer();
+                    // StartMsg dal Judge
+                    this.log("Player" + this.iAm.getName()+ " START MSG Received");
                     // Setto il numero che ha scelto il player
                     this.iAm.setSequence(this.sequence);
 
                     // Comunico alla view il numero scelto
                     this.view.addPlayer(msg.getName(), this.sequence);
 
-                    getSender().tell(new ReadyMsg(this.players), getSelf());
+                    getSender().tell(new ReadyMsg(this.players, this.iAm.getName()), getSelf());
 
                 }).match(StartTurn.class, msg -> {
                     // StartTurn dal Judge
-                    this.log("Player START TURN Received:");
+                    this.log("Player"  + this.iAm.getName()+ "START TURN Received");
 
                     // Genera la stringa guess
                     Sequence trySequence = createNumber(this.stringLength);
@@ -61,7 +61,7 @@ public class PlayerActor extends MastermindActorImpl {
                     // Invio il guess a un player scelto a caso
                     PlayerInfo playerSendGuess = getPlayer();
                     // TODO funziona l'invio?? (al player playerSendGuess)
-                    playerSendGuess.getReference().tell(new GuessMsg(trySequence), getSelf());
+                    playerSendGuess.getReference().tell(new GuessMsg(trySequence), this.iAm.getReference());
 
                 }).match(GuessMsg.class, msg -> {
                     // GuessMsg dal player che ha richiesto il guess
