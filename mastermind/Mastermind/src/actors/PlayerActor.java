@@ -42,7 +42,7 @@ public class PlayerActor extends MastermindActorImpl {
 
                     this.iAm = msg.getPlayer();
                     // StartMsg dal Judge
-                    this.log("Player" + this.iAm.getName()+ " START MSG Received");
+                    this.log("Player " + this.iAm.getName()+ " START MSG Received");
                     // Setto il numero che ha scelto il player
                     this.iAm.setSequence(this.sequence);
 
@@ -53,7 +53,7 @@ public class PlayerActor extends MastermindActorImpl {
 
                 }).match(StartTurn.class, msg -> {
                     // StartTurn dal Judge
-                    this.log("Player"  + this.iAm.getName()+ "START TURN Received");
+                    this.log("Player "  + this.iAm.getName()+ " START TURN Received");
 
                     // Genera la stringa guess
                     Sequence trySequence = createNumber(this.stringLength);
