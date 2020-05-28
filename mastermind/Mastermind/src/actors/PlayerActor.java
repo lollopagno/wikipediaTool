@@ -59,7 +59,7 @@ public class PlayerActor extends MastermindActorImpl {
                     Sequence trySequence = createNumber(this.stringLength);
 
                     // Invio il guess a un player scelto a caso
-                    PlayerInfo playerSendGuess = getPlayer();
+                    PlayerInfo playerSendGuess = getPlayer(); // TODO : TOGLIERE SE STESSO DAL RANDOM
                     // TODO funziona l'invio?? (al player playerSendGuess)
                     playerSendGuess.getReference().tell(new GuessMsg(trySequence), getSelf());
                     this.log(this.iAm.getName()+  " Guess " + playerSendGuess.getName());
