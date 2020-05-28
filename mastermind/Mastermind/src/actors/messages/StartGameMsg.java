@@ -2,7 +2,7 @@ package actors.messages;
 
 import views.players.PlayersView;
 
-public class StartGameMsg {
+public class StartGameMsg implements Message {
     private final int length, players, time;
     private final PlayersView view;
 

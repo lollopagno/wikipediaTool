@@ -2,9 +2,7 @@ package actors.messages;
 
 import model.SequenceInfoGuess;
 
-import java.util.ArrayList;
-
-public final class ReturnGuessMsg {
+public final class ReturnGuessMsg implements Message {
     private final SequenceInfoGuess sequence;
 
     public ReturnGuessMsg(SequenceInfoGuess sequence) {

@@ -1,32 +1,29 @@
 package model;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class SequenceImpl implements Sequence {
-    ArrayList<Integer> numbers;
+    List<Integer> numbers;
 
-    public SequenceImpl(ArrayList<Integer> numbers){
+    public SequenceImpl(List<Integer> numbers){
         this.numbers = numbers;
     }
 
     @Override
     // Ritorna la sequenza random scelta da un players
-    public ArrayList<Integer> getSequence() {
+    public List<Integer> getSequence() {
         return numbers;
     }
 
     @Override
     //Setta la sequenza random scelta da un players
-    public void setSequence(ArrayList<Integer> numbers) {
+    public void setSequence(List<Integer> numbers) {
         this.numbers = numbers;
     }
 
-
     @Override
-    //Verifico il numero di cifre corrette (corrette al posto giusto, corrette ma non al posto giusto)
-    public SequenceInfoGuess tryNumbers(ArrayList<Integer> numbers) {
+    public SequenceInfoGuess tryGuess(Sequence guess) {
         //TODO DA VERIFICARE CON TEST
 
         int rightNumbers = 0;
