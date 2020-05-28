@@ -38,18 +38,17 @@ public class JudgeActor extends MastermindActorImpl {
 
                     this.allReadyMsg ++;
 
-                    while (this.allReadyMsg < players.size()) {
-                        log("wait for count "+this.allReadyMsg);
+                    if (this.allReadyMsg == players.size()) {
+
+                        // Setto il nuovo ordine del turno corrente turno
+                        this.sequenceInfoJudge.newOrderTurn();
+
+                        // Do la parola al giocatore in base all'ordine
+                        PlayerInfo currentPlayer = this.sequenceInfoJudge.getNextPlayers(this.currentIndexTurn);
+                        currentPlayer.getReference().tell(new StartTurn(), getSelf());
+
+                        this.currentIndexTurn++;
                     }
-
-                    // Setto il nuovo ordine del turno corrente turno
-                    this.sequenceInfoJudge.newOrderTurn();
-
-                    // Do la parola al giocatore in base all'ordine
-                    PlayerInfo currentPlayer = this.sequenceInfoJudge.getNextPlayers(this.currentIndexTurn);
-                    currentPlayer.getReference().tell(new StartTurn(), getSelf());
-
-                    this.currentIndexTurn ++;
 
                 }).match(EndTurn.class, msg-> {
                     // Msg dal player di endTurn (è terminato SOLO il suo turno)
@@ -63,7 +62,7 @@ public class JudgeActor extends MastermindActorImpl {
                     PlayerInfo currentPlayer = this.sequenceInfoJudge.getNextPlayers(this.currentIndexTurn);
                     currentPlayer.getReference().tell(new StartTurn(), getSelf());
 
-                    this.currentIndexTurn ++;
+                        this.currentIndexTurn++;
 
                 }).build();
     }
