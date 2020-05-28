@@ -61,8 +61,8 @@ public class PlayerActor extends MastermindActorImpl {
                     // Invio il guess a un player scelto a caso
                     PlayerInfo playerSendGuess = getPlayer();
                     // TODO funziona l'invio?? (al player playerSendGuess)
-                    playerSendGuess.getReference().tell(new GuessMsg(trySequence), this.iAm.getReference());
-
+                    playerSendGuess.getReference().tell(new GuessMsg(trySequence), getSelf());
+                    this.log(this.iAm.getName()+  " Guess " + playerSendGuess.getName());
                 }).match(GuessMsg.class, msg -> {
                     // GuessMsg dal player che ha richiesto il guess
                     // Stringa chiesta dal players
@@ -70,8 +70,9 @@ public class PlayerActor extends MastermindActorImpl {
 
                     // Invio al player la risposta di caratteri corretti o sbagliati
                     getSender().tell(new ReturnGuessMsg(this.iAm.getSequence().tryGuess(guess)), getSelf());
-
+                    this.log(this.iAm.getName() +" Response ");
                 }).match(ReturnGuessMsg.class, msg -> {
+                    this.log(this.iAm.getName() + " Return Response");
                     // ReturnGuessMsg dal player (risposta di quanti caratteri giusti ho indovinato)
                     int rightNumbers = msg.getSequence().getRightNumbers();
                     int rightPlaceNumbers = msg.getSequence().getRightPlaceNumbers();
