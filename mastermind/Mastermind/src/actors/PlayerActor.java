@@ -105,13 +105,13 @@ public class PlayerActor extends MastermindActorImpl {
         return new SequenceImpl(number);
     }
 
-    private  void solutionCorrect(ArrayList PlayerNumber, ArrayList myNumber){
+    /*private  void solutionCorrect(ArrayList PlayerNumber, ArrayList myNumber){
         if(PlayerNumber == myNumber) {
             //TODO SEGNALO LA WIEW CHE C'È STATA UN VINCITORE
         }else{
             // TODO CONTROLLO DEI VARI NUMERI ALL'INTERNO QUALI CORRETTI E QUALI NO
         }
-    }
+    }*/
     private Sequence getMyNumber(){
         return this.sequence;
     }
