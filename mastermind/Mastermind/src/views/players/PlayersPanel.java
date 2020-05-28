@@ -21,10 +21,9 @@ public class PlayersPanel extends JPanel implements PlayersView {
     public PlayersPanel() {
         this.players = new HashSet<>();
         this.panel = new JPanel();
-        this.panel.setPreferredSize(new Dimension(620, 480));
+        // this.panel.setPreferredSize(new Dimension(599, 1600));
         JScrollPane pane = new JScrollPane(this.panel);
-        this.setLayout(new BorderLayout());
-        this.add(BorderLayout.CENTER, pane);
+        this.add(pane);
     }
 
     @Override
@@ -40,6 +39,7 @@ public class PlayersPanel extends JPanel implements PlayersView {
         Optional<PlayerView> view = this.getPlayerViewByName(from);
         view.ifPresent(v -> v.inputSolution(to, sequence));
         this.updateUI();
+        this.panel.updateUI();
     }
 
     @Override
