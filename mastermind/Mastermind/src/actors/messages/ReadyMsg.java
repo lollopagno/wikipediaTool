@@ -4,17 +4,11 @@ import info.PlayerInfo;
 
 import java.util.List;
 
-public class ReadyMsg {
+public class ReadyMsg implements Message {
     private final List<PlayerInfo> players;
-    private final int length;
 
-    public ReadyMsg(List<PlayerInfo> players, int length) {
+    public ReadyMsg(List<PlayerInfo> players) {
         this.players = players;
-        this.length= length;
-    }
-
-    public int getLength() {
-        return this.length;
     }
 
     public List<PlayerInfo> getPlayers() {

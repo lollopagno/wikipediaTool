@@ -27,16 +27,13 @@ public class JudgeActor extends MastermindActorImpl {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-
-                // Msg dalla View
                 .match(StartGameMsg.class, msg -> {
+                    // Msg dalla View
                     this.log("Judge START GAME Received:");
                     this.view = msg.getView();
                     this.startGame(msg.getPlayers(), msg.getLength());
-
-                // Msg dai player di READY
                 }).match(ReadyMsg.class, msg -> {
-
+                    // Msg dai player di READY
                     this.log("Judge Ready Message Received:");
 
                     this.allReadyMsg ++;
@@ -54,9 +51,8 @@ public class JudgeActor extends MastermindActorImpl {
 
                     this.currentIndexTurn ++;
 
-                // Msg dal player di endTurn (è terminato SOLO il suo turno)
                 }).match(EndTurn.class, msg-> {
-
+                    // Msg dal player di endTurn (è terminato SOLO il suo turno)
                     // Inizio un nuovo turno
                     if (currentIndexTurn == this.players.size()){
 

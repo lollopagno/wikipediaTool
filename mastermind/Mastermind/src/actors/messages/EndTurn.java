@@ -1,7 +1,7 @@
 package actors.messages;
 
-public class EndTurn {
-    private boolean sequenceFound;
+public class EndTurn implements Message {
+    private final boolean sequenceFound;
 
     public EndTurn(boolean sequenceFound){
         this.sequenceFound = sequenceFound;

@@ -3,7 +3,6 @@ package actors.messages;
 import info.PlayerInfo;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class StartMsg implements Message {
     private final int length;

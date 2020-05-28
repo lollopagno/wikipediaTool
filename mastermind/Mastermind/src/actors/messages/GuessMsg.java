@@ -1,15 +1,22 @@
 package actors.messages;
 
+import model.Sequence;
+import model.SequenceImpl;
+
 import java.util.ArrayList;
 
-public final class GuessMsg {
-    private final ArrayList<Integer> sequence;
+public final class GuessMsg implements Message {
+    private final Sequence sequence;
 
-    public GuessMsg(ArrayList<Integer> sequence) {
+    public GuessMsg(ArrayList<Integer> numbers) {
+        this(new SequenceImpl(numbers));
+    }
+
+    public GuessMsg(Sequence sequence) {
         this.sequence = sequence;
     }
 
-    public ArrayList<Integer> getSequence() {
+    public Sequence getSequence() {
         return this.sequence;
     }
 }
