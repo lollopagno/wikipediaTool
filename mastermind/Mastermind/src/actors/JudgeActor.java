@@ -34,7 +34,7 @@ public class JudgeActor extends MastermindActorImpl {
                     this.startGame(msg.getPlayers(), msg.getLength());
                 }).match(ReadyMsg.class, msg -> {
                     // Msg dai player di READY
-                    this.log("Judge" +  msg.getPlayerName() + " Ready Message Received");
+                    this.log("Judge Ready Message Received by " + msg.getPlayerName());
 
                     this.allReadyMsg ++;
 
@@ -79,6 +79,6 @@ public class JudgeActor extends MastermindActorImpl {
         this.sequenceInfoJudge = new SequenceInfoJudge(this.players);
 
         this.players.forEach(elem ->
-                elem.getReference().tell( new StartMsg(length, this.players, elem.getName(), elem, view), getSelf()));
+                elem.getReference().tell( new StartMsg(length, this.players, elem.getName(), elem, view,getSender() ), getSelf()));
     }
 }

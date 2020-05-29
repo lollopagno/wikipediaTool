@@ -1,6 +1,7 @@
 package actors;
 
 import actors.messages.*;
+import akka.actor.ActorRef;
 import info.PlayerInfo;
 import model.Sequence;
 import model.SequenceImpl;
@@ -15,6 +16,7 @@ public class PlayerActor extends MastermindActorImpl {
     private ArrayList<PlayerInfo> players;
     private PlayerInfo iAm;
     private int stringLength;
+    private ActorRef judgeActor;
 
     private final Random rand = new Random();
 
@@ -39,7 +41,7 @@ public class PlayerActor extends MastermindActorImpl {
 
                     // Crea il numero da indovinare
                     this.sequence = createNumber(this.stringLength);
-
+                    this.judgeActor = msg.getJudge();
                     this.iAm = msg.getPlayer();
                     // StartMsg dal Judge
                     this.log("Player " + this.iAm.getName()+ " START MSG Received");
@@ -78,9 +80,11 @@ public class PlayerActor extends MastermindActorImpl {
                     int rightPlaceNumbers = msg.getSequence().getRightPlaceNumbers();
 
                     // 1- Inviare a tutti i players la risposta
+                    this.players.forEach(elem -> {
+                        elem.getReference().tell( new NumberAnswer(rightNumbers,rightPlaceNumbers), getSelf());
+                    });
                     // 2- Inviare al Judge il msg fine turno (vado al prossimo giocatore o al nuovo turno)
-
-                    //getSender().tell(new EndTurn(/*boolean*/),getSelf());
+                    this.judgeActor.tell(new EndTurn(true),getSelf()); // true dentro è sbagliato
 
                 }).build();
     }
