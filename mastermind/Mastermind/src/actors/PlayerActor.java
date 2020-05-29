@@ -5,6 +5,7 @@ import akka.actor.ActorRef;
 import info.PlayerInfo;
 import model.Sequence;
 import model.SequenceImpl;
+import model.SequenceInfoGuess;
 import views.players.PlayersView;
 
 import java.util.ArrayList;
@@ -14,9 +15,10 @@ public class PlayerActor extends MastermindActorImpl {
 
     private Sequence sequence;
     private ArrayList<PlayerInfo> players;
-    private PlayerInfo iAm;
-    private int stringLength;
     private ActorRef judgeActor;
+    private PlayerInfo iAm;
+
+    private int stringLength;
 
     private final Random rand = new Random();
 
@@ -25,14 +27,16 @@ public class PlayerActor extends MastermindActorImpl {
     @Override
     public void preStart() throws Exception {
         super.preStart();
-        this.log("Giocatore creato");
+        this.log("Player created!");
     }
 
     @Override
     public Receive createReceive() {
         return receiveBuilder()
 
+                // StartMsg dal Judge
                 .match(StartMsg.class, msg -> {
+
                     this.view = msg.getView();
                     // Lunghezza della stringa
                     this.stringLength = msg.getLength();
@@ -43,56 +47,93 @@ public class PlayerActor extends MastermindActorImpl {
                     this.sequence = createNumber(this.stringLength);
                     this.judgeActor = msg.getJudge();
                     this.iAm = msg.getPlayer();
-                    // StartMsg dal Judge
-                    this.log("Player " + this.iAm.getName()+ " START MSG Received");
+
                     // Setto il numero che ha scelto il player
                     this.iAm.setSequence(this.sequence);
+
+                    // StartMsg dal Judge
+                    this.log("Player " + this.iAm.getName()+ " START MSG Received and NUMBER is "+this.sequence);
 
                     // Comunico alla view il numero scelto
                     this.view.addPlayer(msg.getName(), this.sequence);
 
                     getSender().tell(new ReadyMsg(this.players, this.iAm.getName()), getSelf());
 
+                // StartTurn dal Judge
                 }).match(StartTurn.class, msg -> {
-                    // StartTurn dal Judge
+
                     this.log("Player "  + this.iAm.getName()+ " START TURN Received");
 
                     // Genera la stringa guess
                     Sequence trySequence = createNumber(this.stringLength);
 
                     // Invio il guess a un player scelto a caso
-                    PlayerInfo playerSendGuess = getPlayer(); // TODO : TOGLIERE SE STESSO DAL RANDOM
-                    // TODO funziona l'invio?? (al player playerSendGuess)
-                    playerSendGuess.getReference().tell(new GuessMsg(trySequence), getSelf());
-                    this.log(this.iAm.getName()+  " Guess " + playerSendGuess.getName());
+                    PlayerInfo playerSendGuess = getPlayer();
+
+                    this.log("Player "  + this.iAm.getName()+ " send guess "+trySequence+" to the "+playerSendGuess.getName()
+                            +" with number is "+playerSendGuess.getSequence());
+
+                    playerSendGuess.getReference().tell(new GuessMsg(trySequence, this.iAm), getSelf());
+
+                // GuessMsg dal player
                 }).match(GuessMsg.class, msg -> {
-                    // GuessMsg dal player che ha richiesto il guess
+
+                    this.log("Players "+this.iAm.getName() +" Response to the GUESS MSG at all players");
+
                     // Stringa chiesta dal players
                     Sequence guess = msg.getSequence();
 
-                    // Invio al player la risposta di caratteri corretti o sbagliati
+                    // Risposta da inviare
+                    SequenceInfoGuess response = this.iAm.getSequence().tryGuess(guess);
+
+                    // Invio a tutti i player (tranne me stesso e al mittente) la risposta di caratteri corretti o sbagliati
+                    ArrayList<PlayerInfo> playersTmp = this.players;
+                    // Rimuovo me stesso
+                    playersTmp.remove(this.iAm);
+
+                    playersTmp.forEach(elem -> {
+
+                        // Invio a tutti gli altri la risposta
+                        elem.getReference().tell(new NumberAnswer(response.getRightNumbers(), response.getRightPlaceNumbers()), getSelf());
+                    });
+
+                    // Invio al mittente la risposta
                     getSender().tell(new ReturnGuessMsg(this.iAm.getSequence().tryGuess(guess)), getSelf());
-                    this.log(this.iAm.getName() +" Response ");
+
+                // ReturnGuessMsg dal player che risponde in funzione del guess richiesto
                 }).match(ReturnGuessMsg.class, msg -> {
-                    this.log(this.iAm.getName() + " Return Response");
+
                     // ReturnGuessMsg dal player (risposta di quanti caratteri giusti ho indovinato)
                     int rightNumbers = msg.getSequence().getRightNumbers();
                     int rightPlaceNumbers = msg.getSequence().getRightPlaceNumbers();
 
-                    // 1- Inviare a tutti i players la risposta
-                    this.players.forEach(elem -> {
-                        elem.getReference().tell( new NumberAnswer(rightNumbers,rightPlaceNumbers), getSelf());
-                    });
-                    // 2- Inviare al Judge il msg fine turno (vado al prossimo giocatore o al nuovo turno)
-                    this.judgeActor.tell(new EndTurn(true),getSelf()); // true dentro è sbagliato
+                    this.log("Players "+this.iAm.getName() + " RETURN GUESS MSG with response:\nRight Numbers: "
+                            +rightNumbers+"\nRight Place Number: "+rightPlaceNumbers+"\n");
+
+                    // Invio al Judge il msg di fine turno (vado al prossimo giocatore o al nuovo turno)
+                    this.judgeActor.tell(new EndTurn(),getSelf());
+
+                // NumberAnswer dal player che invia A TUTTI la risposta
+                }).match(NumberAnswer.class, msg -> {
+
+                    this.log("Players "+this.iAm.getName()+" NUMBERS ANSWER\nRight Numbers: "+msg.getRightNumbers()+"\nRight Place Number: "+msg.getRightPlaceNumbers()+"\n");
+
+                    // TODO Memorizzare informazione sulla risposta ricevuta
 
                 }).build();
     }
 
     // Scelgo un player da inviare il guess
     private PlayerInfo getPlayer(){
-        int number = this.rand.nextInt(this.players.size());
-        return this.players.get(number);
+
+        ArrayList<PlayerInfo> playersTmp;
+
+        playersTmp = this.players;
+        playersTmp.remove(this.iAm);
+
+        int number = this.rand.nextInt(playersTmp.size());
+
+        return playersTmp.get(number);
     }
 
     /**

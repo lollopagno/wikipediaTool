@@ -21,20 +21,24 @@ public class JudgeActor extends MastermindActorImpl {
     @Override
     public void preStart() throws Exception {
         super.preStart();
-        this.log("Arbitro creato");
+        this.log("Judge created!");
     }
 
     @Override
     public Receive createReceive() {
         return receiveBuilder()
+
+                // StartGameMsg inviato dalla view
                 .match(StartGameMsg.class, msg -> {
-                    // Msg dalla View
+
                     this.log("Judge START GAME Received");
                     this.view = msg.getView();
                     this.startGame(msg.getPlayers(), msg.getLength());
+
+                // Msg dai player di READY
                 }).match(ReadyMsg.class, msg -> {
-                    // Msg dai player di READY
-                    this.log("Judge Ready Message Received by " + msg.getPlayerName());
+
+                    this.log("Judge READY MESSAGE Received by " + msg.getPlayerName());
 
                     this.allReadyMsg ++;
 
@@ -43,6 +47,8 @@ public class JudgeActor extends MastermindActorImpl {
                         // Setto il nuovo ordine del turno corrente turno
                         this.sequenceInfoJudge.newOrderTurn();
 
+                        this.log("Judge set new Order Turn: "+this.sequenceInfoJudge.showTurn());
+
                         // Do la parola al giocatore in base all'ordine
                         PlayerInfo currentPlayer = this.sequenceInfoJudge.getNextPlayers(this.currentIndexTurn);
                         currentPlayer.getReference().tell(new StartTurn(), getSelf());
@@ -50,8 +56,9 @@ public class JudgeActor extends MastermindActorImpl {
                         this.currentIndexTurn++;
                     }
 
+                // Msg dal player di endTurn (è terminato SOLO il suo turno)
                 }).match(EndTurn.class, msg-> {
-                    // Msg dal player di endTurn (è terminato SOLO il suo turno)
+
                     // Inizio un nuovo turno
                     if (currentIndexTurn == this.players.size()){
 
@@ -60,6 +67,8 @@ public class JudgeActor extends MastermindActorImpl {
                     }
 
                     PlayerInfo currentPlayer = this.sequenceInfoJudge.getNextPlayers(this.currentIndexTurn);
+                    log("currentPlayer "+currentPlayer);
+                    this.log("Judge send MSG at next players: "+currentPlayer.getName());
                     currentPlayer.getReference().tell(new StartTurn(), getSelf());
 
                     this.currentIndexTurn++;
@@ -79,6 +88,6 @@ public class JudgeActor extends MastermindActorImpl {
         this.sequenceInfoJudge = new SequenceInfoJudge(this.players);
 
         this.players.forEach(elem ->
-                elem.getReference().tell( new StartMsg(length, this.players, elem.getName(), elem, view,getSender() ), getSelf()));
+                elem.getReference().tell( new StartMsg(length, this.players, elem.getName(), elem, view, getSelf()), getSelf()));
     }
 }

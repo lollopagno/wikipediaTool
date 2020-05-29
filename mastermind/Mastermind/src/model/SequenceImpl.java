@@ -24,18 +24,19 @@ public class SequenceImpl implements Sequence {
 
     @Override
     public SequenceInfoGuess tryGuess(Sequence guess) {
-        //TODO DA VERIFICARE CON TEST
+
+        List<Integer> myGuess = guess.getSequence();
 
         int rightNumbers = 0;
         int rightPlaceNumbers = 0;
 
         // Per ogni elemento del guess verifico se è presente nella stringa scelta dal players
-        for(int indexGuess = 0; indexGuess<numbers.size(); indexGuess++){
+        for(int indexGuess = 0; indexGuess<myGuess.size(); indexGuess++){
 
             // Estraggo il numero del guess
-            int numberGuess = numbers.get(indexGuess);
+            int numberGuess = myGuess.get(indexGuess);
 
-            //Lo cerco nella stringa del players
+            //Lo cerco nella lista del players
             for(int indexPlayer = 0; indexPlayer<this.numbers.size(); indexPlayer++){
 
                 if (numberGuess == this.numbers.get(indexPlayer)){
@@ -59,5 +60,11 @@ public class SequenceImpl implements Sequence {
         if(!value.isPresent())
             throw new NumberFormatException("The sequence is not a good number.");
         return value.get();
+    }
+
+    private void log(String message){
+        synchronized (System.out){
+            System.out.println(message);
+        }
     }
 }

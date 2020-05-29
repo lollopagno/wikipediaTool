@@ -21,7 +21,7 @@ public class SequenceInfoJudge {
     public PlayerInfo getNextPlayers(int currentIndex){
 
         if (currentIndex+1 < this.players.size()) {
-            return this.players.get(currentIndex+1);
+            return this.players.get(currentIndex);
         }
 
         return null;
@@ -30,17 +30,44 @@ public class SequenceInfoJudge {
     // Ricalcola l'ordine dei players per ogni turno
     public void newOrderTurn(){
 
+        // Array temporaneo all'array players per gestire l'estrazione dei player
+        ArrayList<PlayerInfo> playersTmp;
+        playersTmp = this.players;
+
         ArrayList<PlayerInfo> newOrder = new ArrayList<>();
 
-        for(int i = 0; i<this.players.size(); i++) {
+        for(int i =0; i < this.players.size(); i++) {
 
             // Scelgo un numero random
-            int random = this.rand.nextInt(this.players.size());
+            int random = this.rand.nextInt(playersTmp.size());
 
             //Inserisco nel nuovo ordine l'elemento estratto
-            newOrder.add(this.players.remove(random));
+            newOrder.add((playersTmp.remove(random)));
+
+            // Aggiungo l'ultimo player visto che è rimasto solo lui
+            if(playersTmp.size() == 1){
+                newOrder.add(playersTmp.remove(0));
+            }
         }
 
         this.players = (ArrayList<PlayerInfo>) newOrder.clone();
+    }
+
+    // Visualizza stato ordine dell'ordine dei player rispetto al turno corrente
+    public ArrayList<String> showTurn(){
+
+        ArrayList<String> orderPlayer = new ArrayList<>();
+
+        for (PlayerInfo player : this.players) {
+            orderPlayer.add(player.getName());
+        }
+        return orderPlayer;
+    }
+
+
+    private void log(String message){
+        synchronized (System.out){
+            System.out.println(message);
+        }
     }
 }
