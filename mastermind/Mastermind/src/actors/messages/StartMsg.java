@@ -1,21 +1,20 @@
 package actors.messages;
 
-import actors.JudgeActor;
 import akka.actor.ActorRef;
 import info.PlayerInfo;
 import views.players.PlayersView;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class StartMsg implements Message {
     private final int length;
     public String name;
-    private final ArrayList<PlayerInfo> allPlayers;
+    private final List<PlayerInfo> allPlayers;
     private final PlayerInfo player;
     private final ActorRef judgeActor;
-    private PlayersView view;
+    private final PlayersView view;
 
-    public StartMsg(int length, ArrayList<PlayerInfo> players, String name, PlayerInfo player, PlayersView view, ActorRef judgeActor)
+    public StartMsg(int length, List<PlayerInfo> players, String name, PlayerInfo player, PlayersView view, ActorRef judgeActor)
     {
         this.length = length;
         this.allPlayers = players;
@@ -29,7 +28,7 @@ public class StartMsg implements Message {
         return length;
     }
 
-    public ArrayList<PlayerInfo> getAllPlayers() {
+    public List<PlayerInfo> getAllPlayers() {
         return allPlayers;
     }
 
@@ -38,5 +37,6 @@ public class StartMsg implements Message {
     public String getName() { return this.name; }
 
     public PlayersView getView(){ return  this.view; }
+
     public ActorRef getJudge() { return judgeActor; }
 }

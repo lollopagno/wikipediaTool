@@ -7,11 +7,11 @@ import model.Sequence;
 import model.SequenceInfoGuess;
 import views.players.PlayersView;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class PlayerActor extends MastermindActorImpl {
 
-    private ArrayList<PlayerInfo> others;
+    private List<PlayerInfo> others;
     private ActorRef judgeActor;
     private PlayerInfo iAm;
 
@@ -20,7 +20,7 @@ public class PlayerActor extends MastermindActorImpl {
     @Override
     public void preStart() throws Exception {
         super.preStart();
-        this.log(iAm.getName() + " pre start");
+        this.log(" pre start");
     }
 
     @Override
@@ -77,9 +77,7 @@ public class PlayerActor extends MastermindActorImpl {
                     SequenceInfoGuess response = this.iAm.getSequence().tryGuess(guess);
 
                     // Send the number response to all players except the sender.
-                    others.forEach(elem -> {
-                        elem.getReference().tell(new NumberAnswer(response.getRightNumbers(), response.getRightPlaceNumbers()), getSelf());
-                    });
+                    others.forEach(elem -> elem.getReference().tell(new NumberAnswer(response.getRightNumbers(), response.getRightPlaceNumbers()), getSelf()));
 
                     // Send to the sender the full response.
                     getSender().tell(new ReturnGuessMsg(response), getSelf());
