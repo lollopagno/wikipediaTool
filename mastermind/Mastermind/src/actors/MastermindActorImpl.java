@@ -8,7 +8,7 @@ public abstract class MastermindActorImpl extends AbstractActor implements Maste
 
     protected void log(String message){
         synchronized (System.out){
-            System.out.println(message);
+            System.out.println("[" + this.getSelf().path().name() + "] " + message);
         }
     }
 }
