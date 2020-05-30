@@ -1,12 +1,13 @@
 package model;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
 public class SequenceImpl implements Sequence {
     List<Integer> numbers;
 
-    public SequenceImpl(List<Integer> numbers){
+    public SequenceImpl(List<Integer> numbers) {
         this.numbers = numbers;
     }
 
@@ -17,35 +18,36 @@ public class SequenceImpl implements Sequence {
     }
 
     @Override
-    //Setta la sequenza random scelta da un players
+    // Setta la sequenza random scelta da un players
     public void setSequence(List<Integer> numbers) {
         this.numbers = numbers;
     }
 
     @Override
     public SequenceInfoGuess tryGuess(Sequence guess) {
-
-        List<Integer> myGuess = guess.getSequence();
-
+        List<Integer> sequence = guess.getSequence();
         int rightNumbers = 0;
         int rightPlaceNumbers = 0;
+        // Memorizza se un numero l'ho già conteggiato oppure no.
+        HashMap<Integer, Boolean> visited = new HashMap<>();
+        for (Integer integer : sequence) {
+            visited.put(integer, true);
+        }
 
-        // Per ogni elemento del guess verifico se è presente nella stringa scelta dal players
-        for(int indexGuess = 0; indexGuess<myGuess.size(); indexGuess++){
-
-            // Estraggo il numero del guess
-            int numberGuess = myGuess.get(indexGuess);
-
-            //Lo cerco nella lista del players
-            for(int indexPlayer = 0; indexPlayer<this.numbers.size(); indexPlayer++){
-
-                if (numberGuess == this.numbers.get(indexPlayer)){
-
-                    // Ho trovato il numero
-                    // Verifico se è nella giusta posizione
-                    if(indexGuess == indexPlayer) rightPlaceNumbers++;
-                    else rightNumbers++;
-                    break;
+        // Verifico ogni singolo numero del guess.
+        for (int iGuess = 0; iGuess < sequence.size(); iGuess++) {
+            int nGuess = sequence.get(iGuess);
+            // Lo cerco nella lista del players.
+            for (int iPlayer = 0; iPlayer < this.numbers.size(); iPlayer++) {
+                if (nGuess == this.numbers.get(iPlayer)) {
+                    // Ho trovato il numero e verifico se è nella giusta posizione.
+                    // In questo ciclo contava 2 volte i numeri giusti.
+                    if (iGuess == iPlayer)
+                        rightPlaceNumbers++;
+                    else if(visited.get(iPlayer)){
+                        visited.put(iPlayer, false);
+                        rightNumbers++;
+                    }
                 }
             }
         }
@@ -57,14 +59,8 @@ public class SequenceImpl implements Sequence {
         Optional<String> value = this.numbers.stream()
                 .map(Object::toString)
                 .reduce(String::concat);
-        if(!value.isPresent())
+        if (!value.isPresent())
             throw new NumberFormatException("The sequence is not a good number.");
         return value.get();
-    }
-
-    private void log(String message){
-        synchronized (System.out){
-            System.out.println(message);
-        }
     }
 }
