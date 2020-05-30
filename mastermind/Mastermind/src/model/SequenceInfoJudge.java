@@ -18,7 +18,7 @@ public class SequenceInfoJudge {
     }
 
     // Restituisce il prossimo giocatore di un turno
-    public PlayerInfo getNextPlayers(int currentIndex){
+    public PlayerInfo getNextPlayer(int currentIndex){
 
         if (currentIndex+1 < this.players.size()) {
             return this.players.get(currentIndex);
