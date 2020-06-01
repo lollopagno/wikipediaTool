@@ -29,7 +29,6 @@ public class PlayerActor extends MastermindActorImpl {
 
                 // StartMsg dal Judge
                 .match(StartMsg.class, msg -> {
-
                     this.view = msg.getView();
                     // Save players references.
                     this.judgeActor = msg.getJudge();
@@ -45,7 +44,7 @@ public class PlayerActor extends MastermindActorImpl {
                     this.view.addPlayer(msg.getName(), iAm.getSequence());
 
                     // TODO: Ho modificato questo messaggio per tornare solo gli altri. Non dovrebbe succedere nulla.
-                    getSender().tell(new ReadyMsg(this.others, this.iAm.getName()), getSelf());
+                    getSender().tell(new ReadyMsg(this.others), getSelf());
 
                 // StartTurn dal Judge
                 })
@@ -56,6 +55,7 @@ public class PlayerActor extends MastermindActorImpl {
                     PlayerInfo playerSendGuess = getNextUnSolvedPlayer();
                     if(playerSendGuess == null) {
                         // TODO: Dovrei aver vinto il gioco.
+                        // TODO: Capire perché rimane a null e il primo giocatore automaticamente vince il gioco.
                         this.log("I've win!!!");
                     } else {
                         // Generate a new guess based on previous guesses.

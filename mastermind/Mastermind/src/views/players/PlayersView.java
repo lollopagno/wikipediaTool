@@ -27,4 +27,10 @@ public interface PlayersView {
      * @param player Player that had win.
      */
     void playerWin(String player);
+
+    /**
+     * Show a message in a label.
+     * @param message Message to show.
+     */
+    void showMessage(String message);
 }
