@@ -94,7 +94,175 @@ public class PlayerInfo {
         Sequence seq;
         do {
             // TODO: This generation may be interrupted.
-            seq = createNumber(length);
+            Random r = new Random();
+            List<Integer> last1 = last1try.getNumbers().getSequence();
+            List<Integer> last2 = last2try.getNumbers().getSequence();
+            int rightPlaced = last1try.getRightPlaceNumbers();
+            int right = last1try.getRightNumbers();
+            List<Integer> number = new ArrayList<>(lenght);
+            last1.forEach(e -> number.add(-1));
+
+            /*
+            Riempire la sequenza risultato con tutti i numeri che ho
+            messo nella giusta posizione.
+             */
+            /*
+            Step a: Scorrere tutta la seq1 alla ricerca del prossimo
+            numero uguale al corrispondente nella seq2. Questi numeri
+            sono sicuro che siano giusti e li aggiungo subito nella
+            soluzione. Continuo fino a quando non ho scorso tutta la seq1.
+             */
+            for (int i = 0; i < lenght && rightPlaced > 0; i++) {
+                if (last1.get(i).equals(last2.get(i))) {
+                    number.set(i, last1.get(i));
+                    last1.set(i, -1);
+                    last2.set(i, -1);
+                    right--;
+                    rightPlaced--;
+                }
+            }
+
+            /*
+            Scorro nuovamente tutta la seq1 a partire da un indice casuale
+            alla ricerca del prossimo numero che è contenuto anche nella
+            seq2 ma che non è nella stessa posizione nella seq1.
+            Questo sono sicuro essere un numero giusto, che nella sequenza 2
+            era mal posizionato ma che potrebbe essere ben posizionato nella seq1.
+            Quindi lo aggiungo alla soluzione. Continuo finché non ho scorso
+            nuovamente tutta la seq1. Ovviamente lo devo mettere in una
+            posizione diversa, altrimenti sarebbe stato ben posizionato.
+             */
+            for (int i = r.nextInt(lenght - rightPlaced), j = 0;
+                 j < lenght && rightPlaced > 0;
+                 i++, j++) {
+                if (i == lenght)
+                    i = 0;
+
+                // Se ho già sfruttato questo numero continuo.
+                int n = last1.get(i);
+                if(number.get(i) != -1 || n < 0 || last2.get(i) < 0)
+                    continue;
+
+                // Controllo se last2 contiene il numero e nel caso lo aggiungo ai numbers.
+                for(int x = 0; x < lenght; x++) {
+                    if(last2.get(x) == n){
+                        int rn, t = 0;
+                        /*
+                         Continuo ad estrarre numeri casuali finché non ne trovo uno idoneo.
+                         Se non riesco lo metto nella prima posizione libera.
+                         */
+                        do{
+                            rn = r.nextInt(lenght);
+                            t++;
+                        } while (rn != x &&
+                                t < lenght);
+                        if(t == lenght)
+                            for(int y = 0; y < lenght; y++)
+                                if(number.get(y) == -1)
+                                    rn = y;
+                        number.set(rn, n);
+                        last1.set(rn, -1);
+                        last2.set(rn, -1);
+                        right--;
+                        rightPlaced--;
+                    }
+                }
+            }
+
+            /*
+            A questo punto dovrei essere riuscito a trovare tutte le occorrenze
+            dei numeri correttamente posizionati che avevo rilevato nella seq1.
+            Se così non fosse, dovrei prendere dei numeri casuali dalla seq1
+            per finire tutti i numeri ben posizionati.
+             */
+            for (int i = r.nextInt(lenght), j = 0;
+                 j < lenght && rightPlaced > 0;
+                 i++, j++) {
+                if (i == lenght)
+                    i = 0;
+
+                // Se ho già sfruttato questo numero continuo.
+                if(number.get(i) != -1 || last1.get(i) < 0 || last2.get(i) < 0)
+                    continue;
+
+                int n = last1.get(i);
+                number.set(i, n);
+                last1.set(i, -1);
+                last2.set(i, -1);
+                right--;
+                rightPlaced--;
+            }
+
+            /*
+            Trovare tutti i numeri che ho indovinato ma mal posizionato.
+             */
+            for (int i = 0; i < lenght && right > 0; i++) {
+                // Controllo se last2 contiene il numero e nel caso lo aggiungo ai numbers.
+                int n = last1.get(i);
+                // Controllo se last2 contiene il numero e nel caso lo aggiungo ai numbers.
+                for(int x = 0; x < lenght; x++) {
+                    if(last2.get(x) == n){
+                        int rn, t = 0;
+                        /*
+                         Continuo ad estrarre numeri casuali finché non ne trovo uno idoneo.
+                         Se non riesco lo metto nella prima posizione libera.
+                         */
+                        do{
+                            rn = r.nextInt(lenght);
+                            t++;
+                        } while (rn != x &&
+                                t < lenght);
+                        if(t == lenght)
+                            for(int y = 0; y < lenght; y++)
+                                if(number.get(y) == -1)
+                                    rn = y;
+                        number.set(rn, n);
+                        last1.set(rn, -1);
+                        last2.set(rn, -1);
+                        right--;
+                        rightPlaced--;
+                    }
+                }
+            }
+            
+            for (int i = r.nextInt(lenght), j = 0;
+                 j < lenght && right > 0;
+                 i++, j++) {
+                if (i == lenght)
+                    i = 0;
+
+                int n = last1.get(i);
+                if(n != -1) {
+                    int rn, t = 0;
+                        /*
+                         Continuo ad estrarre numeri casuali finché non ne trovo uno idoneo.
+                         Se non riesco lo metto nella prima posizione libera.
+                         */
+                    do{
+                        rn = r.nextInt(lenght);
+                        t++;
+                    } while (rn != i &&
+                            t < lenght);
+                    if(t == lenght)
+                        for(int y = 0; y < lenght; y++)
+                            if(number.get(y) == -1)
+                                rn = y;
+                    number.set(rn, n);
+                    last1.set(rn, -1);
+                    right--;
+                }
+            }
+
+            /*
+             * Terza esplorazione: riempio casualmente tutti i rimanenti slot.
+             */
+            for (int i = 0; i < lenght; i++) {
+                if (number.get(i) == -1) {
+                    number.set(i, r.nextInt(10));
+                }
+            }
+
+            seq = new SequenceImpl(number);
         } while (alltries.contains(seq));
         forEachRandomInit(seq.getSequence(), System.out::println);
         return seq;
