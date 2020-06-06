@@ -9,6 +9,7 @@ import model.SequenceImpl;
 import model.SequenceInfoGuess;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 public class PlayerInfo {
     private final String name;
@@ -24,7 +25,7 @@ public class PlayerInfo {
         this.name = name;
         this.reference = context.actorOf(Props.create(PlayerActor.class), name);
         this.player = player;
-        this.last1try = this.last2try = new SequenceInfoGuess(null, 0, 0);
+        this.last1try = this.last2try = null;
         alltries = new TreeSet<>();
     }
 
@@ -50,7 +51,7 @@ public class PlayerInfo {
      * @return True if is solved, false then.
      */
     public boolean isSolved() {
-        return this.last1try.getRightPlaceNumbers() == this.sequence.getSequence().size();
+        return this.last1try != null && this.last1try.getRightPlaceNumbers() == this.sequence.getSequence().size();
     }
 
     /**
@@ -59,17 +60,17 @@ public class PlayerInfo {
      * @param guess Guess to save.
      */
     public void setTry(SequenceInfoGuess guess) {
-        if (guess.getRightPlaceNumbers() > this.last1try.getRightPlaceNumbers()) {
+        if (this.last1try != null && guess.getRightPlaceNumbers() > this.last1try.getRightPlaceNumbers()) {
             this.last2try = this.last1try;
-            this.last1try = guess;
         }
+        this.last1try = guess;
     }
 
     public Sequence extractGuess() {
         // TODO: Da completare. Ritornare una sequenza coerente con i tentativi precedenti.
         int length = this.sequence.getSequence().size();
-        if (this.last1try != null) {
-            return createElaborateSequence(length, this.last1try.getNumbers());
+        if (this.last1try != null && this.last2try != null) {
+            return createElaborateSequence(length);
         }
         return createNumber(length);
     }
@@ -89,12 +90,31 @@ public class PlayerInfo {
         return new SequenceImpl(number);
     }
 
-    private Sequence createElaborateSequence(int length, Sequence previousSequence) {
+    private Sequence createElaborateSequence(int lenght) {
         Sequence seq;
         do {
             // TODO: This generation may be interrupted.
             seq = createNumber(length);
         } while (alltries.contains(seq));
+        forEachRandomInit(seq.getSequence(), System.out::println);
         return seq;
+    }
+
+    /**
+     * Utility method.
+     * @param list List to fetch.
+     * @param action Action to do.
+     */
+    public void forEachRandomInit(List<Integer> list, Consumer<? super Integer> action){
+        // Generate the new random start index.
+        int s = new Random().nextInt(list.size());
+        // Start from random index. Repeat at max length times.
+        for (int i = s, j = 0; j < list.size(); i++, j++) {
+            if (i == list.size())
+                i = 0;
+
+            // Pass the current item to the consumer.
+            action.accept(list.get(i));
+        }
     }
 }

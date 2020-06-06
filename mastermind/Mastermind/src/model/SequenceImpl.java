@@ -48,7 +48,7 @@ public class SequenceImpl implements Sequence {
                 }
             }
         }
-        return new SequenceInfoGuess(this, rightNumbers, rightPlaceNumbers);
+        return new SequenceInfoGuess(guess, rightNumbers, rightPlaceNumbers);
     }
 
     @Override

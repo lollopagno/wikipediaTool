@@ -30,7 +30,6 @@ public class JudgeActor extends MastermindActorImpl {
                     this.view = msg.getView();
                     this.view.showMessage(message);
                     this.timeBetweenTurns = msg.getTime();
-                    waitTime();
                     this.startGame(msg.getPlayers(), msg.getLength());
                 })
                 .match(ReadyMsg.class, msg -> {
