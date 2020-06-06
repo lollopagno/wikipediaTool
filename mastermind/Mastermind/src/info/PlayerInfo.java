@@ -25,7 +25,7 @@ public class PlayerInfo {
         this.name = name;
         this.reference = context.actorOf(Props.create(PlayerActor.class), name);
         this.player = player;
-        this.last1try = this.last2try = null;
+        this.last1try = this.last2try = new SequenceInfoGuess(null, 0,0);
     }
 
     public String getName() {
@@ -65,7 +65,11 @@ public class PlayerInfo {
 
     public Sequence extractGuess(){
         // TODO: Da completare. Ritornare una sequenza coerente con i tentativi precedenti.
-        return createNumber(this.sequence.getSequence().size());
+        int length = this.sequence.getSequence().size();
+        if(this.last1try != null) {
+            return createElaborateSequence(length, this.last1try.getNumbers());
+        }
+        return createNumber(length);
     }
 
     /**
@@ -80,5 +84,9 @@ public class PlayerInfo {
             number.add(r.nextInt(10));
         }
         return new SequenceImpl(number);
+    }
+
+    private Sequence createElaborateSequence(int length, Sequence previousSequence){
+        return createNumber(length);
     }
 }
