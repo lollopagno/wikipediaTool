@@ -12,7 +12,6 @@ public class JudgeActor extends MastermindActorImpl {
     private SequenceInfoJudge sequenceInfoJudge;
     private PlayersView view;
     private int allReadyMsg = 0;
-    private int currentIndexTurn = 0;
     private int timeBetweenTurns = 0;
 
     @Override
@@ -24,8 +23,8 @@ public class JudgeActor extends MastermindActorImpl {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                // StartGameMsg inviato dalla view
                 .match(StartGameMsg.class, msg -> {
+                    // StartGameMsg inviato dalla view
                     String message = "Judge START GAME Received";
                     // this.log(message);
                     this.view = msg.getView();
@@ -34,8 +33,8 @@ public class JudgeActor extends MastermindActorImpl {
                     waitTime();
                     this.startGame(msg.getPlayers(), msg.getLength());
                 })
-                // Msg dai player di READY
                 .match(ReadyMsg.class, msg -> {
+                    // Msg dai player di READY
                     this.allReadyMsg++;
                     String senderName = getSender().path().name();
                     this.log("READY MESSAGE Received by " + senderName);
@@ -50,40 +49,27 @@ public class JudgeActor extends MastermindActorImpl {
                         wakeUpNextPlayer();
                     }
                 })
-                // Msg dal player di endTurn (è terminato SOLO il suo turno)
                 .match(EndTurn.class, msg -> {
+                    // Msg dal player di endTurn (è terminato SOLO il suo turno)
                     if (msg.hasPlayerWin()) {
                         // TODO: Inviare un messaggio a tutti gli altri player per notificarli della vittoria di un player.
                         this.view.playerWin(getSender().path().name());
                         return;
                     }
 
-                    // Check if need to start a new turn.
-                    checkStartNewTurn();
+                    waitTime();
                     // Wake up a new player.
                     wakeUpNextPlayer();
                 }).build();
     }
 
     /**
-     * Check if a new turn is needed.
-     */
-    private void checkStartNewTurn() {
-        if (currentIndexTurn == this.sequenceInfoJudge.getNPlayers()) {
-            this.currentIndexTurn = 0;
-            this.sequenceInfoJudge.newOrderTurn();
-            this.view.showMessage("New turn started.");
-        }
-    }
-
-    /**
      * Send the msg start turn to the next player.
      */
     private void wakeUpNextPlayer() {
-        PlayerInfo nextPlayer = this.sequenceInfoJudge.getNextPlayer(this.currentIndexTurn);
+        PlayerInfo nextPlayer = this.sequenceInfoJudge.getNextPlayer();
         nextPlayer.getReference().tell(new StartTurn(), getSelf());
         this.log("Judge sent START TURN MSG at player: " + nextPlayer.getName());
-        this.currentIndexTurn++;
     }
 
     /**

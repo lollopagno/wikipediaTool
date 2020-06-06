@@ -91,13 +91,15 @@ public class PlayerActor extends MastermindActorImpl {
                     this.log("RETURN GUESS MSG with response:\nRight Numbers: "
                             +rightNumbers+"\nRight Place Number: "+rightPlaceNumbers+"\n");
 
+                    // Save the guess and notify the view.
+                    String enemy = getSender().path().name();
                     others.saveGuess(
-                            getSender().path().name(),
+                            enemy,
                             msg.getSequence());
+                    view.inputSolution(iAm.getName(), enemy, msg.getSequence());
 
                     // Invio al Judge il msg di fine turno (vado al prossimo giocatore o al nuovo turno)
                     this.judgeActor.tell(new EndTurn(),getSelf());
-
                 })
                 .match(NumberAnswer.class, msg -> {
                     // NumberAnswer dal player che invia A TUTTI la risposta

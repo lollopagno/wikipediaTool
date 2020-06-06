@@ -56,8 +56,23 @@ public class SequenceImpl implements Sequence {
         Optional<String> value = this.numbers.stream()
                 .map(Object::toString)
                 .reduce(String::concat);
-        if (!value.isPresent())
+        if (value.isEmpty())
             throw new NumberFormatException("The sequence is not a good number.");
         return value.get();
+    }
+
+    @Override
+    public int compareTo(Sequence sequence) {
+        if(numbers.size() != sequence.getSequence().size())
+            throw new IllegalArgumentException("Comparation of sequences of different size.");
+
+        for(int i = 0; i < numbers.size(); i++){
+            int order = numbers.get(i).compareTo(sequence.getSequence().get(i));
+            // If there's an order, I'll return it.
+            if(order != 0)
+                return order;
+        }
+        // Return that the sequences are equals.
+        return 0;
     }
 }
