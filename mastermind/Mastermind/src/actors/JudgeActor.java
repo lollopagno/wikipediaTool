@@ -18,7 +18,7 @@ public class JudgeActor extends MastermindActorImpl {
     @Override
     public void preStart() throws Exception {
         super.preStart();
-        this.log("Judge created!");
+        // this.log("Judge created!");
     }
 
     @Override
@@ -27,10 +27,11 @@ public class JudgeActor extends MastermindActorImpl {
                 // StartGameMsg inviato dalla view
                 .match(StartGameMsg.class, msg -> {
                     String message = "Judge START GAME Received";
-                    this.log(message);
+                    // this.log(message);
                     this.view = msg.getView();
                     this.view.showMessage(message);
                     this.timeBetweenTurns = msg.getTime();
+                    waitTime();
                     this.startGame(msg.getPlayers(), msg.getLength());
                 })
                 // Msg dai player di READY
@@ -51,7 +52,7 @@ public class JudgeActor extends MastermindActorImpl {
                 })
                 // Msg dal player di endTurn (è terminato SOLO il suo turno)
                 .match(EndTurn.class, msg -> {
-                    if(msg.hasPlayerWin()) {
+                    if (msg.hasPlayerWin()) {
                         // TODO: Inviare un messaggio a tutti gli altri player per notificarli della vittoria di un player.
                         this.view.playerWin(getSender().path().name());
                         return;
@@ -79,12 +80,6 @@ public class JudgeActor extends MastermindActorImpl {
      * Send the msg start turn to the next player.
      */
     private void wakeUpNextPlayer() {
-        try {
-            Thread.sleep(this.timeBetweenTurns);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
         PlayerInfo nextPlayer = this.sequenceInfoJudge.getNextPlayer(this.currentIndexTurn);
         nextPlayer.getReference().tell(new StartTurn(), getSelf());
         this.log("Judge sent START TURN MSG at player: " + nextPlayer.getName());
@@ -93,8 +88,9 @@ public class JudgeActor extends MastermindActorImpl {
 
     /**
      * Create players at the start of game.
+     *
      * @param nPlayers Total player number.
-     * @param length Sequence length.
+     * @param length   Sequence length.
      */
     private void startGame(int nPlayers, int length) {
         final List<PlayerInfo> players = new ArrayList<>();
@@ -108,6 +104,28 @@ public class JudgeActor extends MastermindActorImpl {
 
         // Inizialize all players.
         players.forEach(elem ->
-                elem.getReference().tell(new StartMsg(length, players, elem.getName(), elem, view, getSelf()), getSelf()));
+        {
+            elem.getReference().tell(
+                    new StartMsg(
+                            length,
+                            players,
+                            elem.getName(),
+                            elem,
+                            view,
+                            getSelf()),
+                    getSelf());
+            waitTime();
+        });
+    }
+
+    /**
+     * Wait the necessary time between turns.
+     */
+    void waitTime() {
+        try {
+            Thread.sleep(this.timeBetweenTurns);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

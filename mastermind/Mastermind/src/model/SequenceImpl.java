@@ -1,8 +1,6 @@
 package model;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class SequenceImpl implements Sequence {
     List<Integer> numbers;
@@ -28,11 +26,10 @@ public class SequenceImpl implements Sequence {
         List<Integer> sequence = guess.getSequence();
         int rightNumbers = 0;
         int rightPlaceNumbers = 0;
+
         // Memorizza se un numero l'ho già conteggiato oppure no.
-        HashMap<Integer, Boolean> visited = new HashMap<>();
-        for (Integer integer : sequence) {
-            visited.put(integer, true);
-        }
+        List<Boolean> visited = new LinkedList<>();
+        sequence.forEach(e -> visited.add(true));
 
         // Verifico ogni singolo numero del guess.
         for (int iGuess = 0; iGuess < sequence.size(); iGuess++) {
@@ -45,7 +42,7 @@ public class SequenceImpl implements Sequence {
                     if (iGuess == iPlayer)
                         rightPlaceNumbers++;
                     else if(visited.get(iPlayer)){
-                        visited.put(iPlayer, false);
+                        visited.set(iPlayer, false);
                         rightNumbers++;
                     }
                 }
