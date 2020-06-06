@@ -95,8 +95,8 @@ public class PlayerInfo {
         do {
             // TODO: This generation may be interrupted.
             Random r = new Random();
-            List<Integer> last1 = last1try.getNumbers().getSequence();
-            List<Integer> last2 = last2try.getNumbers().getSequence();
+            List<Integer> last1 = new ArrayList<>(last1try.getNumbers().getSequence());
+            List<Integer> last2 = new ArrayList<>(last2try.getNumbers().getSequence());
             int rightPlaced = last1try.getRightPlaceNumbers();
             int right = last1try.getRightNumbers();
             List<Integer> number = new ArrayList<>(lenght);
@@ -115,14 +115,13 @@ public class PlayerInfo {
             for (int i = 0; i < lenght && rightPlaced > 0; i++) {
                 if (last1.get(i).equals(last2.get(i))) {
                     number.set(i, last1.get(i));
-                    last1.set(i, -1);
-                    last2.set(i, -1);
-                    right--;
                     rightPlaced--;
                 }
             }
 
-            /*
+            // Il successivo passaggio lo devo svolgere solo se ci sono dei numeri giusti.
+            if (right > 0 && rightPlaced > 0) {
+/*
             Scorro nuovamente tutta la seq1 a partire da un indice casuale
             alla ricerca del prossimo numero che è contenuto anche nella
             seq2 ma che non è nella stessa posizione nella seq1.
@@ -132,39 +131,25 @@ public class PlayerInfo {
             nuovamente tutta la seq1. Ovviamente lo devo mettere in una
             posizione diversa, altrimenti sarebbe stato ben posizionato.
              */
-            for (int i = r.nextInt(lenght - rightPlaced), j = 0;
-                 j < lenght && rightPlaced > 0;
-                 i++, j++) {
-                if (i == lenght)
-                    i = 0;
+                for (int i = r.nextInt(lenght - rightPlaced), j = 0;
+                     j < lenght && rightPlaced > 0;
+                     i++, j++) {
+                    if (i == lenght)
+                        i = 0;
 
-                // Se ho già sfruttato questo numero continuo.
-                int n = last1.get(i);
-                if(number.get(i) != -1 || n < 0 || last2.get(i) < 0)
-                    continue;
+                    // Se ho già sfruttato questo numero continuo.
+                    int n = last1.get(i);
+                    if (number.get(i) != -1 || n < 0 || last2.get(i) < 0)
+                        continue;
 
-                // Controllo se last2 contiene il numero e nel caso lo aggiungo ai numbers.
-                for(int x = 0; x < lenght; x++) {
-                    if(last2.get(x) == n){
-                        int rn, t = 0;
-                        /*
-                         Continuo ad estrarre numeri casuali finché non ne trovo uno idoneo.
-                         Se non riesco lo metto nella prima posizione libera.
-                         */
-                        do{
-                            rn = r.nextInt(lenght);
-                            t++;
-                        } while (rn != x &&
-                                t < lenght);
-                        if(t == lenght)
-                            for(int y = 0; y < lenght; y++)
-                                if(number.get(y) == -1)
-                                    rn = y;
-                        number.set(rn, n);
-                        last1.set(rn, -1);
-                        last2.set(rn, -1);
-                        right--;
-                        rightPlaced--;
+                    // Controllo se last2 contiene il numero e nel caso lo aggiungo ai numbers.
+                    for (int x = 0; x < lenght; x++) {
+                        if (last2.get(x) == n) {
+                            int rn = getRandomFreeIndexNotI(number, i);
+                            number.set(rn, n);
+                            rightPlaced--;
+                            right--;
+                        }
                     }
                 }
             }
@@ -182,14 +167,11 @@ public class PlayerInfo {
                     i = 0;
 
                 // Se ho già sfruttato questo numero continuo.
-                if(number.get(i) != -1 || last1.get(i) < 0 || last2.get(i) < 0)
+                if (number.get(i) != -1 || last1.get(i) < 0 || last2.get(i) < 0)
                     continue;
 
                 int n = last1.get(i);
                 number.set(i, n);
-                last1.set(i, -1);
-                last2.set(i, -1);
-                right--;
                 rightPlaced--;
             }
 
@@ -197,34 +179,22 @@ public class PlayerInfo {
             Trovare tutti i numeri che ho indovinato ma mal posizionato.
              */
             for (int i = 0; i < lenght && right > 0; i++) {
+                // Controllo che non sia un numero che ho già gestito.
+                if (number.get(i) != -1)
+                    continue;
+
                 // Controllo se last2 contiene il numero e nel caso lo aggiungo ai numbers.
                 int n = last1.get(i);
                 // Controllo se last2 contiene il numero e nel caso lo aggiungo ai numbers.
-                for(int x = 0; x < lenght; x++) {
-                    if(last2.get(x) == n){
-                        int rn, t = 0;
-                        /*
-                         Continuo ad estrarre numeri casuali finché non ne trovo uno idoneo.
-                         Se non riesco lo metto nella prima posizione libera.
-                         */
-                        do{
-                            rn = r.nextInt(lenght);
-                            t++;
-                        } while (rn != x &&
-                                t < lenght);
-                        if(t == lenght)
-                            for(int y = 0; y < lenght; y++)
-                                if(number.get(y) == -1)
-                                    rn = y;
+                for (int x = 0; x < lenght; x++) {
+                    if (last2.get(x) == n) {
+                        int rn = getRandomFreeIndexNotI(number, i);
                         number.set(rn, n);
-                        last1.set(rn, -1);
-                        last2.set(rn, -1);
                         right--;
-                        rightPlaced--;
                     }
                 }
             }
-            
+
             for (int i = r.nextInt(lenght), j = 0;
                  j < lenght && right > 0;
                  i++, j++) {
@@ -232,21 +202,8 @@ public class PlayerInfo {
                     i = 0;
 
                 int n = last1.get(i);
-                if(n != -1) {
-                    int rn, t = 0;
-                        /*
-                         Continuo ad estrarre numeri casuali finché non ne trovo uno idoneo.
-                         Se non riesco lo metto nella prima posizione libera.
-                         */
-                    do{
-                        rn = r.nextInt(lenght);
-                        t++;
-                    } while (rn != i &&
-                            t < lenght);
-                    if(t == lenght)
-                        for(int y = 0; y < lenght; y++)
-                            if(number.get(y) == -1)
-                                rn = y;
+                if (n != -1) {
+                    int rn = getRandomFreeIndexNotI(number, i);
                     number.set(rn, n);
                     last1.set(rn, -1);
                     right--;
@@ -256,13 +213,9 @@ public class PlayerInfo {
             /*
              * Terza esplorazione: riempio casualmente tutti i rimanenti slot.
              */
-            for (int i = 0; i < lenght; i++) {
-                if (number.get(i) == -1) {
-                    number.set(i, r.nextInt(10));
-                }
-            }
+            List<Integer> filled = fillNumberWithRand(lenght, number);
 
-            seq = new SequenceImpl(number);
+            seq = new SequenceImpl(filled);
         } while (alltries.contains(seq));
         forEachRandomInit(seq.getSequence(), System.out::println);
         return seq;
@@ -270,10 +223,11 @@ public class PlayerInfo {
 
     /**
      * Utility method.
-     * @param list List to fetch.
+     *
+     * @param list   List to fetch.
      * @param action Action to do.
      */
-    public void forEachRandomInit(List<Integer> list, Consumer<? super Integer> action){
+    public void forEachRandomInit(List<Integer> list, Consumer<? super Integer> action) {
         // Generate the new random start index.
         int s = new Random().nextInt(list.size());
         // Start from random index. Repeat at max length times.
@@ -284,5 +238,49 @@ public class PlayerInfo {
             // Pass the current item to the consumer.
             action.accept(list.get(i));
         }
+    }
+
+    /**
+     * Fill the number with random Integers.
+     *
+     * @param length Length to fill.
+     * @param number Base to fill.
+     * @return New number filled.
+     */
+    List<Integer> fillNumberWithRand(int length, List<Integer> number) {
+        Random r = new Random();
+        List<Integer> tmp = new ArrayList<>(number);
+        // Fill the number.
+        for (int i = 0; i < number.size(); i++)
+            if (tmp.get(i) == -1)
+                tmp.set(i, r.nextInt(10));
+
+        // Fill the length.
+        for (int i = number.size(); i < length; i++)
+            tmp.add(r.nextInt(10));
+
+        return tmp;
+    }
+
+    int getRandomFreeIndexNotI(List<Integer> number, int i) {
+        Random r = new Random();
+        int length = number.size();
+        int ri, t = 0;
+
+        /*
+         Continuo ad estrarre numeri casuali finché non ne trovo uno idoneo.
+         Se non riesco lo metto nella prima posizione libera.
+         */
+        do {
+            ri = r.nextInt(length);
+            t++;
+        } while (ri != i &&
+                t < length);
+        if (t == length)
+            for (int y = 0; y < length; y++)
+                if (number.get(y) == -1)
+                    ri = y;
+
+        return ri;
     }
 }

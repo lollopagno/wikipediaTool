@@ -72,6 +72,7 @@ public class SequenceImpl implements Sequence {
             if(order != 0)
                 return order;
         }
+        
         // Return that the sequences are equals.
         return 0;
     }
