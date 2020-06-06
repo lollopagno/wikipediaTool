@@ -12,29 +12,33 @@ public class JudgeActor extends MastermindActorImpl {
     private SequenceInfoJudge sequenceInfoJudge;
     private PlayersView view;
     private int allReadyMsg = 0;
-    private int currentIndexTurn = 0;
+    private int timeBetweenTurns = 0;
 
     @Override
     public void preStart() throws Exception {
         super.preStart();
-        this.log("Judge created!");
+        // this.log("Judge created!");
     }
 
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-
-                // StartGameMsg inviato dalla view
                 .match(StartGameMsg.class, msg -> {
-                    this.log("Judge START GAME Received");
+                    // StartGameMsg inviato dalla view
+                    String message = "Judge START GAME Received";
+                    // this.log(message);
                     this.view = msg.getView();
+                    this.view.showMessage(message);
+                    this.timeBetweenTurns = msg.getTime();
+                    waitTime();
                     this.startGame(msg.getPlayers(), msg.getLength());
-
-                    // Msg dai player di READY
                 })
                 .match(ReadyMsg.class, msg -> {
+                    // Msg dai player di READY
                     this.allReadyMsg++;
-                    this.log("READY MESSAGE Received by " + msg.getPlayerName() + " [" + this.allReadyMsg + "/" + this.sequenceInfoJudge.getNPlayers() + "]");
+                    String senderName = getSender().path().name();
+                    this.log("READY MESSAGE Received by " + senderName);
+                    this.log("Ready players -> [" + this.allReadyMsg + "/" + this.sequenceInfoJudge.getNPlayers() + "]");
 
                     if (this.allReadyMsg == this.sequenceInfoJudge.getNPlayers()) {
                         // Set the new player order.
@@ -44,19 +48,18 @@ public class JudgeActor extends MastermindActorImpl {
                         // Wake up a new player.
                         wakeUpNextPlayer();
                     }
-
-                    // Msg dal player di endTurn (è terminato SOLO il suo turno)
                 })
                 .match(EndTurn.class, msg -> {
-                    // Check if need to start a new turn.
-                    if (currentIndexTurn == this.sequenceInfoJudge.getNPlayers()) {
-                        this.currentIndexTurn = 0;
-                        this.sequenceInfoJudge.newOrderTurn();
+                    // Msg dal player di endTurn (è terminato SOLO il suo turno)
+                    if (msg.hasPlayerWin()) {
+                        // TODO: Inviare un messaggio a tutti gli altri player per notificarli della vittoria di un player.
+                        this.view.playerWin(getSender().path().name());
+                        return;
                     }
 
+                    waitTime();
                     // Wake up a new player.
                     wakeUpNextPlayer();
-
                 }).build();
     }
 
@@ -64,16 +67,16 @@ public class JudgeActor extends MastermindActorImpl {
      * Send the msg start turn to the next player.
      */
     private void wakeUpNextPlayer() {
-        PlayerInfo nextPlayer = this.sequenceInfoJudge.getNextPlayer(this.currentIndexTurn);
+        PlayerInfo nextPlayer = this.sequenceInfoJudge.getNextPlayer();
         nextPlayer.getReference().tell(new StartTurn(), getSelf());
         this.log("Judge sent START TURN MSG at player: " + nextPlayer.getName());
-        this.currentIndexTurn++;
     }
 
     /**
      * Create players at the start of game.
+     *
      * @param nPlayers Total player number.
-     * @param length Sequence length.
+     * @param length   Sequence length.
      */
     private void startGame(int nPlayers, int length) {
         final List<PlayerInfo> players = new ArrayList<>();
@@ -87,6 +90,28 @@ public class JudgeActor extends MastermindActorImpl {
 
         // Inizialize all players.
         players.forEach(elem ->
-                elem.getReference().tell(new StartMsg(length, players, elem.getName(), elem, view, getSelf()), getSelf()));
+        {
+            elem.getReference().tell(
+                    new StartMsg(
+                            length,
+                            players,
+                            elem.getName(),
+                            elem,
+                            view,
+                            getSelf()),
+                    getSelf());
+            waitTime();
+        });
+    }
+
+    /**
+     * Wait the necessary time between turns.
+     */
+    void waitTime() {
+        try {
+            Thread.sleep(this.timeBetweenTurns);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

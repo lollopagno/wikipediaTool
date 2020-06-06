@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Represent the list of numbers to find for each player.
  */
-public interface Sequence {
+public interface Sequence extends Comparable<Sequence> {
     /**
      * Return the list of numbers.
      * @return

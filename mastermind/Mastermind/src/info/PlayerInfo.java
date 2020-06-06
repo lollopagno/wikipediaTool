@@ -8,9 +8,7 @@ import model.Sequence;
 import model.SequenceImpl;
 import model.SequenceInfoGuess;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class PlayerInfo {
     private final String name;
@@ -20,12 +18,14 @@ public class PlayerInfo {
 
     private Sequence sequence;
     SequenceInfoGuess last1try, last2try;
+    Set<Sequence> alltries;
 
     public PlayerInfo(String name, ActorContext context, int player) {
         this.name = name;
         this.reference = context.actorOf(Props.create(PlayerActor.class), name);
         this.player = player;
-        this.last1try = this.last2try = null;
+        this.last1try = this.last2try = new SequenceInfoGuess(null, 0, 0);
+        alltries = new TreeSet<>();
     }
 
     public String getName() {
@@ -46,6 +46,7 @@ public class PlayerInfo {
 
     /**
      * The Player Sequence is solved if all numbers of the last try are right placed.
+     *
      * @return True if is solved, false then.
      */
     public boolean isSolved() {
@@ -54,31 +55,46 @@ public class PlayerInfo {
 
     /**
      * Save the previous guess only if is better than the second before.
+     *
      * @param guess Guess to save.
      */
-    public void setTry(SequenceInfoGuess guess){
-        if(guess.getRightPlaceNumbers() > this.last1try.getRightPlaceNumbers()) {
+    public void setTry(SequenceInfoGuess guess) {
+        if (guess.getRightPlaceNumbers() > this.last1try.getRightPlaceNumbers()) {
             this.last2try = this.last1try;
             this.last1try = guess;
         }
     }
 
-    public Sequence extractGuess(){
+    public Sequence extractGuess() {
         // TODO: Da completare. Ritornare una sequenza coerente con i tentativi precedenti.
-        return createNumber(this.sequence.getSequence().size());
+        int length = this.sequence.getSequence().size();
+        if (this.last1try != null) {
+            return createElaborateSequence(length, this.last1try.getNumbers());
+        }
+        return createNumber(length);
     }
 
     /**
      * Create my random sequence.
+     *
      * @param length Sequence length.
      * @return Generated sequence.
      */
-    private Sequence createNumber(int length){
+    private Sequence createNumber(int length) {
         Random r = new Random();
         List<Integer> number = new ArrayList<>();
-        for(int i = 0; i< length; i++){
+        for (int i = 0; i < length; i++) {
             number.add(r.nextInt(10));
         }
         return new SequenceImpl(number);
+    }
+
+    private Sequence createElaborateSequence(int length, Sequence previousSequence) {
+        Sequence seq;
+        do {
+            // TODO: This generation may be interrupted.
+            seq = createNumber(length);
+        } while (alltries.contains(seq));
+        return seq;
     }
 }

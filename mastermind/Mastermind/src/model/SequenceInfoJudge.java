@@ -2,60 +2,59 @@ package model;
 
 import info.PlayerInfo;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 // Memorizza l'array di players e (forse) gestisce il prossimo players di un turno e ricalcola l'ordine per ogni turno
 public class SequenceInfoJudge {
-
-    public ArrayList<PlayerInfo> players;
+    ArrayList<PlayerInfo> players;
+    int playerIndex;
 
     // Setta i players di una partita
     public SequenceInfoJudge(List<PlayerInfo> players) {
+        playerIndex = 0;
         this.players = (ArrayList<PlayerInfo>)((ArrayList<PlayerInfo>)players).clone();
     }
 
-    // Restituisce il prossimo giocatore di un turno
-    public PlayerInfo getNextPlayer(int currentIndex) {
+    /**
+     * Get the next player. Increment the player index.
+     * Calculate a new turn if needed.
+     * @return Turn player info.
+     */
+    public PlayerInfo getNextPlayer() {
+        if (playerIndex + 1 > this.players.size())
+            newOrderTurn();
 
-        if (currentIndex + 1 < this.players.size()) {
-            return this.players.get(currentIndex);
-        }
-
-        return null;
+        return this.players.get(playerIndex++);
     }
 
-    // Ricalcola l'ordine dei players per ogni turno
+    /**
+     * Generate a new turn sequence. Reset the player index.
+     */
     public void newOrderTurn() {
         Random rand = new Random();
-        // Array temporaneo all'array players per gestire l'estrazione dei player
         List<PlayerInfo> playersTmp = this.players;
         ArrayList<PlayerInfo> newOrder = new ArrayList<>();
 
-        for (int i = 0; i < this.players.size(); i++) {
-
-            // Scelgo un numero random
+        // Put a random player in the order.
+        for (int i = 0; i <= this.players.size(); i++) {
             int random = rand.nextInt(playersTmp.size());
-
-            //Inserisco nel nuovo ordine l'elemento estratto
-            newOrder.add((playersTmp.remove(random)));
-
-            // Aggiungo l'ultimo player visto che è rimasto solo lui
-            if (playersTmp.size() == 1) {
-                newOrder.add(playersTmp.remove(0));
-            }
+            newOrder.add(playersTmp.remove(random));
         }
 
         this.players = newOrder;
+        playerIndex = 0;
     }
 
     public int getNPlayers() {
         return this.players.size();
     }
 
-    // Visualizza stato ordine dell'ordine dei player rispetto al turno corrente
+    /**
+     * Visualizza stato ordine dell'ordine dei player rispetto al turno corrente
+     * @return Array List.
+     */
     public ArrayList<String> showTurn() {
 
         ArrayList<String> orderPlayer = new ArrayList<>();

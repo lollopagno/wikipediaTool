@@ -17,11 +17,14 @@ import java.util.Set;
 public class PlayersPanel extends JPanel implements PlayersView {
     private final Set<PlayerView> players;
     private final JPanel panel;
+    private final JLabel info;
 
     public PlayersPanel() {
         this.players = new HashSet<>();
         this.panel = new JPanel();
-        // this.panel.setPreferredSize(new Dimension(599, 1600));
+        this.info = new JLabel("Info label");
+        this.panel.add(this.info);
+        this.panel.setPreferredSize(new Dimension(599, 1600));
         JScrollPane pane = new JScrollPane(this.panel);
         this.add(pane);
     }
@@ -45,6 +48,11 @@ public class PlayersPanel extends JPanel implements PlayersView {
     @Override
     public void playerWin(String player) {
         System.out.println("Stop all!!! A player win!!!");
+    }
+
+    @Override
+    public void showMessage(String message) {
+        SwingUtilities.invokeLater(() -> this.info.setText("Info: " + message));
     }
 
     /**

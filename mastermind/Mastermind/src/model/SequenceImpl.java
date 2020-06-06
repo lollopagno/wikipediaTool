@@ -1,8 +1,6 @@
 package model;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class SequenceImpl implements Sequence {
     List<Integer> numbers;
@@ -28,11 +26,10 @@ public class SequenceImpl implements Sequence {
         List<Integer> sequence = guess.getSequence();
         int rightNumbers = 0;
         int rightPlaceNumbers = 0;
+
         // Memorizza se un numero l'ho già conteggiato oppure no.
-        HashMap<Integer, Boolean> visited = new HashMap<>();
-        for (Integer integer : sequence) {
-            visited.put(integer, true);
-        }
+        List<Boolean> visited = new LinkedList<>();
+        sequence.forEach(e -> visited.add(true));
 
         // Verifico ogni singolo numero del guess.
         for (int iGuess = 0; iGuess < sequence.size(); iGuess++) {
@@ -45,7 +42,7 @@ public class SequenceImpl implements Sequence {
                     if (iGuess == iPlayer)
                         rightPlaceNumbers++;
                     else if(visited.get(iPlayer)){
-                        visited.put(iPlayer, false);
+                        visited.set(iPlayer, false);
                         rightNumbers++;
                     }
                 }
@@ -59,8 +56,23 @@ public class SequenceImpl implements Sequence {
         Optional<String> value = this.numbers.stream()
                 .map(Object::toString)
                 .reduce(String::concat);
-        if (!value.isPresent())
+        if (value.isEmpty())
             throw new NumberFormatException("The sequence is not a good number.");
         return value.get();
+    }
+
+    @Override
+    public int compareTo(Sequence sequence) {
+        if(numbers.size() != sequence.getSequence().size())
+            throw new IllegalArgumentException("Comparation of sequences of different size.");
+
+        for(int i = 0; i < numbers.size(); i++){
+            int order = numbers.get(i).compareTo(sequence.getSequence().get(i));
+            // If there's an order, I'll return it.
+            if(order != 0)
+                return order;
+        }
+        // Return that the sequences are equals.
+        return 0;
     }
 }
