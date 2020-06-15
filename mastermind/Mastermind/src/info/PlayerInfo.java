@@ -99,7 +99,9 @@ public class PlayerInfo {
 
     private Sequence createElaborateSequence(int lenght) {
         Sequence seq;
+        int tries = 0;
         do {
+            tries++;
             // TODO: This generation may be interrupted.
             Random r = new Random();
             List<Integer> last1 = new ArrayList<>(last1try.getNumbers().getSequence());
@@ -119,8 +121,16 @@ public class PlayerInfo {
             sono sicuro che siano giusti e li aggiungo subito nella
             soluzione. Continuo fino a quando non ho scorso tutta la seq1.
              */
-            for (int i = 0; i < lenght && rightPlaced > 0; i++) {
-                if (last1.get(i).equals(last2.get(i))) {
+            // Generate the new random start index.
+            int s = new Random().nextInt(lenght);
+            // Start from random index. Repeat at max length times.
+            for (int i = s, j = 0; j < lenght; i++, j++) {
+                if (i == lenght)
+                    i = 0;
+
+                int l1 = last1.get(i);
+                int l2 = last2.get(i);
+                if (l1 == l2) {
                     number.set(i, last1.get(i));
                     rightPlaced--;
                 }
@@ -128,16 +138,16 @@ public class PlayerInfo {
 
             // Il successivo passaggio lo devo svolgere solo se ci sono dei numeri giusti.
             if (right > 0 && rightPlaced > 0) {
-/*
-            Scorro nuovamente tutta la seq1 a partire da un indice casuale
-            alla ricerca del prossimo numero che è contenuto anche nella
-            seq2 ma che non è nella stessa posizione nella seq1.
-            Questo sono sicuro essere un numero giusto, che nella sequenza 2
-            era mal posizionato ma che potrebbe essere ben posizionato nella seq1.
-            Quindi lo aggiungo alla soluzione. Continuo finché non ho scorso
-            nuovamente tutta la seq1. Ovviamente lo devo mettere in una
-            posizione diversa, altrimenti sarebbe stato ben posizionato.
-             */
+                /*
+                    Scorro nuovamente tutta la seq1 a partire da un indice casuale
+                    alla ricerca del prossimo numero che è contenuto anche nella
+                    seq2 ma che non è nella stessa posizione nella seq1.
+                    Questo sono sicuro essere un numero giusto, che nella sequenza 2
+                    era mal posizionato ma che potrebbe essere ben posizionato nella seq1.
+                    Quindi lo aggiungo alla soluzione. Continuo finché non ho scorso
+                    nuovamente tutta la seq1. Ovviamente lo devo mettere in una
+                    posizione diversa, altrimenti sarebbe stato ben posizionato.
+                 */
                 for (int i = r.nextInt(lenght - rightPlaced), j = 0;
                      j < lenght && rightPlaced > 0;
                      i++, j++) {
@@ -145,15 +155,17 @@ public class PlayerInfo {
                         i = 0;
 
                     // Se ho già sfruttato questo numero continuo.
-                    int n = last1.get(i);
-                    if (number.get(i) != -1 || n < 0 || last2.get(i) < 0)
+                    int m = last1.get(i);
+                    if (number.get(i) != -1 || m < 0)
                         continue;
 
                     // Controllo se last2 contiene il numero e nel caso lo aggiungo ai numbers.
                     for (int x = 0; x < lenght; x++) {
-                        if (last2.get(x) == n) {
+                        if (last2.get(x) == m) {
                             int rn = getRandomFreeIndexNotI(number, i);
-                            number.set(rn, n);
+                            number.set(rn, m);
+
+                            // Decremento entrambi perché li ho usati entrambi in questo passaggio.
                             rightPlaced--;
                             right--;
                         }
@@ -224,7 +236,7 @@ public class PlayerInfo {
 
             seq = new SequenceImpl(filled);
         } while (alltries.contains(seq));
-        forEachRandomInit(seq.getSequence(), System.out::println);
+        alltries.add(seq);
         return seq;
     }
 
