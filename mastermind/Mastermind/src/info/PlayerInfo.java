@@ -60,10 +60,17 @@ public class PlayerInfo {
      * @param guess Guess to save.
      */
     public void setTry(SequenceInfoGuess guess) {
-        if (this.last1try != null && guess.getRightPlaceNumbers() > this.last1try.getRightPlaceNumbers()) {
-            this.last2try = this.last1try;
+        if(last1try.getNumbers() == null) {
+            last1try = guess;
+            return;
         }
-        this.last1try = guess;
+
+        if (guess.getRightPlaceNumbers() > last1try.getRightPlaceNumbers() ||
+                guess.getRightPlaceNumbers() == last1try.getRightPlaceNumbers() &&
+                        guess.getRightNumbers() >= last1try.getRightNumbers()) {
+            last2try = last1try;
+            last1try = guess;
+        }
     }
 
     public Sequence extractGuess() {
@@ -262,6 +269,13 @@ public class PlayerInfo {
         return tmp;
     }
 
+    /**
+     * Get a random index from the list number that is not i.
+     *
+     * @param number List.
+     * @param i      Index to not extract.
+     * @return Random index.
+     */
     int getRandomFreeIndexNotI(List<Integer> number, int i) {
         Random r = new Random();
         int length = number.size();
