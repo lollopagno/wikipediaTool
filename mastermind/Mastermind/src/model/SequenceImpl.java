@@ -56,7 +56,7 @@ public class SequenceImpl implements Sequence {
         Optional<String> value = this.numbers.stream()
                 .map(Object::toString)
                 .reduce(String::concat);
-        if (value.isEmpty())
+        if (!value.isPresent())
             throw new NumberFormatException("The sequence is not a good number.");
         return value.get();
     }

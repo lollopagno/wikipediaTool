@@ -50,7 +50,7 @@ public class PlayerActor extends MastermindActorImpl {
                 })
                 .match(StartTurn.class, msg -> {
                     // StartTurn dal Judge
-                    this.log(" START TURN Received");
+                    this.log("START TURN Received");
 
                     // Send a guess to next unsolved player.
                     PlayerInfo playerSendGuess = others.getNextUnSolvedPlayer();
@@ -104,7 +104,7 @@ public class PlayerActor extends MastermindActorImpl {
                 .match(NumberAnswer.class, msg -> {
                     // NumberAnswer dal player che invia A TUTTI la risposta
 
-                    this.log(" NUMBERS ANSWER\nRight Numbers: "+msg.getRightNumbers()+"\nRight Place Number: "+msg.getRightPlaceNumbers()+"\n");
+                    this.log("NUMBERS ANSWER\nRight Numbers: "+msg.getRightNumbers()+"\nRight Place Number: "+msg.getRightPlaceNumbers()+"\n");
 
                     // TODO Memorizzare informazione sulla risposta ricevuta.
                     // In verità è inutile memorizzare la risposta se non si ha anche la sequenza ad essa collegata.
