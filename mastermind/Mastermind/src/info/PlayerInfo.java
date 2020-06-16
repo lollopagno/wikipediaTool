@@ -60,7 +60,7 @@ public class PlayerInfo {
      * @param guess Guess to save.
      */
     public void setTry(SequenceInfoGuess guess) {
-        if(last1try.getNumbers() == null) {
+        if(last1try == null || last1try.getNumbers() == null) {
             last1try = guess;
             return;
         }
@@ -235,7 +235,7 @@ public class PlayerInfo {
             List<Integer> filled = fillNumberWithRand(lenght, number);
 
             seq = new SequenceImpl(filled);
-        } while (alltries.contains(seq));
+        } while (alltries.contains(seq) && tries < 10000);
         alltries.add(seq);
         return seq;
     }
