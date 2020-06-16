@@ -26,7 +26,6 @@ public class JudgeActor extends MastermindActorImpl {
                 .match(StartGameMsg.class, msg -> {
                     // StartGameMsg inviato dalla view
                     String message = "Judge START GAME Received";
-                    // this.log(message);
                     this.view = msg.getView();
                     this.view.showMessage(message);
                     this.timeBetweenTurns = msg.getTime();
@@ -43,6 +42,8 @@ public class JudgeActor extends MastermindActorImpl {
                         // Set the new player order.
                         this.sequenceInfoJudge.newOrderTurn();
                         this.log("Judge set new Order Turn: " + this.sequenceInfoJudge.showTurn());
+                        // Default Value
+                        this.allReadyMsg = 0;
 
                         // Wake up a new player.
                         wakeUpNextPlayer();
@@ -50,16 +51,37 @@ public class JudgeActor extends MastermindActorImpl {
                 })
                 .match(EndTurn.class, msg -> {
                     // Msg dal player di endTurn (è terminato SOLO il suo turno)
+                    this.allReadyMsg ++;
+
+                    // PLayer Win
                     if (msg.hasPlayerWin()) {
                         // TODO: Inviare un messaggio a tutti gli altri player per notificarli della vittoria di un player.
                         this.view.playerWin(getSender().path().name());
                         return;
                     }
+                    else{
 
-                    waitTime();
-                    // Wake up a new player.
-                    wakeUpNextPlayer();
+                        checkNewOrderTurn();
+                        waitTime();
+                        // Wake up a new player.
+                        wakeUpNextPlayer();
+                    }
+
                 }).build();
+    }
+
+    /**
+     * Check and set new order turn.
+     */
+    private void checkNewOrderTurn(){
+
+        if(this.allReadyMsg == this.sequenceInfoJudge.getNPlayers()){
+            // Set the new player order.
+            this.sequenceInfoJudge.newOrderTurn();
+            this.log("Judge set new Order Turn: " + this.sequenceInfoJudge.showTurn());
+            // Default Value
+            this.allReadyMsg = 0;
+        }
     }
 
     /**
