@@ -61,7 +61,14 @@ public class JudgeActor extends MastermindActorImpl {
                     }
                     else{
 
-                        checkNewOrderTurn();
+                        if(this.allReadyMsg == this.sequenceInfoJudge.getNPlayers()){
+                            // Set the new player order.
+                            this.sequenceInfoJudge.newOrderTurn();
+                            this.log("Judge set new Order Turn: " + this.sequenceInfoJudge.showTurn());
+                            // Default Value
+                            this.allReadyMsg = 0;
+                        }
+
                         waitTime();
                         // Wake up a new player.
                         wakeUpNextPlayer();
@@ -70,19 +77,6 @@ public class JudgeActor extends MastermindActorImpl {
                 }).build();
     }
 
-    /**
-     * Check and set new order turn.
-     */
-    private void checkNewOrderTurn(){
-
-        if(this.allReadyMsg == this.sequenceInfoJudge.getNPlayers()){
-            // Set the new player order.
-            this.sequenceInfoJudge.newOrderTurn();
-            this.log("Judge set new Order Turn: " + this.sequenceInfoJudge.showTurn());
-            // Default Value
-            this.allReadyMsg = 0;
-        }
-    }
 
     /**
      * Send the msg start turn to the next player.
