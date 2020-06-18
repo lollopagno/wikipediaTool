@@ -2,15 +2,9 @@ package views.game;
 
 import actors.JudgeActor;
 import actors.messages.StartGameMsg;
-import actors.messages.StopGameMsg;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
-import model.Sequence;
-import model.SequenceImpl;
-import model.SequenceInfoGuess;
-import model.SequenceInfoJudge;
-import scala.collection.Seq;
 import views.players.PlayersPanel;
 import views.players.PlayersView;
 
@@ -20,17 +14,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.concurrent.Executors;
 
 public class GameView extends JFrame implements ActionListener {
 
     private final ActorRef judgeRef;
-    private ActorSystem system;
+    private final ActorSystem system;
     private final PlayersView players;
     private final int length, nPlayers;
-    private int time;
+    private final int time;
 
     public GameView(int length, int nPlayers, int time) {
         this.setTitle("Game");
@@ -66,8 +57,6 @@ public class GameView extends JFrame implements ActionListener {
         // Genero l'arbitro.
         this.system = ActorSystem.create("Mastermind");
         this.judgeRef = system.actorOf(Props.create(JudgeActor.class), "judge");
-
-
     }
 
     @Override
@@ -83,52 +72,6 @@ public class GameView extends JFrame implements ActionListener {
     }
 
     /**
-     * Add a new player to the panel.
-     * TODO: This will be removed after actor implementation.
-     *
-     * @param player Player name.
-     * @param info   Player infos.
-     */
-    private void playerReady(String player, Sequence info) {
-        SwingUtilities.invokeLater(() -> this.players.addPlayer(player, info));
-    }
-
-    private void generatePlayers() {
-        // TODO: Remove this after actor implementation.
-        ArrayList<Integer> seq = new ArrayList<>();
-        Random r = new Random();
-        for (int i = 0; i < length; i++) {
-            seq.add(r.nextInt(10));
-        }
-        for (int i = 0; i < nPlayers; i++) {
-            Sequence sequence = new SequenceImpl(seq);
-            this.playerReady("player_" + i, sequence);
-        }
-    }
-
-    private void generateSequences() {
-        Executors.newSingleThreadExecutor().execute(() -> {
-            while (this.time-- > 0) {
-                ArrayList<Integer> seq = new ArrayList<>();
-                Random r = new Random();
-                for (int i = 0; i < length; i++) {
-                    seq.add(r.nextInt(10));
-                }
-                Sequence sequence = new SequenceImpl(seq);
-                SequenceInfoGuess info = new SequenceInfoGuess(sequence, 2, 2);
-                int from = r.nextInt(nPlayers);
-                int to = r.nextInt(nPlayers);
-                SwingUtilities.invokeLater(() -> this.players.inputSolution("player_" + from, "player_" + to, info));
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
-    /**
      * Send the message of start game with this the view too at the judge actor ref.
      */
     private void startGame() {
@@ -140,8 +83,7 @@ public class GameView extends JFrame implements ActionListener {
      * Send the message of stop game to judge to stop all players too.
      */
     private void stopGame() {
-
-        // Termino l'esecuzione dell'arbitro
+        // Termino l'esecuzione dell'arbitro.
         this.system.stop(this.judgeRef);
     }
 }
