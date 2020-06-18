@@ -19,18 +19,6 @@ public class OtherPlayersStore {
     }
 
     /**
-     * Select a player to guess.
-     * @return A player info. Return null if all other players are solved.
-     */
-    public PlayerInfo getNextUnSolvedPlayer() {
-        for (PlayerInfo info: others) {
-            if (!info.isSolved())
-                return info;
-        }
-        return null;
-    }
-
-    /**
      * Save a guess made to another player.
      * @param name Another player name.
      * @param guess Guess tried.

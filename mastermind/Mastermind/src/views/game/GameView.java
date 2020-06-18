@@ -9,6 +9,8 @@ import akka.actor.Props;
 import model.Sequence;
 import model.SequenceImpl;
 import model.SequenceInfoGuess;
+import model.SequenceInfoJudge;
+import scala.collection.Seq;
 import views.players.PlayersPanel;
 import views.players.PlayersView;
 
@@ -23,7 +25,9 @@ import java.util.Random;
 import java.util.concurrent.Executors;
 
 public class GameView extends JFrame implements ActionListener {
+
     private final ActorRef judgeRef;
+    private ActorSystem system;
     private final PlayersView players;
     private final int length, nPlayers;
     private int time;
@@ -60,12 +64,10 @@ public class GameView extends JFrame implements ActionListener {
         });
 
         // Genero l'arbitro.
-        ActorSystem system = ActorSystem.create("Mastermind");
+        this.system = ActorSystem.create("Mastermind");
         this.judgeRef = system.actorOf(Props.create(JudgeActor.class), "judge");
 
-        // TODO: Remove those after actors implementation.
-        //this.generatePlayers();
-        //this.generateSequences();
+
     }
 
     @Override
@@ -138,7 +140,8 @@ public class GameView extends JFrame implements ActionListener {
      * Send the message of stop game to judge to stop all players too.
      */
     private void stopGame() {
-        StopGameMsg msg = new StopGameMsg();
-        this.judgeRef.tell(msg, ActorRef.noSender());
+
+        // Termino l'esecuzione dell'arbitro
+        this.system.stop(this.judgeRef);
     }
 }

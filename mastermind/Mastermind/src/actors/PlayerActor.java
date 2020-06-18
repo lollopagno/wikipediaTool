@@ -12,28 +12,31 @@ public class PlayerActor extends MastermindActorImpl {
 
     private ActorRef judgeActor;
     private PlayerInfo iAm;
-    OtherPlayersStore others;
+    OtherPlayersStore others = new OtherPlayersStore();
 
     public PlayersView view;
 
     @Override
     public void preStart() throws Exception {
         super.preStart();
-        others = new OtherPlayersStore();
-        // this.log(" pre start");
     }
 
     @Override
     public Receive createReceive() {
         return receiveBuilder()
+
                 .match(StartMsg.class, msg -> {
                     // StartMsg dal Judge
+
                     this.view = msg.getView();
+
                     // Save players references.
                     this.judgeActor = msg.getJudge();
                     iAm = msg.getPlayer();
+
                     // Generate the sequence of current actor.
                     iAm.generateSequence(msg.getLength());
+
                     // StartMsg from Judge and view notification.
                     this.log("START MSG Received and NUMBER is " + iAm.getSequence());
                     this.view.addPlayer(msg.getName(), iAm.getSequence());
@@ -48,26 +51,22 @@ public class PlayerActor extends MastermindActorImpl {
                     // TODO: Ho modificato questo messaggio per tornare solo gli altri. Non dovrebbe succedere nulla.
                     getSender().tell(new ReadyMsg(), getSelf());
                 })
+
                 .match(StartTurn.class, msg -> {
                     // StartTurn dal Judge
+
                     this.log("START TURN Received");
 
-                    // Send a guess to next unsolved player.
-                    PlayerInfo playerSendGuess = others.getNextUnSolvedPlayer();
-                    if(playerSendGuess == null) {
-                        // TODO: Dovrei aver vinto il gioco.
-                        // TODO: Capire perché rimane a null e il primo giocatore automaticamente vince il gioco.
-                        this.log("I've win!!!");
-                    } else {
-                        // Generate a new guess based on previous guesses.
-                        Sequence trySequence = playerSendGuess.extractGuess();
-                        this.log("Send guess " + trySequence + " to the " + playerSendGuess.getName()
-                                + " with number " + playerSendGuess.getSequence());
+                    // Generate a new guess based on previous guesses.
+                    Sequence trySequence = this.iAm.extractGuess();
+                    this.log("Send guess " + trySequence + " to the " + this.iAm.getName()
+                            + " with number " + this.iAm.getSequence());
 
-                        // TODO: Perché viene inviato il riferimento a iAm? Quando sarebbero recuperabili tramite una getSender()?
-                        playerSendGuess.getReference().tell(new GuessMsg(trySequence, this.iAm), getSelf());
-                    }
+                    // TODO: Perché viene inviato il riferimento a iAm? Quando sarebbero recuperabili tramite una getSender()?
+                    this.iAm.getReference().tell(new GuessMsg(trySequence, this.iAm), getSelf());
+
                 })
+
                 .match(GuessMsg.class, msg -> {
                     // GuessMsg dal player
                     this.log("Response to the GUESS MSG at all players");
@@ -83,6 +82,7 @@ public class PlayerActor extends MastermindActorImpl {
 
                 })
                 .match(ReturnGuessMsg.class, msg -> {
+
                     // ReturnGuessMsg dal player che risponde in funzione del guess richiesto
                     // ReturnGuessMsg dal player (risposta di quanti caratteri giusti ho indovinato)
                     int rightNumbers = msg.getSequence().getRightNumbers();
@@ -98,9 +98,20 @@ public class PlayerActor extends MastermindActorImpl {
                             msg.getSequence());
                     view.inputSolution(iAm.getName(), enemy, msg.getSequence());
 
-                    // Invio al Judge il msg di fine turno (vado al prossimo giocatore o al nuovo turno)
-                    this.judgeActor.tell(new EndTurn(),getSelf());
+                    // Controllo se il giocatore ha vinto
+                    if(this.iAm.isWon(rightPlaceNumbers)){
+
+                        this.log(this.iAm.getName()+" win!!");
+                        // Invio al Judge il messaggio di vittoria
+                        this.judgeActor.tell(new PlayerWin(this.iAm), getSelf());
+
+                    }else {
+
+                        // Invio al Judge il msg di fine turno (vado al prossimo giocatore o al nuovo turno)
+                        this.judgeActor.tell(new EndTurn(), getSelf());
+                    }
                 })
+
                 .match(NumberAnswer.class, msg -> {
                     // NumberAnswer dal player che invia A TUTTI la risposta
 
@@ -109,6 +120,13 @@ public class PlayerActor extends MastermindActorImpl {
                     // TODO Memorizzare informazione sulla risposta ricevuta.
                     // In verità è inutile memorizzare la risposta se non si ha anche la sequenza ad essa collegata.
                     // Infatti la risposta del prof è stata totalmente inutile.
+
+                }).match(EndGame.class, msg ->{
+                    // Il judge ha dichiarato la fine della partita
+
+                    // Stoppo la mia esecuzione
+                    this.log("My execution is finished!");
+                    this.iAm.stopPlayer(getContext());
 
                 }).build();
     }

@@ -42,7 +42,6 @@ public class PlayerPanel extends JPanel implements PlayerView {
         this.add(pane);
 
         this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        // this.setPreferredSize(new Dimension(300, 200));
     }
 
     public String getName() {

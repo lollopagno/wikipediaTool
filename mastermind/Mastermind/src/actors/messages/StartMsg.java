@@ -3,7 +3,6 @@ package actors.messages;
 import akka.actor.ActorRef;
 import info.PlayerInfo;
 import views.players.PlayersView;
-
 import java.util.List;
 
 public class StartMsg implements Message {

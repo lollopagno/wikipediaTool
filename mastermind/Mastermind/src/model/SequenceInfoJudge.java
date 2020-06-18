@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-// Memorizza l'array di players e (forse) gestisce il prossimo players di un turno e ricalcola l'ordine per ogni turno
 public class SequenceInfoJudge {
     ArrayList<PlayerInfo> players;
     int playerIndex;
@@ -66,5 +65,9 @@ public class SequenceInfoJudge {
             orderPlayer.add(player.getName());
         }
         return orderPlayer;
+    }
+
+    public ArrayList<PlayerInfo> showPlayer(){
+        return this.players;
     }
 }

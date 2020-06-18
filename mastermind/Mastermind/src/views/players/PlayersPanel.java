@@ -46,8 +46,12 @@ public class PlayersPanel extends JPanel implements PlayersView {
     }
 
     @Override
-    public void playerWin(String player) {
-        System.out.println("Stop all!!! A player win!!!");
+    // Non funzionante
+    public void refresh(){
+
+        System.out.println("Refresh view");
+        this.players.clear();
+        this.repaint();
     }
 
     @Override

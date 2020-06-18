@@ -17,14 +17,15 @@ public class JudgeActor extends MastermindActorImpl {
     @Override
     public void preStart() throws Exception {
         super.preStart();
-        // this.log("Judge created!");
     }
 
     @Override
     public Receive createReceive() {
         return receiveBuilder()
+
                 .match(StartGameMsg.class, msg -> {
                     // StartGameMsg inviato dalla view
+
                     String message = "Judge START GAME Received";
                     this.view = msg.getView();
                     this.view.showMessage(message);
@@ -33,6 +34,7 @@ public class JudgeActor extends MastermindActorImpl {
                 })
                 .match(ReadyMsg.class, msg -> {
                     // Msg dai player di READY
+
                     this.allReadyMsg++;
                     String senderName = getSender().path().name();
                     this.log("READY MESSAGE Received by " + senderName);
@@ -51,29 +53,28 @@ public class JudgeActor extends MastermindActorImpl {
                 })
                 .match(EndTurn.class, msg -> {
                     // Msg dal player di endTurn (è terminato SOLO il suo turno)
+
                     this.allReadyMsg ++;
 
-                    // PLayer Win
-                    if (msg.hasPlayerWin()) {
-                        // TODO: Inviare un messaggio a tutti gli altri player per notificarli della vittoria di un player.
-                        this.view.playerWin(getSender().path().name());
-                        return;
-                    }
-                    else{
-
-                        if(this.allReadyMsg == this.sequenceInfoJudge.getNPlayers()){
-                            // Set the new player order.
-                            this.sequenceInfoJudge.newOrderTurn();
-                            this.log("Judge set new Order Turn: " + this.sequenceInfoJudge.showTurn());
-                            // Default Value
-                            this.allReadyMsg = 0;
-                        }
-
-                        waitTime();
-                        // Wake up a new player.
-                        wakeUpNextPlayer();
+                    if(this.allReadyMsg == this.sequenceInfoJudge.getNPlayers()){
+                         // Set the new player order.
+                         this.sequenceInfoJudge.newOrderTurn();
+                         this.log("Judge set new Order Turn: " + this.sequenceInfoJudge.showTurn());
+                         // Default Value
+                         this.allReadyMsg = 0;
                     }
 
+                    waitTime();
+                    // Wake up a new player.
+                    wakeUpNextPlayer();
+
+                }).match(PlayerWin.class, msg ->{
+                    // Vittoria di un giocatore
+
+                    this.log(""+msg.getPlayerWinn().getName()+" has won!");
+                    for(PlayerInfo player : this.sequenceInfoJudge.showPlayer()){
+                        player.getReference().tell(new EndGame(), getSelf());
+                    }
                 }).build();
     }
 

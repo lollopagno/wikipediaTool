@@ -45,13 +45,13 @@ public class PlayerInfo {
         return this.sequence;
     }
 
-    /**
-     * The Player Sequence is solved if all numbers of the last try are right placed.
-     *
-     * @return True if is solved, false then.
-     */
-    public boolean isSolved() {
-        return this.last1try != null && this.last1try.getRightPlaceNumbers() == this.sequence.getSequence().size();
+    // Stop lifecycle Actor
+    public void stopPlayer(ActorContext context){
+        context.stop(this.reference);
+    }
+
+    public boolean isWon(int rightPlaceNumbers){
+        return rightPlaceNumbers == this.sequence.getSequence().size();
     }
 
     /**

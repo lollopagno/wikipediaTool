@@ -1,4 +1,3 @@
 package actors.messages;
 
-public final class StopGameMsg {
-}
+public final class StopGameMsg {}
