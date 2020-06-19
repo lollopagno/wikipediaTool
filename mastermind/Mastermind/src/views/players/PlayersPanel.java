@@ -48,14 +48,18 @@ public class PlayersPanel extends JPanel implements PlayersView {
         this.revalidate();
     }
 
+    /**
+     * Azzera tutti i pannelli esistenti.
+     */
     @Override
-    // Non funzionante
     public void refresh(){
-
         System.out.println("Refresh view");
+        this.players.forEach(each -> SwingUtilities.invokeLater(() -> this.panel.remove((Component) each)));
         this.players.clear();
-        this.repaint();
-        this.revalidate();
+        SwingUtilities.invokeLater(() -> {
+            this.repaint();
+            this.revalidate();
+        });
     }
 
     @Override
