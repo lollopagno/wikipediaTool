@@ -9,11 +9,6 @@ public class PlayerReference {
     String name;
     ActorRef ref;
 
-    public PlayerReference(String name, ActorRef ref) {
-        this.name = name;
-        this.ref = ref;
-    }
-
     public PlayerReference(String name, ActorContext context) {
         this.name = name;
         this.ref = context.actorOf(Props.create(PlayerActor.class), name);
