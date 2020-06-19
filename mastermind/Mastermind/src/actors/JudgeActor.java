@@ -34,9 +34,6 @@ public class JudgeActor extends MastermindActorImpl {
                 .match(ReadyMsg.class, msg -> {
                     // Msg dai player di READY
                     this.allReadyMsg++;
-                    // String senderName = getSender().path().name();
-                    // this.log("READY MESSAGE Received by " + senderName);
-                    // this.log("Ready players -> [" + this.allReadyMsg + "/" + this.sequenceInfoJudge.getNPlayers() + "]");
 
                     if (this.allReadyMsg == this.sequenceInfoJudge.getNPlayers()) {
                         // Set the new player order.
@@ -63,15 +60,18 @@ public class JudgeActor extends MastermindActorImpl {
                     waitTime();
                     // Wake up a new player.
                     wakeUpNextPlayer();
+
                 }).match(PlayerWin.class, msg -> {
+
                     // Partita terminata: Vittoria di un giocatore
                     String message = msg.getPlayerWinn().getName() + " has won!";
                     this.log(message);
-                    this.stopExcecutionPlayer();
+                    this.stopExecutionPlayer();
                     view.showMessage(message);
+
                 }).match(EndGameJudge.class, msg ->{
                     // Partita terminata: Pressione pulsante STOP
-                    this.stopExcecutionPlayer();
+                    this.stopExecutionPlayer();
 
                     ActorSystem myReferenceJudge = msg.getSystem();
                     myReferenceJudge.stop(msg.getReference());
@@ -82,7 +82,7 @@ public class JudgeActor extends MastermindActorImpl {
     /**
      * Stop players executions.
      */
-    private void stopExcecutionPlayer(){
+    private void stopExecutionPlayer(){
         this.sequenceInfoJudge.showPlayer().forEach(player -> player.getRef().tell(new EndGame(), getSelf()));
     }
 
@@ -92,7 +92,6 @@ public class JudgeActor extends MastermindActorImpl {
     private void wakeUpNextPlayer() {
         PlayerReference nextPlayer = this.sequenceInfoJudge.getNextPlayer();
         nextPlayer.getRef().tell(new StartTurn(), getSelf());
-        // this.log("Judge sent START TURN MSG at player: " + nextPlayer.getName());
     }
 
     /**
