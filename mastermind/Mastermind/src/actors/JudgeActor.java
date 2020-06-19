@@ -22,10 +22,8 @@ public class JudgeActor extends MastermindActorImpl {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-
                 .match(StartGameMsg.class, msg -> {
                     // StartGameMsg inviato dalla view
-
                     String message = "Judge START GAME Received";
                     this.view = msg.getView();
                     this.view.showMessage(message);
@@ -34,11 +32,10 @@ public class JudgeActor extends MastermindActorImpl {
                 })
                 .match(ReadyMsg.class, msg -> {
                     // Msg dai player di READY
-
                     this.allReadyMsg++;
                     String senderName = getSender().path().name();
-                    this.log("READY MESSAGE Received by " + senderName);
-                    this.log("Ready players -> [" + this.allReadyMsg + "/" + this.sequenceInfoJudge.getNPlayers() + "]");
+                    // this.log("READY MESSAGE Received by " + senderName);
+                    // this.log("Ready players -> [" + this.allReadyMsg + "/" + this.sequenceInfoJudge.getNPlayers() + "]");
 
                     if (this.allReadyMsg == this.sequenceInfoJudge.getNPlayers()) {
                         // Set the new player order.
@@ -53,31 +50,26 @@ public class JudgeActor extends MastermindActorImpl {
                 })
                 .match(EndTurn.class, msg -> {
                     // Msg dal player di endTurn (è terminato SOLO il suo turno)
-
-                    this.allReadyMsg ++;
-
-                    if(this.allReadyMsg == this.sequenceInfoJudge.getNPlayers()){
-                         // Set the new player order.
-                         this.sequenceInfoJudge.newOrderTurn();
-                         this.log("Judge set new Order Turn: " + this.sequenceInfoJudge.showTurn());
-                         // Default Value
-                         this.allReadyMsg = 0;
+                    this.allReadyMsg++;
+                    if (this.allReadyMsg == this.sequenceInfoJudge.getNPlayers()) {
+                        // Set the new player order.
+                        this.sequenceInfoJudge.newOrderTurn();
+                        this.log("Judge set new Order Turn: " + this.sequenceInfoJudge.showTurn());
+                        // Default Value
+                        this.allReadyMsg = 0;
                     }
 
                     waitTime();
                     // Wake up a new player.
                     wakeUpNextPlayer();
-
-                }).match(PlayerWin.class, msg ->{
+                }).match(PlayerWin.class, msg -> {
                     // Vittoria di un giocatore
-
-                    this.log(""+msg.getPlayerWinn().getName()+" has won!");
-                    for(PlayerInfo player : this.sequenceInfoJudge.showPlayer()){
+                    this.log("" + msg.getPlayerWinn().getName() + " has won!");
+                    for (PlayerInfo player : this.sequenceInfoJudge.showPlayer()) {
                         player.getReference().tell(new EndGame(), getSelf());
                     }
                 }).build();
     }
-
 
     /**
      * Send the msg start turn to the next player.
@@ -85,7 +77,7 @@ public class JudgeActor extends MastermindActorImpl {
     private void wakeUpNextPlayer() {
         PlayerInfo nextPlayer = this.sequenceInfoJudge.getNextPlayer();
         nextPlayer.getReference().tell(new StartTurn(), getSelf());
-        this.log("Judge sent START TURN MSG at player: " + nextPlayer.getName());
+        // this.log("Judge sent START TURN MSG at player: " + nextPlayer.getName());
     }
 
     /**
@@ -97,7 +89,7 @@ public class JudgeActor extends MastermindActorImpl {
     private void startGame(int nPlayers, int length) {
         final List<PlayerInfo> players = new ArrayList<>();
         for (int i = 0; i < nPlayers; i++) {
-            PlayerInfo player = new PlayerInfo("player_" + i, this.getContext(), nPlayers);
+            PlayerInfo player = new PlayerInfo("player_" + i, this.getContext());
             players.add(player);
         }
 

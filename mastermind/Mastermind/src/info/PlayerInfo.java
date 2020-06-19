@@ -14,19 +14,16 @@ import java.util.function.Consumer;
 public class PlayerInfo {
     private final String name;
     private final ActorRef reference;
-    // TODO: Capire cosa sia questo player. Deve essere un indice? Identificativo? (In quel caso non basta il nome?
-    private final int player;
 
     private Sequence sequence;
     SequenceInfoGuess last1try, last2try;
-    Set<Sequence> alltries;
+    Set<Sequence> allTries;
 
-    public PlayerInfo(String name, ActorContext context, int player) {
+    public PlayerInfo(String name, ActorContext context) {
         this.name = name;
         this.reference = context.actorOf(Props.create(PlayerActor.class), name);
-        this.player = player;
         this.last1try = this.last2try = null;
-        alltries = new TreeSet<>();
+        allTries = new TreeSet<>();
     }
 
     public String getName() {
@@ -45,7 +42,10 @@ public class PlayerInfo {
         return this.sequence;
     }
 
-    // Stop lifecycle Actor
+    /**
+     * Stop lifecycle Actor.
+     * @param context Actor context.
+     */
     public void stopPlayer(ActorContext context){
         context.stop(this.reference);
     }
@@ -54,13 +54,17 @@ public class PlayerInfo {
         return rightPlaceNumbers == this.sequence.getSequence().size();
     }
 
+    public boolean isSolved() {
+        return last1try != null && last1try.getNumbers() != null && last1try.getRightPlaceNumbers() == sequence.getSequence().size();
+    }
+
     /**
      * Save the previous guess only if is better than the second before.
      *
      * @param guess Guess to save.
      */
     public void setTry(SequenceInfoGuess guess) {
-        if(last1try == null || last1try.getNumbers() == null) {
+        if(last1try == null || last1try.getNumbers() == null) { // This is for the first time.
             last1try = guess;
             return;
         }
@@ -124,7 +128,7 @@ public class PlayerInfo {
             // Generate the new random start index.
             int s = new Random().nextInt(lenght);
             // Start from random index. Repeat at max length times.
-            for (int i = s, j = 0; j < lenght; i++, j++) {
+            for (int i = s, j = 0; j < lenght && rightPlaced > 0; i++, j++) {
                 if (i == lenght)
                     i = 0;
 
@@ -195,9 +199,14 @@ public class PlayerInfo {
             }
 
             /*
-            Trovare tutti i numeri che ho indovinato ma mal posizionato.
+             * Trovo tutti i numeri che ho indovinato ma mal posizionato.
              */
-            for (int i = 0; i < lenght && right > 0; i++) {
+            for (int i = r.nextInt(lenght), j = 0;
+                 j < lenght && right > 0;
+                 i++, j++) {
+                if (i == lenght)
+                    i = 0;
+
                 // Controllo che non sia un numero che ho già gestito.
                 if (number.get(i) != -1)
                     continue;
@@ -210,6 +219,7 @@ public class PlayerInfo {
                         int rn = getRandomFreeIndexNotI(number, i);
                         number.set(rn, n);
                         right--;
+                        break;
                     }
                 }
             }
@@ -235,28 +245,9 @@ public class PlayerInfo {
             List<Integer> filled = fillNumberWithRand(lenght, number);
 
             seq = new SequenceImpl(filled);
-        } while (alltries.contains(seq) && tries < 10000);
-        alltries.add(seq);
+        } while (allTries.contains(seq) && tries < 10000);
+        allTries.add(seq);
         return seq;
-    }
-
-    /**
-     * Utility method.
-     *
-     * @param list   List to fetch.
-     * @param action Action to do.
-     */
-    public void forEachRandomInit(List<Integer> list, Consumer<? super Integer> action) {
-        // Generate the new random start index.
-        int s = new Random().nextInt(list.size());
-        // Start from random index. Repeat at max length times.
-        for (int i = s, j = 0; j < list.size(); i++, j++) {
-            if (i == list.size())
-                i = 0;
-
-            // Pass the current item to the consumer.
-            action.accept(list.get(i));
-        }
     }
 
     /**

@@ -6,6 +6,7 @@ import info.PlayerInfo;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 public class OtherPlayersStore {
     private List<PlayerInfo> others;
@@ -48,5 +49,16 @@ public class OtherPlayersStore {
                                         response.getRightPlaceNumbers()
                                 ),
                                 self));
+    }
+
+    public Optional<PlayerInfo> getNextUnsolvedPlayer() {
+        StringBuilder builder = new StringBuilder();
+        this.others.forEach(info -> {
+            if(!info.isSolved()) {
+                builder.append(info.getName());
+            }
+        });
+        String name = builder.toString();
+        return others.stream().filter(f -> f.getName().equals(name)).findFirst();
     }
 }

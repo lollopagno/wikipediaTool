@@ -35,7 +35,7 @@ public class SolutionDetailPanel extends JPanel {
     }
 
     public void setInfo(int rightPlacedNumbers, int rightNumbers) {
-        this.otherInfo.setText(String.format("%d - %d", rightPlacedNumbers, rightNumbers));
+        this.otherInfo.setText(String.format("RP: %d - RN: %d", rightPlacedNumbers, rightNumbers));
         this.updateUI();
     }
 }
