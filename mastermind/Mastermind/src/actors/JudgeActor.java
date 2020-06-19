@@ -1,6 +1,8 @@
 package actors;
 
 import actors.messages.*;
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
 import model.SequenceInfoJudge;
 import info.PlayerInfo;
 import views.players.PlayersView;
@@ -63,14 +65,29 @@ public class JudgeActor extends MastermindActorImpl {
                     // Wake up a new player.
                     wakeUpNextPlayer();
                 }).match(PlayerWin.class, msg -> {
-                    // Vittoria di un giocatore
+                    // Partita terminata: Vittoria di un giocatore
                     String message = msg.getPlayerWinn().getName() + " has won!";
                     this.log(message);
-                    for (PlayerInfo player : this.sequenceInfoJudge.showPlayer()) {
-                        player.getReference().tell(new EndGame(), getSelf());
-                    }
+
+                    this.stopExcecutionPlayer();
+
                     view.showMessage(message);
+
+                }).match(EndGameJudge.class, msg ->{
+                    // Partita terminata: Pressione pulsante STOP
+                    this.stopExcecutionPlayer();
+
+                    ActorSystem myReferenceJudge = msg.getSystem();
+                    myReferenceJudge.stop(msg.getReference());
+                    log("Stop Game!");
                 }).build();
+    }
+
+    // Termina l'esecuzione dei player
+    private void stopExcecutionPlayer(){
+        this.sequenceInfoJudge.showPlayer().forEach(player -> {
+            player.getReference().tell(new EndGame(), getSelf());
+        });
     }
 
     /**

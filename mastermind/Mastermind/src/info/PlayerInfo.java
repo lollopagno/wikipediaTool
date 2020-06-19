@@ -1,9 +1,7 @@
 package info;
 
 import actors.PlayerActor;
-import akka.actor.ActorContext;
-import akka.actor.ActorRef;
-import akka.actor.Props;
+import akka.actor.*;
 import model.Sequence;
 import model.SequenceImpl;
 import model.SequenceInfoGuess;

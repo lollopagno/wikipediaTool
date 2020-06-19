@@ -116,6 +116,7 @@ public class PlayerActor extends MastermindActorImpl {
                     // Stoppo la mia esecuzione.
                     this.log("My execution is finished!");
                     this.iAm.stopPlayer(getContext());
+
                 }).build();
     }
 }
