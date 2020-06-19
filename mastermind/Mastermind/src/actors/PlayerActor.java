@@ -117,6 +117,7 @@ public class PlayerActor extends MastermindActorImpl {
                     // Judge declare end game. Stop the player.
                     this.log("My execution is finished!");
                     this.iAm.stopPlayer(getContext());
+
                 }).build();
     }
 }

@@ -1,7 +1,10 @@
 package views.game;
 
 import actors.JudgeActor;
+import actors.messages.EndGame;
+import actors.messages.EndGameJudge;
 import actors.messages.StartGameMsg;
+import akka.actor.Actor;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
@@ -17,8 +20,8 @@ import java.awt.event.WindowEvent;
 
 public class GameView extends JFrame implements ActionListener {
 
-    private final ActorRef judgeRef;
-    private final ActorSystem system;
+    private ActorRef judgeRef;
+    private ActorSystem system;
     private final PlayersView players;
     private final int length, nPlayers;
     private final int time;
@@ -53,10 +56,6 @@ public class GameView extends JFrame implements ActionListener {
                 System.exit(-1);
             }
         });
-
-        // Genero l'arbitro.
-        this.system = ActorSystem.create("Mastermind");
-        this.judgeRef = system.actorOf(Props.create(JudgeActor.class), "judge");
     }
 
     @Override
@@ -75,6 +74,13 @@ public class GameView extends JFrame implements ActionListener {
      * Send the message of start game with this the view too at the judge actor ref.
      */
     private void startGame() {
+
+        // Creo l'arbitro.
+        this.system = ActorSystem.create("Mastermind");
+        this.judgeRef = system.actorOf(Props.create(JudgeActor.class), "judge");
+        log(" Judge created!!");
+
+        log("Start new Game!");
         StartGameMsg msg = new StartGameMsg(this.length, this.nPlayers, this.time, this.players);
         this.judgeRef.tell(msg, ActorRef.noSender());
     }
@@ -83,7 +89,13 @@ public class GameView extends JFrame implements ActionListener {
      * Send the message of stop game to judge to stop all players too.
      */
     private void stopGame() {
-        // Termino l'esecuzione dell'arbitro.
-        this.system.stop(this.judgeRef);
+
+        this.judgeRef.tell(new EndGameJudge(this.system, this.judgeRef), ActorRef.noSender());
+    }
+
+    private void log(String msg){
+        synchronized (System.out){
+            System.out.println("[Mastermind] --> "+msg);
+        }
     }
 }

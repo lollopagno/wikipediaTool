@@ -1,6 +1,7 @@
 package actors;
 
 import actors.messages.*;
+import akka.actor.ActorSystem;
 import model.PlayerReference;
 import model.SequenceInfoJudge;
 import views.players.PlayersView;
@@ -9,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JudgeActor extends MastermindActorImpl {
-    // TODO: Valutare se spostare tutto dentro a questa entità.
     private SequenceInfoJudge sequenceInfoJudge;
     private PlayersView view;
     private int allReadyMsg = 0;
@@ -34,7 +34,7 @@ public class JudgeActor extends MastermindActorImpl {
                 .match(ReadyMsg.class, msg -> {
                     // Msg dai player di READY
                     this.allReadyMsg++;
-                    String senderName = getSender().path().name();
+                    // String senderName = getSender().path().name();
                     // this.log("READY MESSAGE Received by " + senderName);
                     // this.log("Ready players -> [" + this.allReadyMsg + "/" + this.sequenceInfoJudge.getNPlayers() + "]");
 
@@ -64,14 +64,26 @@ public class JudgeActor extends MastermindActorImpl {
                     // Wake up a new player.
                     wakeUpNextPlayer();
                 }).match(PlayerWin.class, msg -> {
-                    // Vittoria di un giocatore
+                    // Partita terminata: Vittoria di un giocatore
                     String message = msg.getPlayerWinn().getName() + " has won!";
                     this.log(message);
-                    for (PlayerReference player : this.sequenceInfoJudge.showPlayer()) {
-                        player.getRef().tell(new EndGame(), getSelf());
-                    }
+                    this.stopExcecutionPlayer();
                     view.showMessage(message);
+                }).match(EndGameJudge.class, msg ->{
+                    // Partita terminata: Pressione pulsante STOP
+                    this.stopExcecutionPlayer();
+
+                    ActorSystem myReferenceJudge = msg.getSystem();
+                    myReferenceJudge.stop(msg.getReference());
+                    log("Stop Game!");
                 }).build();
+    }
+
+    /**
+     * Stop players executions.
+     */
+    private void stopExcecutionPlayer(){
+        this.sequenceInfoJudge.showPlayer().forEach(player -> player.getRef().tell(new EndGame(), getSelf()));
     }
 
     /**
