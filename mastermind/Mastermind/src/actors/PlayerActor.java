@@ -39,7 +39,6 @@ public class PlayerActor extends MastermindActorImpl {
                     others = new OtherPlayersStore(msg.getLength());
 
                     // StartMsg from Judge and view notification.
-                    // this.log("START MSG Received and NUMBER is " + iAm.getSequence());
                     this.view.addPlayer(iAm.getName(), iAm.getSequence());
 
                     // Save all other players in the store.
@@ -54,10 +53,8 @@ public class PlayerActor extends MastermindActorImpl {
                 })
                 .match(StartTurn.class, msg -> {
                     // StartTurn dal Judge.
-                    // this.log("START TURN Received");
 
                     // Generate a new guess based on previous guesses.
-                    // Sequence trySequence = this.iAm.extractGuess();
                     Optional<PlayerInfo> info = this.others.getNextUnsolvedPlayer();
                     Sequence trySequence;
                     if (info.isPresent()) {
@@ -71,7 +68,6 @@ public class PlayerActor extends MastermindActorImpl {
                         this.log(this.iAm.getName() + " win!!");
                         // Invio al Judge il messaggio di vittoria
                         this.judgeActor.tell(new PlayerWin(this.iAm), getSelf());
-                        log("C'è stato un vincitore!!!");
                     }
                 })
                 .match(JumpTurn.class, msg -> {
@@ -83,7 +79,6 @@ public class PlayerActor extends MastermindActorImpl {
                     this.judgeActor.tell(new JumpTurn(), getSelf());
 
                     // GuessMsg dal player
-                    // this.log("Response to the GUESS MSG at all players");
 
                     // Calculate the response.
                     Sequence guess = msg.getSequence();
@@ -115,7 +110,6 @@ public class PlayerActor extends MastermindActorImpl {
                 })
                 .match(NumberAnswer.class, msg -> {
                     // NumberAnswer dal player che invia A TUTTI la risposta
-                    // this.log("NUMBERS ANSWER\nRight Numbers: "+msg.getRightNumbers()+"\nRight Place Number: "+msg.getRightPlaceNumbers()+"\n");
 
                     // TODO Memorizzare informazione sulla risposta ricevuta.
                     // In verità è inutile memorizzare la risposta se non si ha anche la sequenza ad essa collegata.
