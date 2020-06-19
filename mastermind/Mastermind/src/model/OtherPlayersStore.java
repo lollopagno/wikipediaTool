@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class OtherPlayersStore {
-    private List<PlayerInfo> others;
+    private final List<PlayerInfo> others;
 
     public OtherPlayersStore(){
         this.others = new LinkedList<>();
@@ -29,9 +29,7 @@ public class OtherPlayersStore {
                 .filter(f ->
                         f.getName().equals(name))
                 .findFirst()
-                .ifPresent(player -> {
-            player.setTry(guess);
-        });
+                .ifPresent(player -> player.setTry(guess));
     }
 
     /**
@@ -52,13 +50,14 @@ public class OtherPlayersStore {
     }
 
     public Optional<PlayerInfo> getNextUnsolvedPlayer() {
-        StringBuilder builder = new StringBuilder();
-        this.others.forEach(info -> {
+        String name = "";
+        for(PlayerInfo info: this.others) {
             if(!info.isSolved()) {
-                builder.append(info.getName());
+                name = name.concat(info.getName());
+                break;
             }
-        });
-        String name = builder.toString();
-        return others.stream().filter(f -> f.getName().equals(name)).findFirst();
+        }
+        String finalName = name;
+        return others.stream().filter(f -> f.getName().equals(finalName)).findFirst();
     }
 }

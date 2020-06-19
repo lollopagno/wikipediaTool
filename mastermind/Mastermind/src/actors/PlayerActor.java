@@ -26,7 +26,6 @@ public class PlayerActor extends MastermindActorImpl {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-
                 .match(StartMsg.class, msg -> {
                     // StartMsg dal Judge
                     this.view = msg.getView();
@@ -60,13 +59,17 @@ public class PlayerActor extends MastermindActorImpl {
                     // Sequence trySequence = this.iAm.extractGuess();
                     Optional<PlayerInfo> info = this.others.getNextUnsolvedPlayer();
                     Sequence trySequence = null;
-                    if(info.isPresent()) {
+                    if (info.isPresent()) {
                         trySequence = info.get().extractGuess();
                         this.log("Send guess " + trySequence.getSequence() + " to the " + info.get().getName());
 
                         // TODO: Perché viene inviato il riferimento a iAm? Quando sarebbero recuperabili tramite una getSender()?
                         info.get().getReference().tell(new GuessMsg(trySequence), getSelf());
                     } else {
+                        // Controllo se il giocatore ha vinto.
+                        this.log(this.iAm.getName() + " win!!");
+                        // Invio al Judge il messaggio di vittoria
+                        this.judgeActor.tell(new PlayerWin(this.iAm), getSelf());
                         log("C'è stato un vincitore!!!");
                     }
                 })
@@ -90,7 +93,7 @@ public class PlayerActor extends MastermindActorImpl {
                     int rightPlaceNumbers = msg.getSequence().getRightPlaceNumbers();
 
                     this.log("RETURN GUESS MSG with response:\nRight Numbers: "
-                            +rightNumbers+"\nRight Place Number: "+rightPlaceNumbers+"\n");
+                            + rightNumbers + "\nRight Place Number: " + rightPlaceNumbers + "\n");
 
                     // Save the guess and notify the view.
                     String enemy = getSender().path().name();
@@ -98,16 +101,8 @@ public class PlayerActor extends MastermindActorImpl {
                             enemy,
                             msg.getSequence());
                     view.inputSolution(iAm.getName(), enemy, msg.getSequence());
-
-                    // Controllo se il giocatore ha vinto
-                    if(this.iAm.isWon(rightPlaceNumbers)){
-                        this.log(this.iAm.getName()+" win!!");
-                        // Invio al Judge il messaggio di vittoria
-                        this.judgeActor.tell(new PlayerWin(this.iAm), getSelf());
-                    }else {
-                        // Invio al Judge il msg di fine turno (vado al prossimo giocatore o al nuovo turno)
-                        this.judgeActor.tell(new EndTurn(), getSelf());
-                    }
+                    // Invio al Judge il msg di fine turno (vado al prossimo giocatore o al nuovo turno)
+                    this.judgeActor.tell(new EndTurn(), getSelf());
                 })
                 .match(NumberAnswer.class, msg -> {
                     // NumberAnswer dal player che invia A TUTTI la risposta
@@ -116,7 +111,7 @@ public class PlayerActor extends MastermindActorImpl {
                     // TODO Memorizzare informazione sulla risposta ricevuta.
                     // In verità è inutile memorizzare la risposta se non si ha anche la sequenza ad essa collegata.
                     // Infatti la risposta del prof è stata totalmente inutile.
-                }).match(EndGame.class, msg ->{
+                }).match(EndGame.class, msg -> {
                     // Il judge ha dichiarato la fine della partita.
                     // Stoppo la mia esecuzione.
                     this.log("My execution is finished!");

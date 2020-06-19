@@ -64,10 +64,12 @@ public class JudgeActor extends MastermindActorImpl {
                     wakeUpNextPlayer();
                 }).match(PlayerWin.class, msg -> {
                     // Vittoria di un giocatore
-                    this.log("" + msg.getPlayerWinn().getName() + " has won!");
+                    String message = msg.getPlayerWinn().getName() + " has won!";
+                    this.log(message);
                     for (PlayerInfo player : this.sequenceInfoJudge.showPlayer()) {
                         player.getReference().tell(new EndGame(), getSelf());
                     }
+                    view.showMessage(message);
                 }).build();
     }
 
