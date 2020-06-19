@@ -1,15 +1,13 @@
 package info;
 
-import actors.PlayerActor;
 import akka.actor.ActorContext;
 import akka.actor.ActorRef;
-import akka.actor.Props;
+import model.PlayerReference;
 import model.Sequence;
 import model.SequenceImpl;
 import model.SequenceInfoGuess;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 public class PlayerInfo {
     private final String name;
@@ -19,9 +17,9 @@ public class PlayerInfo {
     SequenceInfoGuess last1try, last2try;
     Set<Sequence> allTries;
 
-    public PlayerInfo(String name, ActorContext context) {
-        this.name = name;
-        this.reference = context.actorOf(Props.create(PlayerActor.class), name);
+    public PlayerInfo(PlayerReference reference) {
+        this.name = reference.getName();
+        this.reference = reference.getRef();
         this.last1try = this.last2try = null;
         allTries = new TreeSet<>();
     }
@@ -50,12 +48,8 @@ public class PlayerInfo {
         context.stop(this.reference);
     }
 
-    public boolean isWon(int rightPlaceNumbers){
-        return rightPlaceNumbers == this.sequence.getSequence().size();
-    }
-
-    public boolean isSolved() {
-        return last1try != null && last1try.getNumbers() != null && last1try.getRightPlaceNumbers() == sequence.getSequence().size();
+    public boolean isSolved(int length) {
+        return last1try != null && last1try.getNumbers() != null && last1try.getRightPlaceNumbers() == length;
     }
 
     /**
@@ -77,9 +71,8 @@ public class PlayerInfo {
         }
     }
 
-    public Sequence extractGuess() {
+    public Sequence extractGuess(int length) {
         // TODO: Da completare. Ritornare una sequenza coerente con i tentativi precedenti.
-        int length = this.sequence.getSequence().size();
         if (this.last1try != null && this.last2try != null) {
             return createElaborateSequence(length);
         }

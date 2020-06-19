@@ -55,10 +55,12 @@ public class PlayerPanel extends JPanel implements PlayerView {
                         .filter(f -> f.getName().equals(to))
                         .findFirst();
         if (panel.isPresent()) {
-            panel.ifPresent(i -> {
-                i.setSequence(sequence.getNumbers());
-                i.setInfo(sequence.getRightPlaceNumbers(), sequence.getRightNumbers());
-                SwingUtilities.invokeLater(i::updateUI);
+            SolutionDetailPanel sol = panel.get();
+            sol.setSequence(sequence.getNumbers());
+            sol.setInfo(sequence.getRightPlaceNumbers(), sequence.getRightNumbers());
+            SwingUtilities.invokeLater(() -> {
+                sol.repaint();
+                sol.revalidate();
             });
         } else {
             SolutionDetailPanel newPanel = new SolutionDetailPanel();
@@ -68,10 +70,20 @@ public class PlayerPanel extends JPanel implements PlayerView {
             // TODO: Deve essere aggiunta anche ad un pannello visualizzabile.
             this.solutions.add(newPanel);
             this.solutionsPanel.add(newPanel);
+            this.repaint();
+            this.revalidate();
         }
-        SwingUtilities.invokeLater(() -> {
+        /*SwingUtilities.invokeLater(() -> {
             this.solutionsPanel.updateUI();
             this.updateUI();
-        });
+        });*/
+    }
+
+    @Override
+    public void showSolved(String to) {
+        this.solutions.stream()
+                .filter(f -> f.getName().equals(to))
+                .findFirst()
+                .ifPresent(SolutionDetailPanel::showSolved);
     }
 }

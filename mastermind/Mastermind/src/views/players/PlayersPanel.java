@@ -34,15 +34,18 @@ public class PlayersPanel extends JPanel implements PlayersView {
         PlayerView view = new PlayerPanel(player, sequence);
         this.players.add(view);
         this.panel.add((Component) view, BorderLayout.CENTER);
-        this.panel.updateUI();
+        this.panel.repaint();
+        this.panel.revalidate();
     }
 
     @Override
     public void inputSolution(String from, String to, SequenceInfoGuess sequence) {
         Optional<PlayerView> view = this.getPlayerViewByName(from);
         view.ifPresent(v -> v.inputSolution(to, sequence));
-        this.updateUI();
-        this.panel.updateUI();
+        this.panel.repaint();
+        this.panel.revalidate();
+        this.repaint();
+        this.revalidate();
     }
 
     @Override
@@ -52,11 +55,18 @@ public class PlayersPanel extends JPanel implements PlayersView {
         System.out.println("Refresh view");
         this.players.clear();
         this.repaint();
+        this.revalidate();
     }
 
     @Override
     public void showMessage(String message) {
         SwingUtilities.invokeLater(() -> this.info.setText("Info: " + message));
+    }
+
+    @Override
+    public void playerSolved(String from, String to) {
+        this.getPlayerViewByName(from).ifPresent(p -> p.showSolved(to));
+        SwingUtilities.invokeLater(() -> this.info.setText(String.format("Player %s solved %s", from, to)));
     }
 
     /**

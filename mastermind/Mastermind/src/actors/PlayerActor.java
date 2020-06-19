@@ -14,7 +14,7 @@ public class PlayerActor extends MastermindActorImpl {
 
     private ActorRef judgeActor;
     private PlayerInfo iAm;
-    OtherPlayersStore others = new OtherPlayersStore();
+    OtherPlayersStore others;
 
     public PlayersView view;
 
@@ -31,21 +31,22 @@ public class PlayerActor extends MastermindActorImpl {
                     this.view = msg.getView();
 
                     // Save players references.
-                    this.judgeActor = msg.getJudge();
-                    iAm = msg.getPlayer();
+                    this.judgeActor = getSender();
+                    iAm = new PlayerInfo(msg.getPlayer());
 
                     // Generate the sequence of current actor.
                     iAm.generateSequence(msg.getLength());
+                    others = new OtherPlayersStore(msg.getLength());
 
                     // StartMsg from Judge and view notification.
                     // this.log("START MSG Received and NUMBER is " + iAm.getSequence());
-                    this.view.addPlayer(msg.getName(), iAm.getSequence());
+                    this.view.addPlayer(iAm.getName(), iAm.getSequence());
 
                     // Save all other players in the store.
                     msg.getAllPlayers().forEach(elem -> {
                         if (elem.getName().equals(iAm.getName()))
                             return;
-                        others.addPlayer(elem);
+                        others.addPlayer(new PlayerInfo(elem));
                     });
 
                     // TODO: Ho modificato questo messaggio per tornare solo gli altri. Non dovrebbe succedere nulla.
@@ -58,9 +59,9 @@ public class PlayerActor extends MastermindActorImpl {
                     // Generate a new guess based on previous guesses.
                     // Sequence trySequence = this.iAm.extractGuess();
                     Optional<PlayerInfo> info = this.others.getNextUnsolvedPlayer();
-                    Sequence trySequence = null;
+                    Sequence trySequence;
                     if (info.isPresent()) {
-                        trySequence = info.get().extractGuess();
+                        trySequence = info.get().extractGuess(iAm.getSequence().getSequence().size());
                         this.log("Send guess " + trySequence.getSequence() + " to the " + info.get().getName());
 
                         // TODO: Perché viene inviato il riferimento a iAm? Quando sarebbero recuperabili tramite una getSender()?
@@ -88,7 +89,6 @@ public class PlayerActor extends MastermindActorImpl {
                 })
                 .match(ReturnGuessMsg.class, msg -> {
                     // ReturnGuessMsg dal player che risponde in funzione del guess richiesto
-                    // ReturnGuessMsg dal player (risposta di quanti caratteri giusti ho indovinato)
                     int rightNumbers = msg.getSequence().getRightNumbers();
                     int rightPlaceNumbers = msg.getSequence().getRightPlaceNumbers();
 
@@ -97,10 +97,12 @@ public class PlayerActor extends MastermindActorImpl {
 
                     // Save the guess and notify the view.
                     String enemy = getSender().path().name();
-                    this.others.saveGuess(
-                            enemy,
-                            msg.getSequence());
+                    this.others.saveGuess(enemy, msg.getSequence());
                     view.inputSolution(iAm.getName(), enemy, msg.getSequence());
+                    if(msg.getSequence().getNumbers().getSequence().size() == msg.getSequence().getRightPlaceNumbers()) {
+                        view.playerSolved(iAm.getName(), enemy);
+                        view.showMessage("Sequenza indovinata a " + enemy + ".");
+                    }
                     // Invio al Judge il msg di fine turno (vado al prossimo giocatore o al nuovo turno)
                     this.judgeActor.tell(new EndTurn(), getSelf());
                 })
@@ -112,8 +114,7 @@ public class PlayerActor extends MastermindActorImpl {
                     // In verità è inutile memorizzare la risposta se non si ha anche la sequenza ad essa collegata.
                     // Infatti la risposta del prof è stata totalmente inutile.
                 }).match(EndGame.class, msg -> {
-                    // Il judge ha dichiarato la fine della partita.
-                    // Stoppo la mia esecuzione.
+                    // Judge declare end game. Stop the player.
                     this.log("My execution is finished!");
                     this.iAm.stopPlayer(getContext());
                 }).build();

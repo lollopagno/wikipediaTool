@@ -9,10 +9,12 @@ import java.util.List;
 import java.util.Optional;
 
 public class OtherPlayersStore {
+    final int length;
     private final List<PlayerInfo> others;
 
-    public OtherPlayersStore(){
+    public OtherPlayersStore(int length){
         this.others = new LinkedList<>();
+        this.length = length;
     }
 
     public void addPlayer(PlayerInfo info) {
@@ -52,11 +54,15 @@ public class OtherPlayersStore {
     public Optional<PlayerInfo> getNextUnsolvedPlayer() {
         String name = "";
         for(PlayerInfo info: this.others) {
-            if(!info.isSolved()) {
+            if(!info.isSolved(length)) {
                 name = name.concat(info.getName());
                 break;
             }
         }
+
+        if(name.isEmpty())
+            return Optional.empty();
+
         String finalName = name;
         return others.stream().filter(f -> f.getName().equals(finalName)).findFirst();
     }

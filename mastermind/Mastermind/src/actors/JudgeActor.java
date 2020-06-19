@@ -1,11 +1,12 @@
 package actors;
 
 import actors.messages.*;
+import model.PlayerReference;
 import model.SequenceInfoJudge;
-import info.PlayerInfo;
 import views.players.PlayersView;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class JudgeActor extends MastermindActorImpl {
     // TODO: Valutare se spostare tutto dentro a questa entità.
@@ -66,8 +67,8 @@ public class JudgeActor extends MastermindActorImpl {
                     // Vittoria di un giocatore
                     String message = msg.getPlayerWinn().getName() + " has won!";
                     this.log(message);
-                    for (PlayerInfo player : this.sequenceInfoJudge.showPlayer()) {
-                        player.getReference().tell(new EndGame(), getSelf());
+                    for (PlayerReference player : this.sequenceInfoJudge.showPlayer()) {
+                        player.getRef().tell(new EndGame(), getSelf());
                     }
                     view.showMessage(message);
                 }).build();
@@ -77,8 +78,8 @@ public class JudgeActor extends MastermindActorImpl {
      * Send the msg start turn to the next player.
      */
     private void wakeUpNextPlayer() {
-        PlayerInfo nextPlayer = this.sequenceInfoJudge.getNextPlayer();
-        nextPlayer.getReference().tell(new StartTurn(), getSelf());
+        PlayerReference nextPlayer = this.sequenceInfoJudge.getNextPlayer();
+        nextPlayer.getRef().tell(new StartTurn(), getSelf());
         // this.log("Judge sent START TURN MSG at player: " + nextPlayer.getName());
     }
 
@@ -89,9 +90,9 @@ public class JudgeActor extends MastermindActorImpl {
      * @param length   Sequence length.
      */
     private void startGame(int nPlayers, int length) {
-        final List<PlayerInfo> players = new ArrayList<>();
+        final List<PlayerReference> players = new ArrayList<>();
         for (int i = 0; i < nPlayers; i++) {
-            PlayerInfo player = new PlayerInfo("player_" + i, this.getContext());
+            PlayerReference player = new PlayerReference("player_" + i, this.getContext());
             players.add(player);
         }
 
@@ -101,14 +102,12 @@ public class JudgeActor extends MastermindActorImpl {
         // Inizialize all players.
         players.forEach(elem ->
         {
-            elem.getReference().tell(
+            elem.getRef().tell(
                     new StartMsg(
                             length,
                             players,
-                            elem.getName(),
                             elem,
-                            view,
-                            getSelf()),
+                            view),
                     getSelf());
             waitTime();
         });

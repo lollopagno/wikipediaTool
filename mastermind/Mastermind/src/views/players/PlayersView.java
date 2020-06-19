@@ -28,6 +28,13 @@ public interface PlayersView {
     void showMessage(String message);
 
     /**
+     * Show that player from have solved player to.
+     * @param from Player solver.
+     * @param to Player solved.
+     */
+    void playerSolved(String from, String to);
+
+    /**
      * Update view for a new game.
      */
     void refresh();

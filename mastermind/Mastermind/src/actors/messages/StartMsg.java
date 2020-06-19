@@ -1,41 +1,34 @@
 package actors.messages;
 
-import akka.actor.ActorRef;
-import info.PlayerInfo;
+import model.PlayerReference;
 import views.players.PlayersView;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class StartMsg implements Message {
     private final int length;
-    public String name;
-    private final List<PlayerInfo> allPlayers;
-    private final PlayerInfo player;
-    private final ActorRef judgeActor;
+    private final List<PlayerReference> allPlayers;
+    private final PlayerReference player;
     private final PlayersView view;
 
-    public StartMsg(int length, List<PlayerInfo> players, String name, PlayerInfo player, PlayersView view, ActorRef judgeActor)
+    public StartMsg(int length, List<PlayerReference> players, PlayerReference player, PlayersView view)
     {
         this.length = length;
-        this.allPlayers = players;
-        this.name = name;
+        this.allPlayers = new ArrayList<>(players);
         this.player = player;
         this.view = view;
-        this.judgeActor = judgeActor;
     }
 
     public int getLength() {
         return length;
     }
 
-    public List<PlayerInfo> getAllPlayers() {
+    public List<PlayerReference> getAllPlayers() {
         return allPlayers;
     }
 
-    public PlayerInfo getPlayer() { return player; }
-
-    public String getName() { return this.name; }
+    public PlayerReference getPlayer() { return player; }
 
     public PlayersView getView(){ return  this.view; }
-
-    public ActorRef getJudge() { return judgeActor; }
 }

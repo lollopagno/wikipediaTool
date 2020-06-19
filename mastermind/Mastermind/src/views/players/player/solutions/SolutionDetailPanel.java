@@ -31,11 +31,16 @@ public class SolutionDetailPanel extends JPanel {
 
     public void setSequence(Sequence sequence) {
         this.sequence.setText(sequence.toString());
-        this.updateUI();
+        this.validate();
     }
 
     public void setInfo(int rightPlacedNumbers, int rightNumbers) {
         this.otherInfo.setText(String.format("RP: %d - RN: %d", rightPlacedNumbers, rightNumbers));
-        this.updateUI();
+        this.validate();
+    }
+
+    public void showSolved() {
+        SwingUtilities.invokeLater(() -> this.sequence.setText(this.sequence.getText() + "(Solved)"));
+        SwingUtilities.invokeLater(this::validate);
     }
 }

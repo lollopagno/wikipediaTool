@@ -15,4 +15,10 @@ public interface PlayerView {
      * @param sequence Guess Tried.
      */
     void inputSolution(String to, SequenceInfoGuess sequence);
+
+    /**
+     * Show the player to solved.
+     * @param to Player solved.
+     */
+    void showSolved(String to);
 }

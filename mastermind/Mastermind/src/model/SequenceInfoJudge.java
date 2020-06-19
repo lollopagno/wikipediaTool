@@ -1,19 +1,17 @@
 package model;
 
-import info.PlayerInfo;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class SequenceInfoJudge {
-    ArrayList<PlayerInfo> players;
+    ArrayList<PlayerReference> players;
     int playerIndex;
 
     // Setta i players di una partita
-    public SequenceInfoJudge(List<PlayerInfo> players) {
+    public SequenceInfoJudge(List<PlayerReference> players) {
         playerIndex = 0;
-        this.players = (ArrayList<PlayerInfo>)((ArrayList<PlayerInfo>)players).clone();
+        this.players = (ArrayList<PlayerReference>)((ArrayList<PlayerReference>)players).clone();
     }
 
     /**
@@ -21,7 +19,7 @@ public class SequenceInfoJudge {
      * Calculate a new turn if needed.
      * @return Turn player info.
      */
-    public PlayerInfo getNextPlayer() {
+    public PlayerReference getNextPlayer() {
         if (playerIndex + 1 > this.players.size())
             newOrderTurn();
 
@@ -34,8 +32,8 @@ public class SequenceInfoJudge {
     public void newOrderTurn() {
 
         Random rand = new Random();
-        List<PlayerInfo> playersTmp = this.players;
-        ArrayList<PlayerInfo> newOrder = new ArrayList<>();
+        List<PlayerReference> playersTmp = this.players;
+        ArrayList<PlayerReference> newOrder = new ArrayList<>();
         int numberActor = this.players.size();
 
         // Put a random player in the order.
@@ -61,13 +59,13 @@ public class SequenceInfoJudge {
 
         ArrayList<String> orderPlayer = new ArrayList<>();
 
-        for (PlayerInfo player : this.players) {
+        for (PlayerReference player : this.players) {
             orderPlayer.add(player.getName());
         }
         return orderPlayer;
     }
 
-    public ArrayList<PlayerInfo> showPlayer(){
+    public ArrayList<PlayerReference> showPlayer(){
         return this.players;
     }
 }
