@@ -74,7 +74,14 @@ public class PlayerActor extends MastermindActorImpl {
                         log("C'è stato un vincitore!!!");
                     }
                 })
+                .match(JumpTurn.class, msg -> {
+                    //Tempo finito salta il turno
+                    this.judgeActor.tell(new EndTurn(), getSelf());
+                })
                 .match(GuessMsg.class, msg -> {
+                    //TODO INVIARE MESSAGGIO AL ARBITRO CHE SONO IN TEMPO
+                    this.judgeActor.tell(new JumpTurn(), getSelf());
+
                     // GuessMsg dal player
                     // this.log("Response to the GUESS MSG at all players");
 

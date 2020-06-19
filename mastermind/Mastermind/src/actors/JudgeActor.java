@@ -14,6 +14,8 @@ public class JudgeActor extends MastermindActorImpl {
     private PlayersView view;
     private int allReadyMsg = 0;
     private int timeBetweenTurns = 0;
+    private  long jumpTimeStart, jumpTimeFinal = 0;
+    private Runnable task;
 
     @Override
     public void preStart() throws Exception {
@@ -48,6 +50,10 @@ public class JudgeActor extends MastermindActorImpl {
                         // Wake up a new player.
                         wakeUpNextPlayer();
                     }
+                })
+                .match(JumpTurn.class, msg -> {
+                    //todo: FERMARE IL THREAD task
+
                 })
                 .match(EndTurn.class, msg -> {
                     // Msg dal player di endTurn (è terminato SOLO il suo turno)
@@ -86,6 +92,17 @@ public class JudgeActor extends MastermindActorImpl {
         this.sequenceInfoJudge.showPlayer().forEach(player -> player.getRef().tell(new EndGame(), getSelf()));
     }
 
+    // calcolo del timer
+    private void stopTurn(PlayerReference player){
+        this.task = () -> {
+            this.jumpTimeStart = System.currentTimeMillis();
+            // TODO : qui ci vuole una sorta di cronometro fino al timer di input turno (beetweenTurn)
+            // TODO : Come fare il cronometro per il tempo, una volta scaduto invia questo
+            player.getRef().tell(new JumpTurn(), getSelf());
+        };
+        new Thread(task).start();
+    }
+
     /**
      * Send the msg start turn to the next player.
      */
@@ -93,6 +110,7 @@ public class JudgeActor extends MastermindActorImpl {
         PlayerReference nextPlayer = this.sequenceInfoJudge.getNextPlayer();
         nextPlayer.getRef().tell(new StartTurn(), getSelf());
         // this.log("Judge sent START TURN MSG at player: " + nextPlayer.getName());
+        stopTurn(nextPlayer);
     }
 
     /**
