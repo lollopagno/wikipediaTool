@@ -8,6 +8,9 @@ import views.players.PlayersView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class JudgeActor extends MastermindActorImpl {
     private SequenceInfoJudge sequenceInfoJudge;
@@ -92,15 +95,20 @@ public class JudgeActor extends MastermindActorImpl {
         this.sequenceInfoJudge.showPlayer().forEach(player -> player.getRef().tell(new EndGame(), getSelf()));
     }
 
-    // calcolo del timer
-    private void stopTurn(PlayerReference player){
+    /**
+     * Calcolo del timer.
+     * @param player Player to stop.
+     */
+    private void startTimer(PlayerReference player){
+        Executors.newSingleThreadScheduledExecutor().schedule(() -> player.getRef().tell(new JumpTurn(), getSelf()), this.timeBetweenTurns, TimeUnit.MILLISECONDS)
+        /*;
         this.task = () -> {
             this.jumpTimeStart = System.currentTimeMillis();
             // TODO : qui ci vuole una sorta di cronometro fino al timer di input turno (beetweenTurn)
             // TODO : Come fare il cronometro per il tempo, una volta scaduto invia questo
             player.getRef().tell(new JumpTurn(), getSelf());
         };
-        new Thread(task).start();
+        new Thread(task).start();*/
     }
 
     /**
@@ -110,7 +118,7 @@ public class JudgeActor extends MastermindActorImpl {
         PlayerReference nextPlayer = this.sequenceInfoJudge.getNextPlayer();
         nextPlayer.getRef().tell(new StartTurn(), getSelf());
         // this.log("Judge sent START TURN MSG at player: " + nextPlayer.getName());
-        stopTurn(nextPlayer);
+        startTimer(nextPlayer);
     }
 
     /**
