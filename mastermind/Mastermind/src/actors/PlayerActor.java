@@ -9,12 +9,14 @@ import model.SequenceInfoGuess;
 import views.players.PlayersView;
 
 import java.util.Optional;
+import java.util.concurrent.Executors;
 
 public class PlayerActor extends MastermindActorImpl {
 
     private ActorRef judgeActor;
     private PlayerInfo iAm;
     OtherPlayersStore others;
+    boolean jumpTurn = false, haveSend = false;
 
     public PlayersView view;
 
@@ -53,40 +55,27 @@ public class PlayerActor extends MastermindActorImpl {
                 })
                 .match(StartTurn.class, msg -> {
                     // StartTurn dal Judge.
-
-                    // Generate a new guess based on previous guesses.
-                    Optional<PlayerInfo> info = this.others.getNextUnsolvedPlayer();
-                    Sequence trySequence;
-                    if (info.isPresent()) {
-                        trySequence = info.get().extractGuess(iAm.getSequence().getSequence().size());
-                        this.log("Send guess " + trySequence.getSequence() + " to the " + info.get().getName());
-
-                        // TODO: Perché viene inviato il riferimento a iAm? Quando sarebbero recuperabili tramite una getSender()?
-                        info.get().getReference().tell(new GuessMsg(trySequence), getSelf());
-                    } else {
-                        // Controllo se il giocatore ha vinto.
-                        this.log(this.iAm.getName() + " win!!");
-                        // Invio al Judge il messaggio di vittoria
-                        this.judgeActor.tell(new PlayerWin(this.iAm), getSelf());
-                    }
+                    jumpTurn = false;
+                    haveSend = false;
+                    startExtraction();
                 })
                 .match(JumpTurn.class, msg -> {
                     //Tempo finito salta il turno
+                    if (haveSend)
+                        return;
+
+                    this.jumpTurn = true;
+                    this.log("----------------- Jump Turn Received -------------------");
+                    this.view.showMessage(String.format("%s salta il turno.", iAm.getName()));
                     this.judgeActor.tell(new EndTurn(), getSelf());
                 })
                 .match(GuessMsg.class, msg -> {
-                    //TODO INVIARE MESSAGGIO AL ARBITRO CHE SONO IN TEMPO
-                    this.judgeActor.tell(new JumpTurn(), getSelf());
-
-                    // GuessMsg dal player
-
-                    // Calculate the response.
+                    // GuessMsg dal player. Calculate the response.
                     Sequence guess = msg.getSequence();
                     SequenceInfoGuess response = this.iAm.getSequence().tryGuess(guess);
 
+                    // Send to the sender the full response and notify others.
                     others.notifyOtherPlayersAboutResponse(response, getSelf());
-
-                    // Send to the sender the full response.
                     getSender().tell(new ReturnGuessMsg(response), getSelf());
                 })
                 .match(ReturnGuessMsg.class, msg -> {
@@ -94,17 +83,18 @@ public class PlayerActor extends MastermindActorImpl {
                     int rightNumbers = msg.getSequence().getRightNumbers();
                     int rightPlaceNumbers = msg.getSequence().getRightPlaceNumbers();
 
-                    this.log("RETURN GUESS MSG with response:\nRight Numbers: "
-                            + rightNumbers + "\nRight Place Number: " + rightPlaceNumbers + "\n");
+                    // this.log("RETURN GUESS MSG with response:\nRight Numbers: "
+                    //         + rightNumbers + "\nRight Place Number: " + rightPlaceNumbers + "\n");
 
                     // Save the guess and notify the view.
                     String enemy = getSender().path().name();
                     this.others.saveGuess(enemy, msg.getSequence());
                     view.inputSolution(iAm.getName(), enemy, msg.getSequence());
-                    if(msg.getSequence().getNumbers().getSequence().size() == msg.getSequence().getRightPlaceNumbers()) {
+                    if (msg.getSequence().getNumbers().getSequence().size() == msg.getSequence().getRightPlaceNumbers()) {
                         view.playerSolved(iAm.getName(), enemy);
                         view.showMessage("Sequenza indovinata a " + enemy + ".");
                     }
+
                     // Invio al Judge il msg di fine turno (vado al prossimo giocatore o al nuovo turno)
                     this.judgeActor.tell(new EndTurn(), getSelf());
                 })
@@ -116,9 +106,36 @@ public class PlayerActor extends MastermindActorImpl {
                     // Infatti la risposta del prof è stata totalmente inutile.
                 }).match(EndGame.class, msg -> {
                     // Judge declare end game. Stop the player.
-                    this.log("My execution is finished!");
+                    // this.log("My execution is finished!");
                     this.iAm.stopPlayer(getContext());
-
                 }).build();
+    }
+
+    private void startExtraction() {
+        Executors.newSingleThreadExecutor().execute(this::generateSequenceForPlayer);
+    }
+
+    private void generateSequenceForPlayer() {
+        // Generate a new guess based on previous guesses.
+        Optional<PlayerInfo> info = this.others.getNextUnsolvedPlayer();
+        Sequence trySequence;
+        if (info.isPresent()) {
+            // Questa azione può essere molto dispendiosa, occore eseguirla su un altro Thread.
+            trySequence = info.get().extractGuess(iAm.getSequence().getSequence().size());
+            if (jumpTurn) {
+                this.log("------------ out of time --------------");
+            } else {
+                haveSend = true;
+                // this.log("Send guess " + trySequence.getSequence() + " to the " + info.get().getName());
+
+                // TODO: Perché viene inviato il riferimento a iAm? Quando sarebbero recuperabili tramite una getSender()?
+                info.get().getReference().tell(new GuessMsg(trySequence), getSelf());
+            }
+        } else {
+            // Controllo se il giocatore ha vinto.
+            this.log("I've win!!");
+            // Invio al Judge il messaggio di vittoria
+            this.judgeActor.tell(new PlayerWin(), getSelf());
+        }
     }
 }

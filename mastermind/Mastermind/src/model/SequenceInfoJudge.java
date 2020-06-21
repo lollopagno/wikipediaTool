@@ -30,7 +30,6 @@ public class SequenceInfoJudge {
      * Generate a new turn sequence. Reset the player index.
      */
     public void newOrderTurn() {
-
         Random rand = new Random();
         List<PlayerReference> playersTmp = this.players;
         ArrayList<PlayerReference> newOrder = new ArrayList<>();

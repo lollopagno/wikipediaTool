@@ -8,17 +8,19 @@ import views.players.PlayersView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class JudgeActor extends MastermindActorImpl {
+    ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+    ScheduledFuture future;
     private SequenceInfoJudge sequenceInfoJudge;
     private PlayersView view;
     private int allReadyMsg = 0;
     private int timeBetweenTurns = 0;
-    private  long jumpTimeStart, jumpTimeFinal = 0;
-    private Runnable task;
+    boolean playerWon = false;
 
     @Override
     public void preStart() throws Exception {
@@ -44,19 +46,12 @@ public class JudgeActor extends MastermindActorImpl {
                     // this.log("Ready players -> [" + this.allReadyMsg + "/" + this.sequenceInfoJudge.getNPlayers() + "]");
 
                     if (this.allReadyMsg == this.sequenceInfoJudge.getNPlayers()) {
-                        // Set the new player order.
+                        // Set the new player order and wake up another player.
                         this.sequenceInfoJudge.newOrderTurn();
-                        this.log("Judge set new Order Turn: " + this.sequenceInfoJudge.showTurn());
-                        // Default Value
+                        // this.log("Judge set new Order Turn: " + this.sequenceInfoJudge.showTurn());
                         this.allReadyMsg = 0;
-
-                        // Wake up a new player.
                         wakeUpNextPlayer();
                     }
-                })
-                .match(JumpTurn.class, msg -> {
-                    //todo: FERMARE IL THREAD task
-
                 })
                 .match(EndTurn.class, msg -> {
                     // Msg dal player di endTurn (è terminato SOLO il suo turno)
@@ -64,57 +59,61 @@ public class JudgeActor extends MastermindActorImpl {
                     if (this.allReadyMsg == this.sequenceInfoJudge.getNPlayers()) {
                         // Set the new player order.
                         this.sequenceInfoJudge.newOrderTurn();
-                        this.log("Judge set new Order Turn: " + this.sequenceInfoJudge.showTurn());
-                        // Default Value
+                        // this.log("Judge set new Order Turn: " + this.sequenceInfoJudge.showTurn());
                         this.allReadyMsg = 0;
                     }
 
-                    waitTime();
                     // Wake up a new player.
                     wakeUpNextPlayer();
-                }).match(PlayerWin.class, msg -> {
+                })
+                .match(PlayerWin.class, msg -> {
                     // Partita terminata: Vittoria di un giocatore
-                    String message = msg.getPlayerWinn().getName() + " has won!";
+                    String message = getSender().path().name() + " has won!";
                     this.log(message);
-                    this.stopExcecutionPlayer();
+                    playerWon = true;
+                    this.stopExecutionPlayer();
                     view.showMessage(message);
-                }).match(EndGameJudge.class, msg ->{
+                })
+                .match(EndGameJudge.class, msg -> {
                     // Partita terminata: Pressione pulsante STOP
-                    this.stopExcecutionPlayer();
+                    this.stopExecutionPlayer();
 
                     ActorSystem myReferenceJudge = msg.getSystem();
                     myReferenceJudge.stop(msg.getReference());
                     log("Stop Game!");
-                }).build();
+                })
+                .build();
     }
 
     /**
      * Stop players executions.
      */
-    private void stopExcecutionPlayer(){
+    private void stopExecutionPlayer() {
         this.sequenceInfoJudge.showPlayer().forEach(player -> player.getRef().tell(new EndGame(), getSelf()));
     }
 
     /**
      * Calcolo del timer.
+     *
      * @param player Player to stop.
      */
-    private void startTimer(PlayerReference player){
-        Executors.newSingleThreadScheduledExecutor().schedule(() -> player.getRef().tell(new JumpTurn(), getSelf()), this.timeBetweenTurns, TimeUnit.MILLISECONDS)
-        /*;
-        this.task = () -> {
-            this.jumpTimeStart = System.currentTimeMillis();
-            // TODO : qui ci vuole una sorta di cronometro fino al timer di input turno (beetweenTurn)
-            // TODO : Come fare il cronometro per il tempo, una volta scaduto invia questo
-            player.getRef().tell(new JumpTurn(), getSelf());
-        };
-        new Thread(task).start();*/
+    private void startTimer(PlayerReference player) {
+        if (future != null && !future.isDone() && !future.isCancelled())
+            future.cancel(true);
+
+        future = service.schedule(
+                () -> player.getRef().tell(new JumpTurn(), getSelf()),
+                this.timeBetweenTurns, TimeUnit.MILLISECONDS);
     }
 
     /**
      * Send the msg start turn to the next player.
+     * If a player have already won, return the func.
      */
     private void wakeUpNextPlayer() {
+        if (playerWon)
+            return;
+
         PlayerReference nextPlayer = this.sequenceInfoJudge.getNextPlayer();
         nextPlayer.getRef().tell(new StartTurn(), getSelf());
         // this.log("Judge sent START TURN MSG at player: " + nextPlayer.getName());
@@ -139,26 +138,12 @@ public class JudgeActor extends MastermindActorImpl {
 
         // Inizialize all players.
         players.forEach(elem ->
-        {
-            elem.getRef().tell(
-                    new StartMsg(
-                            length,
-                            players,
-                            elem,
-                            view),
-                    getSelf());
-            waitTime();
-        });
-    }
-
-    /**
-     * Wait the necessary time between turns.
-     */
-    void waitTime() {
-        try {
-            Thread.sleep(this.timeBetweenTurns);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+                elem.getRef().tell(
+                        new StartMsg(
+                                length,
+                                players,
+                                elem,
+                                view),
+                        getSelf()));
     }
 }
