@@ -8,50 +8,91 @@ import java.util.ArrayList;
 
 public class RequestClient {
 
-    final int n = 3;
-    final int m = 5;
-
     final String imagePath = "src/main/java/app/bletchley-park-mansion.jpg";
+    private final int x;
+    private final int y;
 
-    // POST per registrare un utente
-    public void registerUser(String username) throws Exception{
+    private final View view;
+
+    public RequestClient(View view, int x, int y){
+        this.view = view;
+        this.x = x;
+        this.y = y;
+    }
+
+    /**
+     * HTTP POST to register a user
+     * @param username name of a user
+     */
+    public void registerUser(String username) {
 
         //TODO da cambiare in chiamata POST quando Daniele crea l'API
         //Documentazione metodi HTTP: https://mkyong.com/java/how-to-send-http-request-getpost-in-java/
 
         String url = "https://java-travis-ci.herokuapp.com/players/"+username;
-        HttpsURLConnection httpClient = (HttpsURLConnection) new URL(url).openConnection();
 
-        httpClient.setRequestMethod("GET");
+        try {
 
-    }
+            HttpsURLConnection httpClient = (HttpsURLConnection) new URL(url).openConnection();
+            httpClient.setRequestMethod("GET");
+            httpClient.setRequestProperty("User-Agent", "Mozilla/5.0");
+            int responseCode = httpClient.getResponseCode();
+            log("\nSending 'GET' (POST) request to URL : " + url);
+            log("Response Code : " + responseCode);
 
-    // GET per mostrare la lista degli utenti registrati
-    public ArrayList<String> listUser() throws Exception{
-
-        String url = "https://java-travis-ci.herokuapp.com/players";
-        HttpsURLConnection httpClient = (HttpsURLConnection) new URL(url).openConnection();
-
-        httpClient.setRequestMethod("GET");
-
-        try (BufferedReader in = new BufferedReader(
-                new InputStreamReader(httpClient.getInputStream()))) {
-
-            ArrayList<String> response = new ArrayList<>();
-            String line;
-
-            while ((line = in.readLine()) != null) {
-                response.add(line);
-            }
-
-            return response;
+        }catch (Exception ex){
+            log("Error url POST " + ex.getMessage());
         }
+
+        // Get list user
+        ArrayList<String> users = this.listUser();
+
+        // Update view
+        this.view.createTable(users);
+
+        // Start game
+        this.startGame();
     }
 
-    public void startGame(){
+    /**
+     * HTTP GET for extract list user
+     * @return list of users in the game
+     */
+    private ArrayList<String> listUser() {
 
-        final PuzzleBoard puzzle = new PuzzleBoard(n, m, imagePath);
+        ArrayList<String> response = new ArrayList<>();
+        String url = "https://java-travis-ci.herokuapp.com/players";
+
+        try {
+            HttpsURLConnection httpClient = (HttpsURLConnection) new URL(url).openConnection();
+            httpClient.setRequestMethod("GET");
+            httpClient.setRequestProperty("User-Agent", "Mozilla/5.0");
+            int responseCode = httpClient.getResponseCode();
+            log("\nSending 'GET' request to URL : " + url);
+            log("Response Code : " + responseCode);
+
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(httpClient.getInputStream()))) {
+                String line;
+
+                while ((line = in.readLine()) != null) {
+                    response.add(line);
+                }
+            }
+        }catch (Exception ex){
+            log("Error url GET " + ex.getMessage());
+        }
+        return response;
+    }
+
+    /**
+     * Start puzzle game
+     */
+    public void startGame(){
+        final PuzzleBoard puzzle = new PuzzleBoard(this.x, this.y, this.imagePath);
         puzzle.setVisible(true);
     }
 
+    private void log(String msg){
+        System.out.println(msg);
+    }
 }

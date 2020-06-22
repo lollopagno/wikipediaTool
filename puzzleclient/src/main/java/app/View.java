@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
+import java.util.Vector;
 
 public class View extends JFrame implements ActionListener, KeyListener {
 
@@ -17,7 +18,8 @@ public class View extends JFrame implements ActionListener, KeyListener {
 
     public View() {
 
-        this.client = new RequestClient();
+        // Client Object
+        this.client = new RequestClient(this, 5, 3);
 
         // Params View
         this.setTitle("Register User");
@@ -44,7 +46,6 @@ public class View extends JFrame implements ActionListener, KeyListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         SwingUtilities.invokeLater(() -> registerUser(this.username.getText()));
-        SwingUtilities.invokeLater(this::listUser);
     }
 
     @Override
@@ -66,50 +67,40 @@ public class View extends JFrame implements ActionListener, KeyListener {
      */
     private void registerUser(String username) {
 
-        try {
-            // POST - registrazione utente
-            log("POST register user: " + username);
-            this.client.registerUser(username);
-        } catch (Exception ex) {
-            log("Error url POST " + ex.getMessage());
-        }
-    }
-
-    /**
-     * Mostra la lista degli utenti che stanno giocando
-     */
-    private void listUser(){
-
-        ArrayList<String> users = new ArrayList<>();
-
-        try{
-            // GET - lista di utenti che partecipano
-            users = this.client.listUser();
-            this.controlPanel.removeAll();
-        }catch(Exception ex){
-            log("Error url GET " + ex.getMessage());
-        }
-
-        createTable(users);
-
+        this.client.registerUser(username);
+        log("POST register user: " + username);
     }
 
     /**
      * Creazione tabella con tutti gli utenti
      * @param users
      */
-    private void createTable(ArrayList<String> users){
+    public void createTable(ArrayList<String> users) {
 
         //TODO aggiornare ogni 30 sec la tabella per nuovi utenti
+        // Implementare un NewSingleThread
 
+        // Remove all object into view
+        this.controlPanel.removeAll();
+
+        // Column
+        Vector<String> column = new Vector<>();
+        column.add("User");
+
+        // Row data
+        Vector<Vector<String>> rowData = new Vector<>();
+        Vector<String> data = new Vector<>();
         users.forEach((player) -> {
-            JLabel label = new JLabel();
-            label.setText(player);
-            this.controlPanel.add(label);
+            data.add(player);
         });
-        this.controlPanel.setVisible(true);
 
-        this.client.startGame();
+        final JTable table = new JTable(rowData, column);
+        JScrollPane scrollPane = new JScrollPane(table);
+        this.controlPanel.add(scrollPane);
+
+        // New title
+        this.setTitle("List user");
+        SwingUtilities.invokeLater(() -> { this.repaint(); this.revalidate(); });
     }
 
     private void log(String msg){
