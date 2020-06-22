@@ -80,16 +80,14 @@ public class PlayerActor extends MastermindActorImpl {
                 })
                 .match(ReturnGuessMsg.class, msg -> {
                     // ReturnGuessMsg dal player che risponde in funzione del guess richiesto
-                    int rightNumbers = msg.getSequence().getRightNumbers();
-                    int rightPlaceNumbers = msg.getSequence().getRightPlaceNumbers();
-
-                    // this.log("RETURN GUESS MSG with response:\nRight Numbers: "
-                    //         + rightNumbers + "\nRight Place Number: " + rightPlaceNumbers + "\n");
+                    //int rightNumbers = msg.getSequence().getRightNumbers();
+                    //int rightPlaceNumbers = msg.getSequence().getRightPlaceNumbers();
 
                     // Save the guess and notify the view.
                     String enemy = getSender().path().name();
                     this.others.saveGuess(enemy, msg.getSequence());
                     view.inputSolution(iAm.getName(), enemy, msg.getSequence());
+
                     if (msg.getSequence().getNumbers().getSequence().size() == msg.getSequence().getRightPlaceNumbers()) {
                         view.playerSolved(iAm.getName(), enemy);
                         view.showMessage("Sequenza indovinata a " + enemy + ".");
@@ -104,13 +102,16 @@ public class PlayerActor extends MastermindActorImpl {
                     // TODO Memorizzare informazione sulla risposta ricevuta.
                     // In verità è inutile memorizzare la risposta se non si ha anche la sequenza ad essa collegata.
                     // Infatti la risposta del prof è stata totalmente inutile.
+
                 }).match(EndGame.class, msg -> {
                     // Judge declare end game. Stop the player.
-                    // this.log("My execution is finished!");
                     this.iAm.stopPlayer(getContext());
                 }).build();
     }
 
+    /**
+     * Start Thread generate guess
+     */
     private void startExtraction() {
         Executors.newSingleThreadExecutor().execute(this::generateSequenceForPlayer);
     }
@@ -126,7 +127,6 @@ public class PlayerActor extends MastermindActorImpl {
                 this.log("------------ out of time --------------");
             } else {
                 haveSend = true;
-                // this.log("Send guess " + trySequence.getSequence() + " to the " + info.get().getName());
 
                 // TODO: Perché viene inviato il riferimento a iAm? Quando sarebbero recuperabili tramite una getSender()?
                 info.get().getReference().tell(new GuessMsg(trySequence), getSelf());

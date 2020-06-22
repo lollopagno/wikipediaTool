@@ -36,19 +36,16 @@ public class JudgeActor extends MastermindActorImpl {
                     this.view = msg.getView();
                     this.view.showMessage(message);
                     this.timeBetweenTurns = msg.getTime();
-                    this.startGame(msg.getPlayers(), msg.getLength());
+                    startGame(msg.getPlayers(), msg.getLength());
                 })
                 .match(ReadyMsg.class, msg -> {
                     // Msg dai player di READY
                     this.allReadyMsg++;
-                    // String senderName = getSender().path().name();
-                    // this.log("READY MESSAGE Received by " + senderName);
-                    // this.log("Ready players -> [" + this.allReadyMsg + "/" + this.sequenceInfoJudge.getNPlayers() + "]");
 
                     if (this.allReadyMsg == this.sequenceInfoJudge.getNPlayers()) {
                         // Set the new player order and wake up another player.
                         this.sequenceInfoJudge.newOrderTurn();
-                        // this.log("Judge set new Order Turn: " + this.sequenceInfoJudge.showTurn());
+
                         this.allReadyMsg = 0;
                         wakeUpNextPlayer();
                     }
@@ -59,7 +56,6 @@ public class JudgeActor extends MastermindActorImpl {
                     if (this.allReadyMsg == this.sequenceInfoJudge.getNPlayers()) {
                         // Set the new player order.
                         this.sequenceInfoJudge.newOrderTurn();
-                        // this.log("Judge set new Order Turn: " + this.sequenceInfoJudge.showTurn());
                         this.allReadyMsg = 0;
                     }
 
@@ -92,6 +88,21 @@ public class JudgeActor extends MastermindActorImpl {
         this.sequenceInfoJudge.showPlayer().forEach(player -> player.getRef().tell(new EndGame(), getSelf()));
     }
 
+
+    /**
+     * Send the msg start turn to the next player.
+     * If a player have already won, return the func.
+     */
+    private void wakeUpNextPlayer() {
+        if (playerWon)
+            return;
+
+        PlayerReference nextPlayer = this.sequenceInfoJudge.getNextPlayer();
+        nextPlayer.getRef().tell(new StartTurn(), getSelf());
+
+        startTimer(nextPlayer);
+    }
+
     /**
      * Calcolo del timer.
      *
@@ -104,20 +115,6 @@ public class JudgeActor extends MastermindActorImpl {
         future = service.schedule(
                 () -> player.getRef().tell(new JumpTurn(), getSelf()),
                 this.timeBetweenTurns, TimeUnit.MILLISECONDS);
-    }
-
-    /**
-     * Send the msg start turn to the next player.
-     * If a player have already won, return the func.
-     */
-    private void wakeUpNextPlayer() {
-        if (playerWon)
-            return;
-
-        PlayerReference nextPlayer = this.sequenceInfoJudge.getNextPlayer();
-        nextPlayer.getRef().tell(new StartTurn(), getSelf());
-        // this.log("Judge sent START TURN MSG at player: " + nextPlayer.getName());
-        startTimer(nextPlayer);
     }
 
     /**
