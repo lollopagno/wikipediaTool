@@ -1,13 +1,13 @@
 package app;
 
-import com.google.gson.*;
-
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonParser;
 
 public class RequestClient {
 
@@ -15,10 +15,9 @@ public class RequestClient {
     private final int x;
     private final int y;
 
-    private final View view;
+    private HttpsURLConnection httpClient;
 
     public RequestClient(View view, int x, int y){
-        this.view = view;
         this.x = x;
         this.y = y;
     }
@@ -27,26 +26,25 @@ public class RequestClient {
      * HTTP POST to register a user
      * @param username name of a user
      */
-    public void registerUser(String username) {
+    public ArrayList<String> registerUser(String username) {
 
-        //TODO da cambiare in chiamata POST quando Daniele crea l'API
         //Documentazione metodi HTTP: https://mkyong.com/java/how-to-send-http-request-getpost-in-java/
 
         String url = "https://java-travis-ci.herokuapp.com/players/";
 
         try {
 
-            HttpsURLConnection httpClient = (HttpsURLConnection) new URL(url).openConnection();
-            httpClient.setRequestMethod("POST");
+            this.httpClient = (HttpsURLConnection) new URL(url).openConnection();
+            this.httpClient.setRequestMethod("POST");
 
             // Send post request
-            httpClient.setDoOutput(true);
-            try (DataOutputStream wr = new DataOutputStream(httpClient.getOutputStream())) {
+            this.httpClient.setDoOutput(true);
+            try (DataOutputStream wr = new DataOutputStream(this.httpClient.getOutputStream())) {
                 wr.writeBytes(username);
                 wr.flush();
             }
 
-            int responseCode = httpClient.getResponseCode();
+            int responseCode = this.httpClient.getResponseCode();
             log("\nSending 'POST'  request to URL : " + url);
             log("Response Code : " + responseCode);
 
@@ -55,13 +53,7 @@ public class RequestClient {
         }
 
         // Get list user
-        ArrayList<String> users = this.listUser();
-
-        // Update view
-        this.view.updateListUser(users);
-
-        // Start game
-        this.startGame();
+        return this.listUser();
     }
 
     /**
@@ -75,11 +67,10 @@ public class RequestClient {
         String url = "https://java-travis-ci.herokuapp.com/players";
 
         try {
+            this.httpClient = (HttpsURLConnection) new URL(url).openConnection();
+            this.httpClient.setRequestMethod("GET");
 
-            HttpsURLConnection httpClient = (HttpsURLConnection) new URL(url).openConnection();
-            httpClient.setRequestMethod("GET");
-
-            try (BufferedReader in = new BufferedReader(new InputStreamReader(httpClient.getInputStream()))) {
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(this.httpClient.getInputStream()))) {
                 String line;
 
                 while ((line = in.readLine()) != null) {
@@ -87,7 +78,7 @@ public class RequestClient {
                 }
             }
 
-            int responseCode = httpClient.getResponseCode();
+            int responseCode = this.httpClient.getResponseCode();
             log("\nSending 'GET' request to URL : " + url);
             log("Response Code : " + responseCode);
 
@@ -97,13 +88,12 @@ public class RequestClient {
             }else{
 
                 // Convert to JsonArray
-                JsonObject jsonResult = new Gson().fromJson(resultAPI.toString(), JsonObject.class);
+                JsonArray jsonArray = new JsonParser().parse(resultAPI.toString()).getAsJsonArray();
 
                 // Convert to ArrayList
-                JsonArray jArray = jsonResult.getAsJsonArray();
-                if (jArray != null) {
-                    for (int i=0;i<jArray.size();i++){
-                        response.add(jArray.get(i).toString());
+                if (jsonArray != null) {
+                    for (int i=0; i<jsonArray.size(); i++){
+                        response.add(jsonArray.get(i).toString());
                     }
                 }
             }

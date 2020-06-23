@@ -76,7 +76,14 @@ public class View extends JFrame implements ActionListener, KeyListener {
      * @param username user name
      */
     private void registerUser(String username) {
-        this.client.registerUser(username);
+
+        ArrayList<String> users = this.client.registerUser(username);
+
+        // Update view
+        this.updateListUser(users);
+
+        // Start game
+        this.client.startGame();
     }
 
     /**
@@ -98,16 +105,17 @@ public class View extends JFrame implements ActionListener, KeyListener {
     private void updateView(ArrayList<String> users){
 
         log("[Executor] --> Update table in view");
-        log(users+"");
 
         // Row data
+        // TODO capire perchè non visualizza tutti gli user e renderli NON modificabili dalla tabella
         Vector<Vector<String>> rowData = new Vector<>();
         Vector<String> data = new Vector<>(users);
-        
+
         rowData.add(data);
 
         // Table Users
         final JTable table = new JTable(rowData, this.columnTable);
+        table.setFillsViewportHeight(true);
         JScrollPane scrollPane = new JScrollPane(table);
         this.controlPanel.add(scrollPane);
 
