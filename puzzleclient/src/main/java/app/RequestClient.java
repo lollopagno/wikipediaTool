@@ -86,7 +86,7 @@ public class RequestClient {
                 throw new RuntimeException("HttpResponseCode: " + responseCode);
 
             }else{
-
+                System.out.println(resultAPI);
                 // Convert to JsonArray
                 JsonArray jsonArray = new JsonParser().parse(resultAPI.toString()).getAsJsonArray();
 

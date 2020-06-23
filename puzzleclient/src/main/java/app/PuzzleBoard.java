@@ -1,10 +1,8 @@
 package app;
 
 import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
+import javax.swing.*;
+
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -18,13 +16,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.IntStream;
 
 @SuppressWarnings("serial")
 public class PuzzleBoard extends JFrame {
 	
 	final int rows, columns;
-	private List<Tile> tiles = new ArrayList<>();
+    private final ScheduledExecutorService job = Executors.newSingleThreadScheduledExecutor();
+    private List<Tile> tiles = new ArrayList<>();
 	
 	private SelectionManager selectionManager = new SelectionManager();
 	
@@ -95,6 +96,8 @@ public class PuzzleBoard extends JFrame {
             	});
             });
     	});
+        /** check if another players has selected a card*/
+        this.job.execute(()-> selectedCard(tiles));
     	
     	pack();
         setLocationRelativeTo(null);
@@ -104,5 +107,12 @@ public class PuzzleBoard extends JFrame {
     	if(tiles.stream().allMatch(Tile::isInRightPlace)) {
     		JOptionPane.showMessageDialog(this, "Puzzle Completed!", "", JOptionPane.INFORMATION_MESSAGE);
     	}
+    }
+    private void selectedCard(List<Tile> tiles){
+        tiles.forEach(tile->{
+            if(tile.getSelected()){
+                setBorder(BorderFactory.createLineBorder(Color.red));
+            }
+        });
     }
 }

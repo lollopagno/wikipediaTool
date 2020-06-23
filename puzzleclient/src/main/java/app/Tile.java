@@ -6,6 +6,7 @@ class Tile implements Comparable<Tile>{
 	private Image image;
 	private int originalPosition;
 	private int currentPosition;
+    private SelectionManager selectionManager;
 
     public Tile(final Image image, final int originalPosition, final int currentPosition) {
         this.image = image;
@@ -34,4 +35,8 @@ class Tile implements Comparable<Tile>{
 		return this.currentPosition < other.currentPosition ? -1 
 				: (this.currentPosition == other.currentPosition ? 0 : 1);
 	}
+
+    public boolean getSelected(){
+        return selectionManager.getSelected();
+    }
 }

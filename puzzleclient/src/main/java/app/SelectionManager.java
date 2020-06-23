@@ -19,6 +19,7 @@ public class SelectionManager {
 		}
 	}
 
+
 	private void swap(final Tile t1, final Tile t2) {
 		int pos = t1.getCurrentPosition();
 		t1.setCurrentPosition(t2.getCurrentPosition());
@@ -29,4 +30,9 @@ public class SelectionManager {
 	interface Listener{
 		void onSwapPerformed();
 	}
+
+	public boolean getSelected(){
+		return selectionActive;
+	}
+
 }

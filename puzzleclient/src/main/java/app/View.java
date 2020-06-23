@@ -98,6 +98,8 @@ public class View extends JFrame implements ActionListener, KeyListener {
         this.job.scheduleAtFixedRate(() -> updateView(users), 0, 30000, TimeUnit.MILLISECONDS);
     }
 
+
+
     /**
      * Create table with all users
      * @param users list user name
