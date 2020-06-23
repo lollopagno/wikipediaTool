@@ -1,7 +1,10 @@
 package app;
 
+import com.google.gson.*;
+
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
@@ -29,13 +32,20 @@ public class RequestClient {
         //TODO da cambiare in chiamata POST quando Daniele crea l'API
         //Documentazione metodi HTTP: https://mkyong.com/java/how-to-send-http-request-getpost-in-java/
 
-        String url = "https://java-travis-ci.herokuapp.com/players/"+username;
+        String url = "https://java-travis-ci.herokuapp.com/players/";
 
         try {
 
             HttpsURLConnection httpClient = (HttpsURLConnection) new URL(url).openConnection();
-            httpClient.setRequestMethod("GET");
-            httpClient.setRequestProperty("User-Agent", "Mozilla/5.0");
+            httpClient.setRequestMethod("POST");
+
+            // Send post request
+            httpClient.setDoOutput(true);
+            try (DataOutputStream wr = new DataOutputStream(httpClient.getOutputStream())) {
+                wr.writeBytes(username);
+                wr.flush();
+            }
+
             int responseCode = httpClient.getResponseCode();
             log("\nSending 'POST'  request to URL : " + url);
             log("Response Code : " + responseCode);
@@ -60,27 +70,47 @@ public class RequestClient {
      */
     private ArrayList<String> listUser() {
 
-        ArrayList<String> response = new ArrayList<>();
+        StringBuilder resultAPI = new StringBuilder();
+        ArrayList<String> response = new ArrayList();
         String url = "https://java-travis-ci.herokuapp.com/players";
 
         try {
+
             HttpsURLConnection httpClient = (HttpsURLConnection) new URL(url).openConnection();
             httpClient.setRequestMethod("GET");
-            httpClient.setRequestProperty("User-Agent", "Mozilla/5.0");
-            int responseCode = httpClient.getResponseCode();
-            log("\nSending 'GET' request to URL : " + url);
-            log("Response Code : " + responseCode);
 
             try (BufferedReader in = new BufferedReader(new InputStreamReader(httpClient.getInputStream()))) {
                 String line;
 
                 while ((line = in.readLine()) != null) {
-                    response.add(line);
+                    resultAPI.append(line);
+                }
+            }
+
+            int responseCode = httpClient.getResponseCode();
+            log("\nSending 'GET' request to URL : " + url);
+            log("Response Code : " + responseCode);
+
+            if(responseCode != 200) {
+                throw new RuntimeException("HttpResponseCode: " + responseCode);
+
+            }else{
+
+                // Convert to JsonArray
+                JsonObject jsonResult = new Gson().fromJson(resultAPI.toString(), JsonObject.class);
+
+                // Convert to ArrayList
+                JsonArray jArray = jsonResult.getAsJsonArray();
+                if (jArray != null) {
+                    for (int i=0;i<jArray.size();i++){
+                        response.add(jArray.get(i).toString());
+                    }
                 }
             }
         }catch (Exception ex){
             log("Error url GET " + ex.getMessage());
         }
+
         return response;
     }
 

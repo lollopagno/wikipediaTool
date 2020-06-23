@@ -98,14 +98,13 @@ public class View extends JFrame implements ActionListener, KeyListener {
     private void updateView(ArrayList<String> users){
 
         log("[Executor] --> Update table in view");
+        log(users+"");
 
         // Row data
         Vector<Vector<String>> rowData = new Vector<>();
-        //Vector<String> data = new Vector<>(users);
-        Vector<String> data = new Vector<>();
-        users.forEach((player) -> {
-            data.add(player);
-        });
+        Vector<String> data = new Vector<>(users);
+        
+        rowData.add(data);
 
         // Table Users
         final JTable table = new JTable(rowData, this.columnTable);
