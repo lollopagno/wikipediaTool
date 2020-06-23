@@ -109,10 +109,10 @@ public class PuzzleBoard extends JFrame {
     	}
     }
     private void selectedCard(List<Tile> tiles){
-        tiles.forEach(tile->{
+        /*tiles.forEach(tile->{
             if(tile.getSelected()){
                 setBorder(BorderFactory.createLineBorder(Color.red));
             }
-        });
+        });*/
     }
 }
