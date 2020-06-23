@@ -4,6 +4,8 @@ import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 import com.google.gson.JsonArray;
@@ -48,8 +50,12 @@ public class RequestClient {
             log("\nSending 'POST'  request to URL : " + url);
             log("Response Code : " + responseCode);
 
+            if(responseCode != 200){
+                throw new RuntimeException("Http POST failed: " + responseCode);
+            }
+
         }catch (Exception ex){
-            log("Error url POST " + ex.getMessage());
+            log("Http POST failed:  " + ex.getMessage());
         }
 
         // Get list user
@@ -83,7 +89,7 @@ public class RequestClient {
             log("Response Code : " + responseCode);
 
             if(responseCode != 200) {
-                throw new RuntimeException("HttpResponseCode: " + responseCode);
+                throw new RuntimeException("Http GET failed:  " + responseCode);
 
             }else{
                 System.out.println(resultAPI);
@@ -98,10 +104,30 @@ public class RequestClient {
                 }
             }
         }catch (Exception ex){
-            log("Error url GET " + ex.getMessage());
+            log("Http GET failed:  " + ex.getMessage());
         }
 
         return response;
+    }
+
+    /**
+     * HTTP DELETE for delete user from server
+     */
+    public void deleteUser() {
+
+        String url = "";
+
+        try {
+            this.httpClient = (HttpsURLConnection) new URL(url).openConnection();
+            this.httpClient.setDoOutput(true);
+
+            this.httpClient.setRequestProperty("Content-Type", "application/x-www-form-urlencoded" );
+            this.httpClient.setRequestMethod("DELETE");
+            this.httpClient.connect();
+
+        }catch(Exception ex){
+            log("Http DELETE failed:  " + ex.getMessage());
+        }
     }
 
     /**

@@ -1,12 +1,15 @@
 package app;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Vector;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -29,7 +32,7 @@ public class View extends JFrame implements ActionListener, KeyListener {
 
         // Params View
         this.setTitle("Register User");
-        this.setSize(320, 240);
+        this.setSize(500, 500);
         this.setLayout(new BorderLayout());
 
         // Button Register User
@@ -42,7 +45,7 @@ public class View extends JFrame implements ActionListener, KeyListener {
 
         // Control Panel
         this.controlPanel = new JPanel(new FlowLayout());
-        this.controlPanel.setSize(320, (int) (240 * 0.1));
+        this.controlPanel.setSize(500, (int) (500 * 0.1));
 
         this.controlPanel.add(registerUser);
         this.controlPanel.add(this.username);
@@ -98,8 +101,6 @@ public class View extends JFrame implements ActionListener, KeyListener {
         this.job.scheduleAtFixedRate(() -> updateView(users), 0, 30000, TimeUnit.MILLISECONDS);
     }
 
-
-
     /**
      * Create table with all users
      * @param users list user name
@@ -109,14 +110,27 @@ public class View extends JFrame implements ActionListener, KeyListener {
         log("[Executor] --> Update table in view");
 
         // Row data
-        // TODO capire perchè non visualizza tutti gli user e renderli NON modificabili dalla tabella
         Vector<Vector<String>> rowData = new Vector<>();
-        Vector<String> data = new Vector<>(users);
 
-        rowData.add(data);
+        // Add user into vector
+        users.forEach(user -> {
+            Vector<String> vector = new Vector<>();
+            vector.add(user);
+            rowData.add(vector);
+        });
+
+        // Model for create jTable not editable
+        TableModel model = new DefaultTableModel(rowData, this.columnTable)
+        {
+            public boolean isCellEditable(int row, int column)
+            {
+                return false;
+            }
+        };
 
         // Table Users
-        final JTable table = new JTable(rowData, this.columnTable);
+        JTable table = new JTable(model);
+
         table.setFillsViewportHeight(true);
         JScrollPane scrollPane = new JScrollPane(table);
         this.controlPanel.add(scrollPane);
@@ -126,6 +140,7 @@ public class View extends JFrame implements ActionListener, KeyListener {
             this.revalidate();
         });
     }
+
     private void log(String msg){
         System.out.println(msg);
     }
