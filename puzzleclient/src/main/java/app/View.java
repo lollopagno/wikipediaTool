@@ -8,18 +8,24 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Vector;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class View extends JFrame implements ActionListener, KeyListener {
 
     private final JTextField username;
     private final JPanel controlPanel;
+    private Vector<String> columnTable;
 
     private final RequestClient client;
 
-    public View() {
+    private final ScheduledExecutorService job = Executors.newSingleThreadScheduledExecutor();
+
+    public View(int x, int y) {
 
         // Client Object
-        this.client = new RequestClient(this, 5, 3);
+        this.client = new RequestClient(this, x, y);
 
         // Params View
         this.setTitle("Register User");
@@ -41,6 +47,10 @@ public class View extends JFrame implements ActionListener, KeyListener {
         this.controlPanel.add(registerUser);
         this.controlPanel.add(this.username);
         this.add(this.controlPanel, BorderLayout.CENTER);
+
+        //Set column Table
+        this.columnTable = new Vector<>();
+        this.columnTable.add("User");
     }
 
     @Override
@@ -62,47 +72,51 @@ public class View extends JFrame implements ActionListener, KeyListener {
     public void keyReleased(KeyEvent e) {}
 
     /**
-     * Azione del pulsante registerUser
-     * @param username nome dell'utente
+     * RegisterUser button action
+     * @param username user name
      */
     private void registerUser(String username) {
-
         this.client.registerUser(username);
-        log("POST register user: " + username);
     }
 
     /**
-     * Creazione tabella con tutti gli utenti
-     * @param users
+     * Execution job: update list user view
+     * @param users list user name
      */
-    public void createTable(ArrayList<String> users) {
+    public void updateListUser(ArrayList<String> users) {
 
-        //TODO aggiornare ogni 30 sec la tabella per nuovi utenti
-        // Implementare un NewSingleThread
-
-        // Remove all object into view
         this.controlPanel.removeAll();
+        this.setTitle("List user");
 
-        // Column
-        Vector<String> column = new Vector<>();
-        column.add("User");
+        this.job.scheduleAtFixedRate(() -> updateView(users), 0, 30000, TimeUnit.MILLISECONDS);
+    }
+
+    /**
+     * Create table with all users
+     * @param users list user name
+     */
+    private void updateView(ArrayList<String> users){
+
+        log("[Executor] --> Update table in view");
 
         // Row data
         Vector<Vector<String>> rowData = new Vector<>();
+        //Vector<String> data = new Vector<>(users);
         Vector<String> data = new Vector<>();
         users.forEach((player) -> {
             data.add(player);
         });
 
-        final JTable table = new JTable(rowData, column);
+        // Table Users
+        final JTable table = new JTable(rowData, this.columnTable);
         JScrollPane scrollPane = new JScrollPane(table);
         this.controlPanel.add(scrollPane);
 
-        // New title
-        this.setTitle("List user");
-        SwingUtilities.invokeLater(() -> { this.repaint(); this.revalidate(); });
+        SwingUtilities.invokeLater(() -> {
+            this.repaint();
+            this.revalidate();
+        });
     }
-
     private void log(String msg){
         System.out.println(msg);
     }

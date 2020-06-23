@@ -37,7 +37,7 @@ public class RequestClient {
             httpClient.setRequestMethod("GET");
             httpClient.setRequestProperty("User-Agent", "Mozilla/5.0");
             int responseCode = httpClient.getResponseCode();
-            log("\nSending 'GET' (POST) request to URL : " + url);
+            log("\nSending 'POST'  request to URL : " + url);
             log("Response Code : " + responseCode);
 
         }catch (Exception ex){
@@ -48,7 +48,7 @@ public class RequestClient {
         ArrayList<String> users = this.listUser();
 
         // Update view
-        this.view.createTable(users);
+        this.view.updateListUser(users);
 
         // Start game
         this.startGame();
