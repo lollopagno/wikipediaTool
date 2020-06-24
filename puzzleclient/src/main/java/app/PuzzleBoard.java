@@ -65,6 +65,7 @@ public class PuzzleBoard extends JFrame {
 
     
     private void createTiles(final String imagePath) {
+        // TODO: Il caricamento dell'immagine dev'essere fatto.
 		final BufferedImage image;
         
         try {
