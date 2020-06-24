@@ -9,13 +9,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Vector;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class View extends JFrame implements ActionListener, KeyListener {
+public class RegisterView extends JFrame implements ActionListener, KeyListener {
 
     private final JTextField username;
     private final JPanel controlPanel;
@@ -25,8 +24,7 @@ public class View extends JFrame implements ActionListener, KeyListener {
 
     private final ScheduledExecutorService job = Executors.newSingleThreadScheduledExecutor();
 
-    public View(int x, int y) {
-
+    public RegisterView(int x, int y) {
         // Client Object
         this.client = new RequestClient(this, x, y);
 
@@ -58,7 +56,7 @@ public class View extends JFrame implements ActionListener, KeyListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        SwingUtilities.invokeLater(() -> registerUser(this.username.getText()));
+        registerUser(this.username.getText());
     }
 
     @Override
@@ -67,7 +65,7 @@ public class View extends JFrame implements ActionListener, KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-            SwingUtilities.invokeLater(() -> registerUser(this.username.getText()));
+            registerUser(this.username.getText());
         }
     }
 
@@ -79,7 +77,6 @@ public class View extends JFrame implements ActionListener, KeyListener {
      * @param username user name
      */
     private void registerUser(String username) {
-
         ArrayList<String> users = this.client.registerUser(username);
 
         // Update view
@@ -94,9 +91,10 @@ public class View extends JFrame implements ActionListener, KeyListener {
      * @param users list user name
      */
     public void updateListUser(ArrayList<String> users) {
-
-        this.controlPanel.removeAll();
-        this.setTitle("List user");
+        SwingUtilities.invokeLater(() -> {
+            this.controlPanel.removeAll();
+            this.setTitle("List user");
+        });
 
         this.job.scheduleAtFixedRate(() -> updateView(users), 0, 30000, TimeUnit.MILLISECONDS);
     }
@@ -106,7 +104,6 @@ public class View extends JFrame implements ActionListener, KeyListener {
      * @param users list user name
      */
     private void updateView(ArrayList<String> users){
-
         log("[Executor] --> Update table in view");
 
         // Row data
@@ -128,14 +125,14 @@ public class View extends JFrame implements ActionListener, KeyListener {
             }
         };
 
-        // Table Users
-        JTable table = new JTable(model);
-
-        table.setFillsViewportHeight(true);
-        JScrollPane scrollPane = new JScrollPane(table);
-        this.controlPanel.add(scrollPane);
-
         SwingUtilities.invokeLater(() -> {
+            // Table Users
+            JTable table = new JTable(model);
+
+            table.setFillsViewportHeight(true);
+            JScrollPane scrollPane = new JScrollPane(table);
+            this.controlPanel.add(scrollPane);
+
             this.repaint();
             this.revalidate();
         });
