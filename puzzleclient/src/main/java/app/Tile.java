@@ -2,7 +2,7 @@ package app;
 
 import java.awt.Image;
 
-class Tile implements Comparable<Tile>{
+public class Tile implements Comparable<Tile>{
 	private Image image;
 	private int originalPosition;
 	private int currentPosition;

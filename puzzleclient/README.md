@@ -8,7 +8,7 @@ TODO Client:
     Tramite la chiamata GET https://java-travis-ci.herokuapp.com/players è possibile scaricare l'elenco di tutti i player già presenti.
     Ogni 30 secondi un job dovrebbe scaricare una lista aggiornata dei giocatori sul server oppure tramite un pulsante per forzare l'aggiornamento.
     
-Le due view soprascritte potrebbero essere anche la stessa.
+Le due registerView soprascritte potrebbero essere anche la stessa.
 
 - [ ] Schermata di gioco attuale
     1. Se una casella è già occupata da un altro giocatore, deve essere circondata di giallo.

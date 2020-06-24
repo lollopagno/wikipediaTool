@@ -16,12 +16,9 @@ import java.util.concurrent.TimeUnit;
 
 public class View extends JFrame implements ActionListener, KeyListener {
 
-    // Component View
     private final JTextField username;
     private final JPanel controlPanel;
-
-    // Component Table
-    private final Vector<String> columnTable = new Vector<>();;
+    private Vector<String> columnTable;
 
     private final RequestClient client;
 
@@ -53,7 +50,8 @@ public class View extends JFrame implements ActionListener, KeyListener {
         this.controlPanel.add(this.username);
         this.add(this.controlPanel, BorderLayout.CENTER);
 
-        //Set Table
+        //Set column Table
+        this.columnTable = new Vector<>();
         this.columnTable.add("User");
     }
 
@@ -96,21 +94,28 @@ public class View extends JFrame implements ActionListener, KeyListener {
      */
     public void updateListUser() {
 
+        this.controlPanel.removeAll();
         this.setTitle("List user");
 
-        this.job.scheduleAtFixedRate(this::updateView, 0, 30000, TimeUnit.MILLISECONDS);
+        // Row data
+        Vector<Vector<String>> rowData = new Vector<>();
+
+        this.job.scheduleAtFixedRate(() -> updateView(rowData), 0, 30000, TimeUnit.MILLISECONDS);
     }
 
     /**
      * Create table with all users
      */
-    private void updateView(){
+    private void updateView(Vector<Vector<String>> rowData){
 
         // Get list user
         ArrayList<String> users = this.client.listUser();
-        Vector<Vector<String>> rowData = new Vector<>();
 
         log("[Executor] --> Update table in view");
+
+        if(!rowData.isEmpty()){
+            rowData.clear();
+        }
 
         // Add user into vector
         users.forEach(user -> {
@@ -130,10 +135,9 @@ public class View extends JFrame implements ActionListener, KeyListener {
 
         // Table Users
         JTable table = new JTable(model);
+
         table.setFillsViewportHeight(true);
         JScrollPane scrollPane = new JScrollPane(table);
-
-        this.controlPanel.removeAll();
         this.controlPanel.add(scrollPane);
 
         SwingUtilities.invokeLater(() -> {
