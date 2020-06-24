@@ -26,6 +26,7 @@ public class PuzzleBoard extends JFrame {
 	final int rows, columns;
     private final ScheduledExecutorService job = Executors.newSingleThreadScheduledExecutor();
     private List<Tile> tiles = new ArrayList<>();
+    private int current;
 	
 	private SelectionManager selectionManager = new SelectionManager();
 	
@@ -89,7 +90,10 @@ public class PuzzleBoard extends JFrame {
                 if (response.isSuccessful() && response.body() != null) {
                      int position = 0;
 
-                    // TODO: Scaricare dal server l'attuale disposizione delle tessere.
+                    // TODO: Scaricare dal server l'attuale disposizione delle tessere
+                    for(Tile tile: response.body())
+                       current = tile.getCurrentPosition(); //TODO: QUESTA È LA POSIZIONE CORRENTE
+
                     for (int i = 0; i < rows; i++) {
                         for (int j = 0; j < columns; j++) {
                             final Image imagePortion = createImage(new FilteredImageSource(image.getSource(),
@@ -131,8 +135,8 @@ public class PuzzleBoard extends JFrame {
             	});
             });
     	});
-        /** check if another players has selected a card*/
-        this.job.execute(()-> selectedCard(tiles));
+        /* check if another players has selected a card*/
+        //this.job.execute(()-> selectedCard(tiles));
     	
     	pack();
         setLocationRelativeTo(null);
