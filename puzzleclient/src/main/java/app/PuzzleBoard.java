@@ -65,7 +65,8 @@ public class PuzzleBoard extends JFrame {
         final List<Integer> randomPositions = new ArrayList<>();
         IntStream.range(0, rows*columns).forEach(item -> { randomPositions.add(item); }); 
         Collections.shuffle(randomPositions);
-        
+
+        // TODO: Scaricare dal server l'attuale disposizione delle tessere.
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
             	final Image imagePortion = createImage(new FilteredImageSource(image.getSource(),
@@ -74,6 +75,7 @@ public class PuzzleBoard extends JFrame {
                         					(imageWidth / columns), 
                         					imageHeight / rows)));
 
+            	// TODO: Sincronizzare tutti i pezzi delle immagini con la loro attuale posizione, non quella originale.
                 tiles.add(new Tile(imagePortion, position, randomPositions.get(position)));
                 position++;
             }
@@ -104,10 +106,12 @@ public class PuzzleBoard extends JFrame {
     }
 
     private void checkSolution() {
+        // TODO: Questa parte deve essere effettuata dal server immagino.
     	if(tiles.stream().allMatch(Tile::isInRightPlace)) {
     		JOptionPane.showMessageDialog(this, "Puzzle Completed!", "", JOptionPane.INFORMATION_MESSAGE);
     	}
     }
+
     private void selectedCard(List<Tile> tiles){
         /*tiles.forEach(tile->{
             if(tile.getSelected()){
