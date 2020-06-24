@@ -1,13 +1,8 @@
 package app;
 
-import app.remoteservices.RemoteServices;
-import app.remoteservices.ReturnMessage;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
-import retrofit2.Call;
 import retrofit2.Callback;
-import retrofit2.Response;
-
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -24,6 +19,8 @@ public class RequestClient {
 
     private HttpsURLConnection httpClient;
 
+    //Documentazione metodi HTTP: https://mkyong.com/java/how-to-send-http-request-getpost-in-java/
+
     public RequestClient(RegisterView registerView, int x, int y) {
         this.x = x;
         this.y = y;
@@ -35,8 +32,6 @@ public class RequestClient {
      * @param username name of a user
      */
     public void registerUser(String username) {
-
-        //Documentazione metodi HTTP: https://mkyong.com/java/how-to-send-http-request-getpost-in-java/
 
         String url = "https://java-travis-ci.herokuapp.com/players/";
 
@@ -63,23 +58,6 @@ public class RequestClient {
         } catch (Exception ex) {
             log("Http POST failed:  " + ex.getMessage());
         }
-    }
-
-    private void newAddPlayer(String name, Consumer<ReturnMessage> action) {
-        Call<ReturnMessage> call = RemoteServices.getInstance().getPlayersService().addPlayer(name);
-        call.enqueue(new Callback<>() {
-            @Override
-            public void onResponse(Call<ReturnMessage> call, Response<ReturnMessage> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    action.accept(response.body());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ReturnMessage> call, Throwable t) {
-
-            }
-        });
     }
 
     /**
@@ -131,7 +109,7 @@ public class RequestClient {
     /**
      * HTTP DELETE for delete user from server
      */
-    public void deleteUser(String name, Consumer<String> action) {
+    /*public void deleteUser(String name, Consumer<String> action) {
         Call<ReturnMessage> call = RemoteServices.getInstance().getPlayersService().deletePlayer(name);
         call.enqueue(new Callback<>() {
             @Override
@@ -149,7 +127,7 @@ public class RequestClient {
                 }
             }
         });
-    }
+    }*/
 
     /**
      * Start puzzle game
@@ -157,11 +135,6 @@ public class RequestClient {
     public void startGame() {
         final PuzzleBoard puzzle = new PuzzleBoard(this.x, this.y, this.imagePath);
         puzzle.setVisible(true);
-        newAddPlayer("daniele", add -> {
-            if (add.getResult()) {
-                deleteUser("daniele", this::log);
-            }
-        });
     }
 
     private void log(String msg) {
