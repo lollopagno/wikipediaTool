@@ -4,10 +4,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 import java.util.Vector;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -24,7 +21,6 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
     private final ScheduledExecutorService job = Executors.newSingleThreadScheduledExecutor();
 
     public RegisterView(int x, int y) {
-
         // Client Object
         this.client = new RequestClient(x, y);
 
@@ -52,6 +48,15 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
         //Set column Table
         this.columnTable = new Vector<>();
         this.columnTable.add("User");
+
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                super.windowClosing(e);
+
+                job.shutdown();
+            }
+        });
     }
 
     @Override

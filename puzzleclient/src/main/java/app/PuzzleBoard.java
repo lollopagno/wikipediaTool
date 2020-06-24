@@ -1,13 +1,13 @@
 package app;
 
+import app.remoteservices.RemoteServices;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
-
-
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.GridLayout;
-import java.awt.Image;
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
@@ -20,11 +20,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.stream.IntStream;
 
 @SuppressWarnings("serial")
 public class PuzzleBoard extends JFrame {
-	
 	final int rows, columns;
     private final ScheduledExecutorService job = Executors.newSingleThreadScheduledExecutor();
     private List<Tile> tiles = new ArrayList<>();
@@ -44,8 +42,7 @@ public class PuzzleBoard extends JFrame {
         board.setLayout(new GridLayout(rows, columns, 0, 0));
         getContentPane().add(board, BorderLayout.CENTER);
         
-        createTiles(imagePath);
-        paintPuzzle(board);
+        createTiles(imagePath, board);
 
         // Action close view puzzle
         this.addWindowListener(new WindowAdapter() {
@@ -64,7 +61,7 @@ public class PuzzleBoard extends JFrame {
     }
 
     
-    private void createTiles(final String imagePath) {
+    private void createTiles(final String imagePath, final JPanel board) {
         // TODO: Il caricamento dell'immagine dev'essere fatto.
 		final BufferedImage image;
         
@@ -78,26 +75,44 @@ public class PuzzleBoard extends JFrame {
         final int imageWidth = image.getWidth(null);
         final int imageHeight = image.getHeight(null);
 
-        int position = 0;
         
+        /*
+        Questa è la vecchia parte delle positions.
+        Adesso le dobbiamo scaricare dal server.
         final List<Integer> randomPositions = new ArrayList<>();
         IntStream.range(0, rows*columns).forEach(item -> { randomPositions.add(item); }); 
-        Collections.shuffle(randomPositions);
+        Collections.shuffle(randomPositions);*/
+        Call<List<Tile>> boxes = RemoteServices.getInstance().getPuzzleService().getMappings();
+        boxes.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(Call<List<Tile>> call, Response<List<Tile>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                     int position = 0;
 
-        // TODO: Scaricare dal server l'attuale disposizione delle tessere.
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < columns; j++) {
-            	final Image imagePortion = createImage(new FilteredImageSource(image.getSource(),
-                        new CropImageFilter(j * imageWidth / columns, 
-                        					i * imageHeight / rows, 
-                        					(imageWidth / columns), 
-                        					imageHeight / rows)));
+                    // TODO: Scaricare dal server l'attuale disposizione delle tessere.
+                    for (int i = 0; i < rows; i++) {
+                        for (int j = 0; j < columns; j++) {
+                            final Image imagePortion = createImage(new FilteredImageSource(image.getSource(),
+                                    new CropImageFilter(j * imageWidth / columns,
+                                            i * imageHeight / rows,
+                                            (imageWidth / columns),
+                                            imageHeight / rows)));
 
-            	// TODO: Sincronizzare tutti i pezzi delle immagini con la loro attuale posizione, non quella originale.
-                tiles.add(new Tile(imagePortion, position, randomPositions.get(position)));
-                position++;
+                            // TODO: Sincronizzare tutti i pezzi delle immagini con la loro attuale posizione, non quella originale.
+                            tiles.add(new Tile(imagePortion, position, response.body().get(position).getCurrentPosition()));
+                            position++;
+                        }
+                    }
+
+                    paintPuzzle(board);
+                }
             }
-        }
+
+            @Override
+            public void onFailure(Call<List<Tile>> call, Throwable t) {
+                log(t.getMessage());
+            }
+        });
 	}
     
     private void paintPuzzle(final JPanel board) {
@@ -136,5 +151,11 @@ public class PuzzleBoard extends JFrame {
                 setBorder(BorderFactory.createLineBorder(Color.red));
             }
         });*/
+    }
+
+    private void log(String msg) {
+        synchronized (System.out) {
+            System.out.println(msg);
+        }
     }
 }

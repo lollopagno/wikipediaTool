@@ -9,7 +9,7 @@ import retrofit2.http.Path;
 import java.util.List;
 
 public interface Puzzle {
-    @GET("/mappings")
+    @GET("/mapping")
     Call<List<Tile>> getMappings();
 
     @PUT("/take/{player}/{id}")
