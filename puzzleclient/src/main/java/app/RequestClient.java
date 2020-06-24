@@ -39,8 +39,6 @@ public class RequestClient {
             this.httpClient = (HttpsURLConnection) new URL(url).openConnection();
             this.httpClient.setRequestMethod("POST");
 
-            log("Name register: "+username);
-
             // Send post request
             this.httpClient.setDoOutput(true);
             try (DataOutputStream wr = new DataOutputStream(this.httpClient.getOutputStream())) {
