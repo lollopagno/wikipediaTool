@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.ArrayList;
 import java.util.Vector;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -27,7 +26,7 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
     public RegisterView(int x, int y) {
 
         // Client Object
-        this.client = new RequestClient(this, x, y);
+        this.client = new RequestClient(x, y);
 
         // Params View
         this.setTitle("Register User");
@@ -78,7 +77,7 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
      * @param username user name
      */
     private void registerUser(String username) {
-
+        /*
         // Register user
         this.client.registerUser(username);
 
@@ -87,13 +86,22 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
 
         // Start game
         this.client.startGame();
+        */
+
+        this.client.addPlayer(username, msg -> {
+            log(msg);
+            // Update view
+            this.updateListUser();
+
+            // Start game
+            this.client.startGame();
+        });
     }
 
     /**
      * Execution job: update list user view
      */
     public void updateListUser() {
-
         SwingUtilities.invokeLater(() -> this.setTitle("List user"));
         this.job.scheduleAtFixedRate(this::updateView, 0, 30000, TimeUnit.MILLISECONDS);
     }
@@ -102,41 +110,42 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
      * Create table with all users
      */
     private void updateView(){
-
         // Get list user
-        ArrayList<String> users = this.client.listUser();
-        Vector<Vector<String>> rowData = new Vector<>();
+        this.client.allUsers(list -> {
+            Vector<Vector<String>> rowData = new Vector<>();
 
-        log("[Executor] --> Update table in view");
+            log("[Executor] --> Update table in view");
 
-        // Add user into vector
-        users.forEach(user -> {
-            Vector<String> vector = new Vector<>();
-            vector.add(user);
-            rowData.add(vector);
-        });
+            // Add user into vector
+            list.forEach(user -> {
+                Vector<String> vector = new Vector<>();
+                vector.add(user);
+                rowData.add(vector);
+            });
 
-        // Model for create jTable not editable
-        TableModel model = new DefaultTableModel(rowData, this.columnTable)
-        {
-            public boolean isCellEditable(int row, int column)
+            // Model for create jTable not editable
+            TableModel model = new DefaultTableModel(rowData, this.columnTable)
             {
-                return false;
-            }
-        };
+                public boolean isCellEditable(int row, int column)
+                {
+                    return false;
+                }
+            };
 
-        SwingUtilities.invokeLater(() -> {
+            SwingUtilities.invokeLater(() -> {
 
-            // Table Users
-            JTable table = new JTable(model);
-            table.setFillsViewportHeight(true);
-            JScrollPane scrollPane = new JScrollPane(table);
+                // Table Users
+                JTable table = new JTable(model);
+                table.setFillsViewportHeight(true);
+                JScrollPane scrollPane = new JScrollPane(table);
 
-            this.controlPanel.removeAll();
-            this.controlPanel.add(scrollPane);
+                this.controlPanel.removeAll();
+                this.controlPanel.add(scrollPane);
 
-            this.repaint();
-            this.revalidate();
+                this.repaint();
+                this.revalidate();
+            });
+
         });
     }
 

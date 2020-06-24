@@ -2,18 +2,11 @@ package app;
 
 import app.remoteservices.RemoteServices;
 import app.remoteservices.ReturnMessage;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonParser;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import javax.net.ssl.HttpsURLConnection;
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class RequestClient {
@@ -22,93 +15,49 @@ public class RequestClient {
     private final int x;
     private final int y;
 
-    private HttpsURLConnection httpClient;
-
     //Documentazione metodi HTTP: https://mkyong.com/java/how-to-send-http-request-getpost-in-java/
 
-    public RequestClient(RegisterView registerView, int x, int y) {
+    public RequestClient(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
-    /**
-     * HTTP POST to register a user
-     *
-     * @param username name of a user
-     */
-    public void registerUser(String username) {
-
-        String url = "https://java-travis-ci.herokuapp.com/players/";
-
-        try {
-
-            this.httpClient = (HttpsURLConnection) new URL(url).openConnection();
-            this.httpClient.setRequestMethod("POST");
-
-            // Send post request
-            this.httpClient.setDoOutput(true);
-            try (DataOutputStream wr = new DataOutputStream(this.httpClient.getOutputStream())) {
-                wr.writeBytes(username);
-                wr.flush();
+    public void addPlayer(String name, Consumer<String> action) {
+        Call<ReturnMessage> add = RemoteServices.getInstance().getPlayersService().addPlayer(name);
+        add.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(Call<ReturnMessage> call, Response<ReturnMessage> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    log(response.body().getMessage());
+                    action.accept(response.body().getMessage());
+                }
             }
 
-            int responseCode = this.httpClient.getResponseCode();
-            log("\nSending 'POST'  request to URL : " + url);
-            log("Response Code : " + responseCode);
-
-            if (responseCode != 200) {
-                throw new RuntimeException("Http POST failed: " + responseCode);
+            @Override
+            public void onFailure(Call<ReturnMessage> call, Throwable t) {
+                synchronized (System.out) {
+                    System.out.println(t.getMessage());
+                }
             }
-
-        } catch (Exception ex) {
-            log("Http POST failed:  " + ex.getMessage());
-        }
+        });
     }
 
-    /**
-     * HTTP GET for extract list user
-     *
-     * @return list of users in the game
-     */
-    public ArrayList<String> listUser() {
-
-        StringBuilder resultAPI = new StringBuilder();
-        ArrayList<String> response = new ArrayList<>();
-        String url = "https://java-travis-ci.herokuapp.com/players";
-
-        try {
-            this.httpClient = (HttpsURLConnection) new URL(url).openConnection();
-            this.httpClient.setRequestMethod("GET");
-
-            try (BufferedReader in = new BufferedReader(new InputStreamReader(this.httpClient.getInputStream()))) {
-                String line;
-
-                while ((line = in.readLine()) != null) {
-                    resultAPI.append(line);
+    public void allUsers(Consumer<List<String>> action) {
+        Call<List<String>> res = RemoteServices.getInstance().getPlayersService().allPlayers();
+        res.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(Call<List<String>> call, Response<List<String>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    log(response.body().toString());
+                    action.accept(response.body());
                 }
             }
 
-            int responseCode = this.httpClient.getResponseCode();
-            log("\nSending 'GET' request to URL : " + url);
-            log("Response Code : " + responseCode);
+            @Override
+            public void onFailure(Call<List<String>> call, Throwable t) {
 
-            if (responseCode != 200) {
-                throw new RuntimeException("Http GET failed:  " + responseCode);
-            }else{
-                // Convert to JsonArray
-                JsonArray jsonArray = new JsonParser().parse(resultAPI.toString()).getAsJsonArray();
-
-                // Convert to ArrayList
-                if (jsonArray != null) {
-                    for (int i = 0; i < jsonArray.size(); i++) {
-                        response.add(jsonArray.get(i).toString());
-                    }
-                }
             }
-        } catch (Exception ex) {
-            log("Http GET failed:  " + ex.getMessage());
-        }
-        return response;
+        });
     }
 
     /**
@@ -140,7 +89,6 @@ public class RequestClient {
     public void startGame() {
         final PuzzleBoard puzzle = new PuzzleBoard(this.x, this.y, this.imagePath);
         puzzle.setVisible(true);
-        deleteUser("pippo", this::log);
     }
 
     private void log(String msg) {
