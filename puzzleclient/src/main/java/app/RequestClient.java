@@ -1,8 +1,13 @@
 package app;
 
+import app.remoteservices.RemoteServices;
+import app.remoteservices.ReturnMessage;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
+import retrofit2.Call;
 import retrofit2.Callback;
+import retrofit2.Response;
+
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -109,7 +114,7 @@ public class RequestClient {
     /**
      * HTTP DELETE for delete user from server
      */
-    /*public void deleteUser(String name, Consumer<String> action) {
+    public void deleteUser(String name, Consumer<String> action) {
         Call<ReturnMessage> call = RemoteServices.getInstance().getPlayersService().deletePlayer(name);
         call.enqueue(new Callback<>() {
             @Override
@@ -127,7 +132,7 @@ public class RequestClient {
                 }
             }
         });
-    }*/
+    }
 
     /**
      * Start puzzle game
@@ -135,6 +140,7 @@ public class RequestClient {
     public void startGame() {
         final PuzzleBoard puzzle = new PuzzleBoard(this.x, this.y, this.imagePath);
         puzzle.setVisible(true);
+        deleteUser("pippo", this::log);
     }
 
     private void log(String msg) {

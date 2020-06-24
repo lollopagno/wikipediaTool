@@ -141,7 +141,9 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
     }
 
     private void log(String msg){
-        System.out.println(msg);
+        synchronized (System.out) {
+            System.out.println(msg);
+        }
     }
 }
 
