@@ -34,7 +34,7 @@ public class RequestClient {
      *
      * @param username name of a user
      */
-    public ArrayList<String> registerUser(String username) {
+    public void registerUser(String username) {
 
         //Documentazione metodi HTTP: https://mkyong.com/java/how-to-send-http-request-getpost-in-java/
 
@@ -44,6 +44,8 @@ public class RequestClient {
 
             this.httpClient = (HttpsURLConnection) new URL(url).openConnection();
             this.httpClient.setRequestMethod("POST");
+
+            log("Name register: "+username);
 
             // Send post request
             this.httpClient.setDoOutput(true);
@@ -63,9 +65,6 @@ public class RequestClient {
         } catch (Exception ex) {
             log("Http POST failed:  " + ex.getMessage());
         }
-
-        // Get list user
-        return this.listUser();
     }
 
     private void newAddPlayer(String name, Consumer<ReturnMessage> action) {
@@ -90,7 +89,7 @@ public class RequestClient {
      *
      * @return list of users in the game
      */
-    private ArrayList<String> listUser() {
+    public ArrayList<String> listUser() {
 
         StringBuilder resultAPI = new StringBuilder();
         ArrayList<String> response = new ArrayList<>();
@@ -114,9 +113,7 @@ public class RequestClient {
 
             if (responseCode != 200) {
                 throw new RuntimeException("Http GET failed:  " + responseCode);
-
-            } else {
-                System.out.println(resultAPI);
+            }else{
                 // Convert to JsonArray
                 JsonArray jsonArray = new JsonParser().parse(resultAPI.toString()).getAsJsonArray();
 
@@ -130,7 +127,6 @@ public class RequestClient {
         } catch (Exception ex) {
             log("Http GET failed:  " + ex.getMessage());
         }
-
         return response;
     }
 

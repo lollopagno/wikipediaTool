@@ -77,10 +77,10 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
      * @param username user name
      */
     private void registerUser(String username) {
-        ArrayList<String> users = this.client.registerUser(username);
+        this.client.registerUser(username);
 
         // Update view
-        this.updateListUser(users);
+        this.updateListUser(this.client.listUser());
 
         // Start game
         this.client.startGame();
@@ -88,7 +88,6 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
 
     /**
      * Execution job: update list user view
-     * @param users list user name
      */
     public void updateListUser(ArrayList<String> users) {
         SwingUtilities.invokeLater(() -> {
@@ -96,18 +95,24 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
             this.setTitle("List user");
         });
 
-        this.job.scheduleAtFixedRate(() -> updateView(users), 0, 30000, TimeUnit.MILLISECONDS);
+        // Row data
+        Vector<Vector<String>> rowData = new Vector<>();
+
+        this.job.scheduleAtFixedRate(() -> updateView(rowData), 0, 30000, TimeUnit.MILLISECONDS);
     }
 
     /**
      * Create table with all users
-     * @param users list user name
      */
-    private void updateView(ArrayList<String> users){
+    private void updateView(Vector<Vector<String>> rowData){
+
+        // Get list user
+        ArrayList<String> users = this.client.listUser();
         log("[Executor] --> Update table in view");
 
-        // Row data
-        Vector<Vector<String>> rowData = new Vector<>();
+        if(!rowData.isEmpty()){
+            rowData.clear();
+        }
 
         // Add user into vector
         users.forEach(user -> {
