@@ -1,15 +1,20 @@
 package app;
 
+import app.remoteservices.RemoteServices;
+import app.remoteservices.ReturnMessage;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonParser;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonParser;
+import java.util.function.Consumer;
 
 public class RequestClient {
 
@@ -19,13 +24,14 @@ public class RequestClient {
 
     private HttpsURLConnection httpClient;
 
-    public RequestClient(View view, int x, int y){
+    public RequestClient(RegisterView registerView, int x, int y) {
         this.x = x;
         this.y = y;
     }
 
     /**
      * HTTP POST to register a user
+     *
      * @param username name of a user
      */
     public ArrayList<String> registerUser(String username) {
@@ -50,11 +56,11 @@ public class RequestClient {
             log("\nSending 'POST'  request to URL : " + url);
             log("Response Code : " + responseCode);
 
-            if(responseCode != 200){
+            if (responseCode != 200) {
                 throw new RuntimeException("Http POST failed: " + responseCode);
             }
 
-        }catch (Exception ex){
+        } catch (Exception ex) {
             log("Http POST failed:  " + ex.getMessage());
         }
 
@@ -62,14 +68,32 @@ public class RequestClient {
         return this.listUser();
     }
 
+    private void newAddPlayer(String name, Consumer<ReturnMessage> action) {
+        Call<ReturnMessage> call = RemoteServices.getInstance().getPlayersService().addPlayer(name);
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(Call<ReturnMessage> call, Response<ReturnMessage> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    action.accept(response.body());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ReturnMessage> call, Throwable t) {
+
+            }
+        });
+    }
+
     /**
      * HTTP GET for extract list user
+     *
      * @return list of users in the game
      */
     private ArrayList<String> listUser() {
 
         StringBuilder resultAPI = new StringBuilder();
-        ArrayList<String> response = new ArrayList();
+        ArrayList<String> response = new ArrayList<>();
         String url = "https://java-travis-ci.herokuapp.com/players";
 
         try {
@@ -88,22 +112,22 @@ public class RequestClient {
             log("\nSending 'GET' request to URL : " + url);
             log("Response Code : " + responseCode);
 
-            if(responseCode != 200) {
+            if (responseCode != 200) {
                 throw new RuntimeException("Http GET failed:  " + responseCode);
 
-            }else{
+            } else {
                 System.out.println(resultAPI);
                 // Convert to JsonArray
                 JsonArray jsonArray = new JsonParser().parse(resultAPI.toString()).getAsJsonArray();
 
                 // Convert to ArrayList
                 if (jsonArray != null) {
-                    for (int i=0; i<jsonArray.size(); i++){
+                    for (int i = 0; i < jsonArray.size(); i++) {
                         response.add(jsonArray.get(i).toString());
                     }
                 }
             }
-        }catch (Exception ex){
+        } catch (Exception ex) {
             log("Http GET failed:  " + ex.getMessage());
         }
 
@@ -113,32 +137,42 @@ public class RequestClient {
     /**
      * HTTP DELETE for delete user from server
      */
-    public void deleteUser() {
+    public void deleteUser(String name, Consumer<String> action) {
+        Call<ReturnMessage> call = RemoteServices.getInstance().getPlayersService().deletePlayer(name);
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(Call<ReturnMessage> call, Response<ReturnMessage> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    log(response.body().getMessage());
+                    action.accept(response.body().getMessage());
+                }
+            }
 
-        String url = "";
-
-        try {
-            this.httpClient = (HttpsURLConnection) new URL(url).openConnection();
-            this.httpClient.setDoOutput(true);
-
-            this.httpClient.setRequestProperty("Content-Type", "application/x-www-form-urlencoded" );
-            this.httpClient.setRequestMethod("DELETE");
-            this.httpClient.connect();
-
-        }catch(Exception ex){
-            log("Http DELETE failed:  " + ex.getMessage());
-        }
+            @Override
+            public void onFailure(Call<ReturnMessage> call, Throwable t) {
+                synchronized (System.out) {
+                    System.out.println(t.getMessage());
+                }
+            }
+        });
     }
 
     /**
      * Start puzzle game
      */
-    public void startGame(){
+    public void startGame() {
         final PuzzleBoard puzzle = new PuzzleBoard(this.x, this.y, this.imagePath);
         puzzle.setVisible(true);
+        newAddPlayer("daniele", add -> {
+            if (add.getResult()) {
+                deleteUser("daniele", this::log);
+            }
+        });
     }
 
-    private void log(String msg){
-        System.out.println(msg);
+    private void log(String msg) {
+        synchronized (System.out) {
+            System.out.println(msg);
+        }
     }
 }
