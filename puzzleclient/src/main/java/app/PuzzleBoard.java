@@ -8,8 +8,7 @@ import retrofit2.Response;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.CropImageFilter;
 import java.awt.image.FilteredImageSource;
@@ -22,7 +21,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 @SuppressWarnings("serial")
-public class PuzzleBoard extends JFrame {
+public class PuzzleBoard extends JFrame{
 
     private SelectionManager selectionManager = new SelectionManager();
     private final ScheduledExecutorService job = Executors.newSingleThreadScheduledExecutor();
@@ -117,6 +116,7 @@ public class PuzzleBoard extends JFrame {
                                             (imageWidth / columns),
                                             imageHeight / rows)));
 
+                            // TODO getOriginalPosition or getCurrentPosition ??
                             tiles.add(new Tile(imagePortion, position, response.body().get(position).getOriginalPosition()));;
                             position++;
                         }
@@ -138,7 +138,7 @@ public class PuzzleBoard extends JFrame {
     	Collections.sort(tiles);
     	
     	tiles.forEach(tile -> {
-    		final TileButton btn = new TileButton(tile);
+    		final TileButton btn = new TileButton(tile, this.requestClient, tile.getOriginalPosition(), this.username);
             board.add(btn);
             btn.setBorder(BorderFactory.createLineBorder(Color.gray));
             btn.addActionListener(actionListener -> {

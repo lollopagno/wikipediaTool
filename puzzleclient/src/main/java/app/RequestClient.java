@@ -2,6 +2,7 @@ package app;
 
 import app.remoteservices.RemoteServices;
 import app.remoteservices.ReturnMessage;
+import jdk.jfr.Frequency;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -87,6 +88,30 @@ public class RequestClient {
             public void onFailure(Call<ReturnMessage> call, Throwable t) {
                 log(t.getMessage());
             }
+        });
+    }
+
+    /**
+     * HTTP PUT for take a boxe
+     * @param name user name
+     * @param id id boxe
+     * @param action lambda-function
+     */
+    public void takeBox(String name, Integer id, Consumer<String> action){
+
+        log("Change position box id: "+id);
+        Call<Boolean> call = RemoteServices.getInstance().getPuzzleService().take(name, id);
+        call.enqueue(new Callback<>() {
+
+            @Override
+            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    action.accept(response.toString());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Boolean> call, Throwable t) {log(t.getMessage());}
         });
     }
 
