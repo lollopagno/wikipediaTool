@@ -14,8 +14,6 @@ public class RemoteServices {
         return instance;
     }
 
-    private RemoteServices(){}
-
     private static final String BASE_URL = "https://java-travis-ci.herokuapp.com/";
 
     public Players getPlayersService() {

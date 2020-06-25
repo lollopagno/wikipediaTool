@@ -23,22 +23,33 @@ import java.util.concurrent.ScheduledExecutorService;
 
 @SuppressWarnings("serial")
 public class PuzzleBoard extends JFrame {
-	final int rows, columns;
+
+    private SelectionManager selectionManager = new SelectionManager();
     private final ScheduledExecutorService job = Executors.newSingleThreadScheduledExecutor();
+
+    private final RequestClient requestClient;
+    private String username;
+
     private List<Tile> tiles = new ArrayList<>();
+
     private int current;
+    final int rows, columns;
 	
-	private SelectionManager selectionManager = new SelectionManager();
-	
-    public PuzzleBoard(final int rows, final int columns, final String imagePath) {
+    public PuzzleBoard(final int rows, final int columns, final String imagePath, String username) {
+
+        // Dimension Puzzle
     	this.rows = rows;
 		this.columns = columns;
-    	
+
+		// Object Request Client
+        this.requestClient = new RequestClient(this.rows, this.columns);
+        this.username = username;
+
     	setTitle("Puzzle");
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
-        final JPanel board = new JPanel();
+        JPanel board = new JPanel();
         board.setBorder(BorderFactory.createLineBorder(Color.gray));
         board.setLayout(new GridLayout(rows, columns, 0, 0));
         getContentPane().add(board, BorderLayout.CENTER);
@@ -51,8 +62,11 @@ public class PuzzleBoard extends JFrame {
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
 
-                // TODO: qui richiamare l'API Delete
-            }
+                requestClient.deleteUser(username, msg ->{
+                    log(msg);
+                });
+                log("Closed window puzzle!");
+       }
 
             @Override
             public void windowClosed(WindowEvent e) {
@@ -85,6 +99,7 @@ public class PuzzleBoard extends JFrame {
         Collections.shuffle(randomPositions);*/
         Call<List<Tile>> boxes = RemoteServices.getInstance().getPuzzleService().getMappings();
         boxes.enqueue(new Callback<>() {
+
             @Override
             public void onResponse(Call<List<Tile>> call, Response<List<Tile>> response) {
                 if (response.isSuccessful() && response.body() != null) {

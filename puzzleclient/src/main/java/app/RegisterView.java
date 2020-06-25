@@ -21,6 +21,7 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
     private final ScheduledExecutorService job = Executors.newSingleThreadScheduledExecutor();
 
     public RegisterView(int x, int y) {
+
         // Client Object
         this.client = new RequestClient(x, y);
 
@@ -49,11 +50,11 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
         this.columnTable = new Vector<>();
         this.columnTable.add("User");
 
+        // Action close view user
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
-
                 job.shutdown();
             }
         });
@@ -82,19 +83,10 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
      * @param username user name
      */
     private void registerUser(String username) {
-        /*
-        // Register user
-        this.client.registerUser(username);
-
-        // Update view
-        this.updateListUser();
-
-        // Start game
-        this.client.startGame();
-        */
 
         this.client.addPlayer(username, msg -> {
             log(msg);
+
             // Update view
             this.updateListUser();
 
@@ -115,6 +107,7 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
      * Create table with all users
      */
     private void updateView(){
+
         // Get list user
         this.client.allUsers(list -> {
             Vector<Vector<String>> rowData = new Vector<>();
@@ -128,7 +121,7 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
                 rowData.add(vector);
             });
 
-            // Model for create jTable not editable
+            // Model for create JTable not editable
             TableModel model = new DefaultTableModel(rowData, this.columnTable)
             {
                 public boolean isCellEditable(int row, int column)
