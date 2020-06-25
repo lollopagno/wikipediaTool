@@ -85,13 +85,13 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
     private void registerUser(String username) {
 
         this.client.addPlayer(username, msg -> {
-            log(msg);
+            log(msg+": "+username);
 
             // Update view
             this.updateListUser();
 
             // Start game
-            this.client.startGame();
+            this.client.startGame(username);
         });
     }
 
@@ -112,7 +112,7 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
         this.client.allUsers(list -> {
             Vector<Vector<String>> rowData = new Vector<>();
 
-            log("[Executor] --> Update table in view");
+            log("Update table in view every 30s");
 
             // Add user into vector
             list.forEach(user -> {
@@ -149,7 +149,7 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
 
     private void log(String msg){
         synchronized (System.out) {
-            System.out.println(msg);
+            System.out.println("[Info] "+msg);
         }
     }
 }

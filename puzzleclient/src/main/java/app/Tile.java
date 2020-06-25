@@ -32,6 +32,8 @@ public class Tile implements Comparable<Tile>{
     	currentPosition = newPosition;
     }
 
+    public int getOriginalPosition(){ return this.originalPosition;}
+
 	@Override
 	public int compareTo(Tile other) {
 		return this.currentPosition < other.currentPosition ? -1 

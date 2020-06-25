@@ -32,7 +32,6 @@ public class PuzzleBoard extends JFrame {
 
     private List<Tile> tiles = new ArrayList<>();
 
-    private int current;
     final int rows, columns;
 	
     public PuzzleBoard(final int rows, final int columns, final String imagePath, String username) {
@@ -63,11 +62,10 @@ public class PuzzleBoard extends JFrame {
                 super.windowClosing(e);
 
                 requestClient.deleteUser(username, msg ->{
-                    log(msg);
+                    log(msg+": "+username);
                 });
                 log("Closed window puzzle!");
        }
-
             @Override
             public void windowClosed(WindowEvent e) {
                 super.windowClosed(e);
@@ -77,9 +75,10 @@ public class PuzzleBoard extends JFrame {
 
     
     private void createTiles(final String imagePath, final JPanel board) {
-        // TODO: Il caricamento dell'immagine dev'essere fatto.
+
 		final BufferedImage image;
-        
+
+		// Load image
         try {
             image = ImageIO.read(new File(imagePath));
         } catch (IOException ex) {
@@ -87,27 +86,28 @@ public class PuzzleBoard extends JFrame {
             return;
         }
 
+        // Params image
         final int imageWidth = image.getWidth(null);
         final int imageHeight = image.getHeight(null);
 
-        
-        /*
-        Questa è la vecchia parte delle positions.
+        /* <-- Questa è la vecchia parte delle positions -->
+
         Adesso le dobbiamo scaricare dal server.
         final List<Integer> randomPositions = new ArrayList<>();
         IntStream.range(0, rows*columns).forEach(item -> { randomPositions.add(item); }); 
-        Collections.shuffle(randomPositions);*/
+        Collections.shuffle(randomPositions);
+
+            <-- end version prof -->
+        */
+
+        // API GET for extract position boxes image
         Call<List<Tile>> boxes = RemoteServices.getInstance().getPuzzleService().getMappings();
         boxes.enqueue(new Callback<>() {
 
             @Override
             public void onResponse(Call<List<Tile>> call, Response<List<Tile>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                     int position = 0;
-
-                    // TODO: Scaricare dal server l'attuale disposizione delle tessere
-                    for(Tile tile: response.body())
-                       current = tile.getCurrentPosition(); //TODO: QUESTA È LA POSIZIONE CORRENTE
+                    int position = 0;
 
                     for (int i = 0; i < rows; i++) {
                         for (int j = 0; j < columns; j++) {
@@ -117,12 +117,10 @@ public class PuzzleBoard extends JFrame {
                                             (imageWidth / columns),
                                             imageHeight / rows)));
 
-                            // TODO: Sincronizzare tutti i pezzi delle immagini con la loro attuale posizione, non quella originale.
-                            tiles.add(new Tile(imagePortion, position, response.body().get(position).getCurrentPosition()));
+                            tiles.add(new Tile(imagePortion, position, response.body().get(position).getOriginalPosition()));;
                             position++;
                         }
                     }
-
                     paintPuzzle(board);
                 }
             }
@@ -174,7 +172,7 @@ public class PuzzleBoard extends JFrame {
 
     private void log(String msg) {
         synchronized (System.out) {
-            System.out.println(msg);
+            System.out.println("[Info] "+msg);
         }
     }
 }

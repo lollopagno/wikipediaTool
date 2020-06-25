@@ -15,13 +15,9 @@ public class RequestClient {
     private final int x;
     private final int y;
 
-    public String username;
-
     public RequestClient(int x, int y) {
         this.x = x;
         this.y = y;
-
-        this.username = null;
     }
 
     /**
@@ -30,8 +26,6 @@ public class RequestClient {
      * @param action lambda-function
      */
     public void addPlayer(String name, Consumer<String> action) {
-
-        this.setUsername(name);
 
         Call<ReturnMessage> add = RemoteServices.getInstance().getPlayersService().addPlayer(name);
         add.enqueue(new Callback<>() {
@@ -74,7 +68,8 @@ public class RequestClient {
 
     /**
      * HTTP DELETE for delete user from server
-     * //@param action lambda-function
+     * @param name user name
+     * @param action lambda-function
      */
     public void deleteUser(String name, Consumer<String> action) {
 
@@ -98,18 +93,14 @@ public class RequestClient {
     /**
      * Start puzzle game
      */
-    public void startGame() {
-        final PuzzleBoard puzzle = new PuzzleBoard(this.x, this.y, this.imagePath, this.username);
+    public void startGame(String username) {
+        final PuzzleBoard puzzle = new PuzzleBoard(this.x, this.y, this.imagePath, username);
         puzzle.setVisible(true);
-    }
-
-    private void setUsername(String username){
-        this.username = username;
     }
 
     private void log(String msg) {
         synchronized (System.out) {
-            System.out.println(msg);
+            System.out.println("[Info] "+msg);
         }
     }
 }

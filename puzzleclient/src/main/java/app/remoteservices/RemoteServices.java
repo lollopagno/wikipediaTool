@@ -21,7 +21,6 @@ public class RemoteServices {
             Retrofit retrofit = new Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
             players = retrofit.create(Players.class);
         }
-
         return players;
     }
 
@@ -30,7 +29,6 @@ public class RemoteServices {
             Retrofit retrofit = new Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
             puzzle = retrofit.create(Puzzle.class);
         }
-
         return puzzle;
     }
 }
