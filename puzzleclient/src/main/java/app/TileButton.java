@@ -3,8 +3,6 @@ package app;
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -16,15 +14,18 @@ public class TileButton extends JButton{
 	private final RequestClient requestClient;
 	private final Integer idBox;
 	private final String username;
+	private final SelectionManager selectionManager;
 
-	public TileButton(final Tile tile, RequestClient requestClient, Integer idBox, String username) {
+	public TileButton(final Tile tile, RequestClient requestClient, Integer idBox, String username, SelectionManager selectionManager) {
 		super(new ImageIcon(tile.getImage()));
 
 		this.requestClient = requestClient;
 		this.idBox = idBox;
 		this.username = username;
+		this.selectionManager = selectionManager;
 
-		addMouseListener(new MouseAdapter() {
+		if(this.selectionManager.getSelected()){
+			addMouseListener(new MouseAdapter() {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -34,7 +35,20 @@ public class TileButton extends JButton{
 				// Prendo il possesso di quella casella
 				checkTakeBox();
 			}
-		});
+			});
+		}else {
+			addMouseListener(new MouseAdapter() {
+
+				@Override
+				public void mouseClicked(MouseEvent e) {
+
+					setBorder(BorderFactory.createLineBorder(Color.red));
+
+					// Lascio il possesso di quella casella
+					checkReleaseBox();
+				}
+			});
+		}
 
 
 	}
@@ -42,7 +56,13 @@ public class TileButton extends JButton{
 	// TODO: metodo aggiunto per prendere in possesso una casella (non attendibile)
 	// Prima bisogna verificare se la casella è già stata presa, se è libera fare la PUT
 	private void checkTakeBox(){
-		requestClient.takeBox(username, idBox, System.out::println);
+		if(selectionManager.getSelected())
+			requestClient.takeBox(username, idBox, System.out::println);
 	}
+
+	private void checkReleaseBox(){
+		requestClient.releaseBox(username, idBox, System.out::println);
+	}
+
 
 }

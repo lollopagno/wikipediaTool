@@ -100,18 +100,36 @@ public class RequestClient {
     public void takeBox(String name, Integer id, Consumer<String> action){
 
         log("Change position box id: "+id);
-        Call<Boolean> call = RemoteServices.getInstance().getPuzzleService().take(name, id);
+        Call<ReturnMessage> call = RemoteServices.getInstance().getPuzzleService().take(name, id);
         call.enqueue(new Callback<>() {
 
             @Override
-            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+            public void onResponse(Call<ReturnMessage> call, Response<ReturnMessage> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     action.accept(response.toString());
                 }
             }
 
             @Override
-            public void onFailure(Call<Boolean> call, Throwable t) {log(t.getMessage());}
+            public void onFailure(Call<ReturnMessage> call, Throwable t) {log(t.getMessage());}
+        });
+    }
+
+    public void releaseBox(String name, Integer id, Consumer<String> action){
+
+        log("Release, position box id: "+id);
+        Call<ReturnMessage> call = RemoteServices.getInstance().getPuzzleService().release(name,id);
+        call.enqueue(new Callback<>() {
+
+            @Override
+            public void onResponse(Call<ReturnMessage> call, Response<ReturnMessage> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    action.accept(response.toString());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ReturnMessage> call, Throwable t) {log(t.getMessage());}
         });
     }
 

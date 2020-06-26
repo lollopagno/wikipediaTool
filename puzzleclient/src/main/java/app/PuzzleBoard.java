@@ -138,7 +138,7 @@ public class PuzzleBoard extends JFrame{
     	Collections.sort(tiles);
     	
     	tiles.forEach(tile -> {
-    		final TileButton btn = new TileButton(tile, this.requestClient, tile.getOriginalPosition(), this.username);
+    		final TileButton btn = new TileButton(tile, this.requestClient, tile.getOriginalPosition(), this.username, this.selectionManager);
             board.add(btn);
             btn.setBorder(BorderFactory.createLineBorder(Color.gray));
             btn.addActionListener(actionListener -> {
