@@ -24,6 +24,7 @@ public class TileButton extends JButton{
 		this.username = username;
 		this.selectionManager = selectionManager;
 
+		// TODO : TOGLIERE IF OPPURE COME FARE FERMARE IL SECONDO CLICK?
 		if(this.selectionManager.getSelected()){
 			addMouseListener(new MouseAdapter() {
 
