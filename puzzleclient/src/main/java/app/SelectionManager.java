@@ -12,7 +12,7 @@ public class SelectionManager {
 			selectionActive = false;
 
 			swap(selectedTile, tile);
-			requestClient.moveBox(username,selectedTile,tile,System.out::println);
+			//requestClient.moveBox(username,selectedTile,tile,System.out::println);
 			listener.onSwapPerformed();
 		} else {
 			selectionActive = true;
