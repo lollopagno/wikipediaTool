@@ -28,9 +28,9 @@ public class SelectionManager {
 		t2.setCurrentPosition(pos);
 	}
 
-	public void setSelected() {
+	/*public void setSelected() {
 		this.selectionActive = true;
-	}
+	}*/
 
 	@FunctionalInterface
 	interface Listener{
