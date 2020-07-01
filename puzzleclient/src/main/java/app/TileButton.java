@@ -26,21 +26,20 @@ public class TileButton extends JButton{
 		this.selectionManager = selectionManager;
 
 		// TODO : TOGLIERE IF OPPURE COME FARE FERMARE IL SECONDO CLICK?
-		System.out.println(this.selectionManager.getSelected());
-		//if(!this.selectionManager.getSelected()){
+		//System.out.println(this.selectionManager.getSelected());
+		if(!this.selectionManager.getSelected()) {
 			addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					setBorder(BorderFactory.createLineBorder(Color.red));
 
-			@Override
-			public void mouseClicked(MouseEvent e) {
-
-				setBorder(BorderFactory.createLineBorder(Color.red));
-
-				// Prendo il possesso di quella casella
-				checkTakeBox();
-			}
+					// Prendo il possesso di quella casella
+					checkTakeBox();
+				}
 			});
-
-
+		}else{
+			checkReleaseBox();
+		}
 	}
 
 	// TODO: metodo aggiunto per prendere in possesso una casella (non attendibile)
@@ -55,7 +54,7 @@ public class TileButton extends JButton{
 		requestClient.releaseBox(username, idBox, System.out::println);
 	}
 
-	//private void checkMoveBox(){requestClient.moveBox(username, idBox, idBox2,System.out::println);}
+	//private void checkMoveBox(){requestClient.moveBox(username, idBox,  ,System.out::println);}
 
 
 }

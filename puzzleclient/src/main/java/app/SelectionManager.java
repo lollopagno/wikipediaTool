@@ -4,20 +4,22 @@ public class SelectionManager {
 
 	private boolean selectionActive = false;
 	private Tile selectedTile;
+	//private RequestClient requestClient;
 
-	public void selectTile(final Tile tile, final Listener listener) {
+	public void selectTile(String username, RequestClient requestClient,final Tile tile, final Listener listener) {
 		
 		if(selectionActive) {
 			selectionActive = false;
-			
+
 			swap(selectedTile, tile);
-			
+			requestClient.moveBox(username,selectedTile,tile,System.out::println);
 			listener.onSwapPerformed();
 		} else {
 			selectionActive = true;
 			selectedTile = tile;
 		}
 	}
+
 
 
 	private void swap(final Tile t1, final Tile t2) {

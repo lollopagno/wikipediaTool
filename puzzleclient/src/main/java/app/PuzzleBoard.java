@@ -142,7 +142,7 @@ public class PuzzleBoard extends JFrame{
             board.add(btn);
             btn.setBorder(BorderFactory.createLineBorder(Color.gray));
             btn.addActionListener(actionListener -> {
-            	selectionManager.selectTile(tile, () -> {
+            	selectionManager.selectTile(this.username,this.requestClient,tile, () -> {
             		paintPuzzle(board);
                 	checkSolution();
             	});
