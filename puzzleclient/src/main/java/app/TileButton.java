@@ -27,7 +27,7 @@ public class TileButton extends JButton{
 
 		// TODO : TOGLIERE IF OPPURE COME FARE FERMARE IL SECONDO CLICK?
 		System.out.println(this.selectionManager.getSelected());
-		if(!this.selectionManager.getSelected()){
+		//if(!this.selectionManager.getSelected()){
 			addMouseListener(new MouseAdapter() {
 
 			@Override
@@ -39,16 +39,6 @@ public class TileButton extends JButton{
 				checkTakeBox();
 			}
 			});
-		}else {
-			addMouseListener(new MouseAdapter() {
-
-				@Override
-				public void mouseClicked(MouseEvent e) {
-					// Lascio il possesso di quella casella
-					checkReleaseBox();
-				}
-			});
-		}
 
 
 	}
@@ -57,6 +47,7 @@ public class TileButton extends JButton{
 	// Prima bisogna verificare se la casella è già stata presa, se è libera fare la PUT
 	private void checkTakeBox(){
 		if(selectionManager.getSelected())
+			//selectionManager.setSelected();
 			requestClient.takeBox(username, idBox, System.out::println);
 	}
 
