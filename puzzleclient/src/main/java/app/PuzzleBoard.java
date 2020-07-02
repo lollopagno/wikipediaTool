@@ -119,7 +119,8 @@ public class PuzzleBoard extends JFrame{
             }
         });
 	}
-    
+
+	// Paint Puzzle
     private void paintPuzzle(final JPanel board) {
     	board.removeAll();
     	
@@ -129,16 +130,30 @@ public class PuzzleBoard extends JFrame{
     		final TileButton btn = new TileButton(tile, this.requestClient, this.username);
             board.add(btn);
             btn.setBorder(BorderFactory.createLineBorder(Color.gray));
+            btn.setColor(Color.gray);
 
+            // Action Button puzzle
             btn.addActionListener(actionListener -> {
 
-                // TODO Qui implementare azione di deselezione
-                log("Deselect button");
+                // Check button is not yellow
+                if(! btn.getColor().equals(Color.yellow)) {
 
-            	selectionManager.selectTile(this.username,this.requestClient,tile, () -> {
-            		paintPuzzle(board);
-                	checkSolution();
-            	});
+                    // Check button is red
+                    if(btn.getColor().equals(Color.red)){
+                        btn.actionButtonRed();
+
+                    }else {
+
+                        // Action for gray button
+                        btn.actionButtonGray();
+
+                        // Move boxes
+                        selectionManager.selectTile(this.username, this.requestClient, tile, () -> {
+                            paintPuzzle(board);
+                            checkSolution();
+                        });
+                    }
+                }
             });
     	});
     	
@@ -146,6 +161,7 @@ public class PuzzleBoard extends JFrame{
         setLocationRelativeTo(null);
     }
 
+    // Check Solution
     private void checkSolution() {
     	if(tiles.stream().allMatch(Tile::isInRightPlace)) {
     		JOptionPane.showMessageDialog(this, "Puzzle Completed!", "", JOptionPane.INFORMATION_MESSAGE);

@@ -19,6 +19,7 @@ public class TileButton extends JButton{
 	private final String username;
 	private Tile tile;
 	private String stateBox;
+	private Color color;
 
 	public TileButton(final Tile tile, RequestClient requestClient, String username) {
 		super(new ImageIcon(tile.getImage()));
@@ -26,32 +27,34 @@ public class TileButton extends JButton{
 		this.tile = tile;
 		this.requestClient = requestClient;
 		this.username = username;
+		setColor(Color.gray);
+	}
 
-		// Action button puzzle
-		addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
+	// Action for button red
+	public void actionButtonRed(){
 
-				// Check border box is yellow
-				// TODO da verificare l'uguaglianza
-				if (! getBorder().equals(BorderFactory.createLineBorder(Color.yellow))) {
+		// Check state box
 
-					// Check state box
-					// Caso raro in cui selezione e deseleziono la mia casella
-				    if (checkStateBox()) {
+		// ATTENZIONE NON ELIMINARE IL CONTROLLO DEL IF
+		// --> Questo controllo alla fine può essere eliminato <--
+		//if (checkStateBox()) {
 
-						// Deseleziono la casella presa
-						releaseBox();
+			setBorder(BorderFactory.createLineBorder(Color.gray));
+			setColor(Color.gray);
 
-					} else {
-						setBorder(BorderFactory.createLineBorder(Color.red));
+			// Deseleziono la casella presa
+			releaseBox();
+		//}
+	}
 
-						// Prendo il possesso di quella casella
-						takeBox();
-					}
-				}
-			}
-		});
+	// Action for button gray
+	public void actionButtonGray(){
+
+		setBorder(BorderFactory.createLineBorder(Color.red));
+		setColor(Color.red);
+
+		// Prendo il possesso di quella casella
+		takeBox();
 	}
 
 	// Implement API PUT takeBox
@@ -82,17 +85,19 @@ public class TileButton extends JButton{
 		});
 	}
 
+	// Metodi get/set: colore del bottone
+	public void setColor(Color color){ this.color = color;}
+	public Color getColor(){ return this.color;}
+
+	// Metodi get/set: stato (true, false) del box del risultato dell'API GET getState
 	private void setStateBox(String result){
 		this.stateBox = result;
 	}
-
-	private Boolean getStateBox(){
-		return Boolean.parseBoolean(this.stateBox);
-	}
+	private Boolean getStateBox(){ return Boolean.parseBoolean(this.stateBox);}
 
 	private void log(String msg){
 		synchronized (System.out){
-			System.out.println(msg);
+			System.out.println("[Info] "+msg);
 		}
 	}
 }

@@ -6,7 +6,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import javax.swing.*;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -130,7 +129,7 @@ public class RequestClient {
             @Override
             public void onResponse(Call<ReturnMessage> call, Response<ReturnMessage> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    if (Boolean.parseBoolean(response.body().getMessage())) {
+                    if (response.body().getMessage().equals("true")) {
                         action.accept("true");
                     }else {
                         action.accept("false");
@@ -197,7 +196,7 @@ public class RequestClient {
      */
     public void moveBox(String name, Integer id, Integer id2, Consumer<String> action){
 
-        log("Move "+id + "with "+id2);
+        log("Move id: "+id + " with id: "+id2);
         Call<Boolean> call = RemoteServices.getInstance().getPuzzleService().move(name,id, id2);
         call.enqueue(new Callback<>() {
 

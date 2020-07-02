@@ -165,18 +165,19 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
      */
     private void updateCardColor(String username){
 
-        log("Execute thread color box yellow");
+        log("Update color box every 5s");
 
         this.client.mappingBox(tiles -> {
 
             tiles.forEach(tile -> {
 
                 this.client.checkStateBox(username, tile.getOriginalPosition(), msg -> {
+
                     if(Boolean.parseBoolean(msg)){
-                        System.out.println("Box is colored yellow");
                         SwingUtilities.invokeLater(() -> {
 
                             // TODO capire come riprendere il bottone di quel tile da cambiare
+                            //log("Box is colored yellow");
                             //final TileButton btn = new TileButton(tile, this.client, username);
                             //btn.setBorder(BorderFactory.createLineBorder(Color.yellow));
                         });
