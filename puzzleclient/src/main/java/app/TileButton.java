@@ -25,9 +25,7 @@ public class TileButton extends JButton{
 		this.username = username;
 		this.selectionManager = selectionManager;
 
-		//System.out.println(this.selectionManager.getSelected());
-		//if(!this.selectionManager.getSelected()) {
-			addMouseListener(new MouseAdapter() {
+		addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
 					setBorder(BorderFactory.createLineBorder(Color.red));
@@ -35,7 +33,7 @@ public class TileButton extends JButton{
 					// Prendo il possesso di quella casella
 					checkTakeBox();
 				}
-			});
+		});
 		// TODO : FAR SI CHE FACCIA RELEASE SOLO DI QUELLO SELZIONATO IN PRECEDENZA
 		//checkReleaseBox();
 
@@ -43,13 +41,15 @@ public class TileButton extends JButton{
 	}
 
 	private void checkTakeBox(){
-		if(selectionManager.getSelected())
+		System.out.println(idBox+ "è " + selectionManager.getSelected());
+		if(!selectionManager.getSelected())
+			System.out.println("viene presa" + idBox);
 			requestClient.takeBox(username, idBox, System.out::println);
 	}
 
 	//evitare release multipla
 	private void checkReleaseBox(){
-		if(!selectionManager.getSelected())
+		if(selectionManager.getSelected())
 			requestClient.releaseBox(username, idBox, System.out::println);
 	}
 
