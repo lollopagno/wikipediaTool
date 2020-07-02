@@ -7,7 +7,7 @@ public class SelectionManager {
 	//private RequestClient requestClient;
 
 	public void selectTile(String username, RequestClient requestClient,final Tile tile, final Listener listener) {
-		
+
 		if(selectionActive) {
 			selectionActive = false;
 
@@ -19,8 +19,6 @@ public class SelectionManager {
 			selectedTile = tile;
 		}
 	}
-
-
 
 	private void swap(final Tile t1, final Tile t2) {
 		int pos = t1.getCurrentPosition();

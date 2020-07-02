@@ -1,7 +1,5 @@
 package app;
 
-import com.google.gson.annotations.SerializedName;
-
 import java.awt.Image;
 
 public class Tile implements Comparable<Tile>{

@@ -24,7 +24,7 @@ import java.util.concurrent.ScheduledExecutorService;
 @SuppressWarnings("serial")
 public class PuzzleBoard extends JFrame{
 
-    private SelectionManager selectionManager = new SelectionManager();
+    private final SelectionManager selectionManager = new SelectionManager();
     private final ScheduledExecutorService job = Executors.newSingleThreadScheduledExecutor();
 
     private final RequestClient requestClient;
@@ -90,16 +90,6 @@ public class PuzzleBoard extends JFrame{
         final int imageWidth = image.getWidth(null);
         final int imageHeight = image.getHeight(null);
 
-        /* <-- Questa è la vecchia parte delle positions -->
-
-        Adesso le dobbiamo scaricare dal server.
-        final List<Integer> randomPositions = new ArrayList<>();
-        IntStream.range(0, rows*columns).forEach(item -> { randomPositions.add(item); }); 
-        Collections.shuffle(randomPositions);
-
-            <-- end version prof -->
-        */
-
         // API GET for extract position boxes image
         Call<List<Tile>> boxes = RemoteServices.getInstance().getPuzzleService().getMappings();
         boxes.enqueue(new Callback<>() {
@@ -138,10 +128,8 @@ public class PuzzleBoard extends JFrame{
     	
     	Collections.sort(tiles);
 
-
-
     	tiles.forEach(tile -> {
-    		final TileButton btn = new TileButton(tile, this.requestClient, tile.getOriginalPosition(), this.username, this.selectionManager);
+    		final TileButton btn = new TileButton(tile, this.requestClient, tile.getOriginalPosition(), this.username);
             board.add(btn);
             btn.setBorder(BorderFactory.createLineBorder(Color.gray));
             /* check if another players has selected a card*/

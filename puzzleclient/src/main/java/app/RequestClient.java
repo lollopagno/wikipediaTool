@@ -2,7 +2,6 @@ package app;
 
 import app.remoteservices.RemoteServices;
 import app.remoteservices.ReturnMessage;
-import jdk.jfr.Frequency;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -135,7 +134,6 @@ public class RequestClient {
     public void moveBox(String name, Integer id,Integer id2, Consumer<String> action){
 
         log("Move "+id + "with "+id2);
-        log("ciao");
         Call<Boolean> call = RemoteServices.getInstance().getPuzzleService().move(name,id, id2);
         call.enqueue(new Callback<>() {
 

@@ -13,44 +13,40 @@ public class TileButton extends JButton{
 
 	private final RequestClient requestClient;
 	private final Integer idBox;
-	//private final Integer idBox2;
 	private final String username;
-	private final SelectionManager selectionManager;
 
-	public TileButton(final Tile tile, RequestClient requestClient, Integer idBox, String username, SelectionManager selectionManager) {
+	public TileButton(final Tile tile, RequestClient requestClient, Integer idBox, String username) {
 		super(new ImageIcon(tile.getImage()));
 
 		this.requestClient = requestClient;
 		this.idBox = idBox;
 		this.username = username;
-		this.selectionManager = selectionManager;
 
-		addMouseListener(new MouseAdapter() {
+			addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					setBorder(BorderFactory.createLineBorder(Color.red));
 
-					// Prendo il possesso di quella casella
-					checkTakeBox();
+					//TODO if API checkTake
+					//if (/*API getState*/ true){
+
+						// Deseleziono la casella presa
+						/* API release */
+						//checkReleaseBox();
+
+					//}else{
+						setBorder(BorderFactory.createLineBorder(Color.red));
+
+						// Prendo il possesso di quella casella
+						takeBox();
+					//}
+
 				}
-		});
-		// TODO : FAR SI CHE FACCIA RELEASE SOLO DI QUELLO SELZIONATO IN PRECEDENZA
-		//checkReleaseBox();
-
-
+			});
 	}
 
-	private void checkTakeBox(){
-		System.out.println(idBox+ "è " + selectionManager.getSelected());
-		if(!selectionManager.getSelected())
-			System.out.println("viene presa" + idBox);
-			requestClient.takeBox(username, idBox, System.out::println);
-	}
+	private void takeBox(){ requestClient.takeBox(username, idBox, System.out::println); }
 
 	//evitare release multipla
-	private void checkReleaseBox(){
-		if(selectionManager.getSelected())
-			requestClient.releaseBox(username, idBox, System.out::println);
-	}
+	private void checkReleaseBox(){  requestClient.releaseBox(username, idBox, System.out::println);}
 
 }
