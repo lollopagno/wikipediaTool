@@ -25,46 +25,32 @@ public class TileButton extends JButton{
 		this.username = username;
 		this.selectionManager = selectionManager;
 
-		// TODO : TOGLIERE IF OPPURE COME FARE FERMARE IL SECONDO CLICK?
-		System.out.println(this.selectionManager.getSelected());
-		if(!this.selectionManager.getSelected()){
+		//System.out.println(this.selectionManager.getSelected());
+		//if(!this.selectionManager.getSelected()) {
 			addMouseListener(new MouseAdapter() {
-
-			@Override
-			public void mouseClicked(MouseEvent e) {
-
-				setBorder(BorderFactory.createLineBorder(Color.red));
-
-				// Prendo il possesso di quella casella
-				checkTakeBox();
-			}
-			});
-		}else {
-			addMouseListener(new MouseAdapter() {
-
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					// Lascio il possesso di quella casella
-					checkReleaseBox();
+					setBorder(BorderFactory.createLineBorder(Color.red));
+
+					// Prendo il possesso di quella casella
+					checkTakeBox();
 				}
 			});
-		}
+		// TODO : FAR SI CHE FACCIA RELEASE SOLO DI QUELLO SELZIONATO IN PRECEDENZA
+		//checkReleaseBox();
 
 
 	}
 
-	// TODO: metodo aggiunto per prendere in possesso una casella (non attendibile)
-	// Prima bisogna verificare se la casella è già stata presa, se è libera fare la PUT
 	private void checkTakeBox(){
 		if(selectionManager.getSelected())
 			requestClient.takeBox(username, idBox, System.out::println);
 	}
 
+	//evitare release multipla
 	private void checkReleaseBox(){
-		requestClient.releaseBox(username, idBox, System.out::println);
+		if(!selectionManager.getSelected())
+			requestClient.releaseBox(username, idBox, System.out::println);
 	}
-
-	//private void checkMoveBox(){requestClient.moveBox(username, idBox, idBox2,System.out::println);}
-
 
 }

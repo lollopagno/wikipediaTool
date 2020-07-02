@@ -7,6 +7,7 @@ import retrofit2.Response;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -136,20 +137,21 @@ public class PuzzleBoard extends JFrame{
     	board.removeAll();
     	
     	Collections.sort(tiles);
-    	
+
+        /* check if another players has selected a card*/
+        this.job.execute(()-> selectedCard(tiles));
+
     	tiles.forEach(tile -> {
     		final TileButton btn = new TileButton(tile, this.requestClient, tile.getOriginalPosition(), this.username, this.selectionManager);
             board.add(btn);
             btn.setBorder(BorderFactory.createLineBorder(Color.gray));
             btn.addActionListener(actionListener -> {
-            	selectionManager.selectTile(tile, () -> {
+            	selectionManager.selectTile(this.username,this.requestClient,tile, () -> {
             		paintPuzzle(board);
                 	checkSolution();
             	});
             });
     	});
-        /* check if another players has selected a card*/
-        //this.job.execute(()-> selectedCard(tiles));
     	
     	pack();
         setLocationRelativeTo(null);
@@ -163,11 +165,12 @@ public class PuzzleBoard extends JFrame{
     }
 
     private void selectedCard(List<Tile> tiles){
-        /*tiles.forEach(tile->{
+        tiles.forEach(tile->{
             if(tile.getSelected()){
-                setBorder(BorderFactory.createLineBorder(Color.red));
+                System.out.println("yellow");
+                rootPane.setBorder(BorderFactory.createLineBorder(Color.yellow));
             }
-        });*/
+        });
     }
 
     private void log(String msg) {
