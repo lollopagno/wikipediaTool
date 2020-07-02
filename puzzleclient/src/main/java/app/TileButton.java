@@ -43,13 +43,15 @@ public class TileButton extends JButton{
 	}
 
 	private void checkTakeBox(){
-		if(selectionManager.getSelected())
+		System.out.println(idBox+ "è " + selectionManager.getSelected());
+		if(!selectionManager.getSelected())
+			System.out.println("viene presa" + idBox);
 			requestClient.takeBox(username, idBox, System.out::println);
 	}
 
 	//evitare release multipla
 	private void checkReleaseBox(){
-		if(!selectionManager.getSelected())
+		if(selectionManager.getSelected())
 			requestClient.releaseBox(username, idBox, System.out::println);
 	}
 
