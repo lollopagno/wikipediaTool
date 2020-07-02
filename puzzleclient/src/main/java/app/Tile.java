@@ -41,5 +41,4 @@ public class Tile implements Comparable<Tile>{
 		return this.currentPosition < other.currentPosition ? -1 
 				: (this.currentPosition == other.currentPosition ? 0 : 1);
 	}
-
 }

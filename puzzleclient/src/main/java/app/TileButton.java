@@ -3,50 +3,96 @@ package app;
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.text.StyledEditorKit;
 
 @SuppressWarnings("serial")
 public class TileButton extends JButton{
 
 	private final RequestClient requestClient;
-	private final Integer idBox;
 	private final String username;
+	private Tile tile;
+	private String stateBox;
 
-	public TileButton(final Tile tile, RequestClient requestClient, Integer idBox, String username) {
+	public TileButton(final Tile tile, RequestClient requestClient, String username) {
 		super(new ImageIcon(tile.getImage()));
 
+		this.tile = tile;
 		this.requestClient = requestClient;
-		this.idBox = idBox;
 		this.username = username;
 
-			addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseClicked(MouseEvent e) {
+		// Action button puzzle
+		addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
 
-					//TODO if API checkTake
-					//if (/*API getState*/ true){
+				// Check border box is yellow
+				// TODO da verificare l'uguaglianza
+				if (! getBorder().equals(BorderFactory.createLineBorder(Color.yellow))) {
+
+					// Check state box
+					// Caso raro in cui selezione e deseleziono la mia casella
+				    if (checkStateBox()) {
 
 						// Deseleziono la casella presa
-						/* API release */
-						//checkReleaseBox();
+						releaseBox();
 
-					//}else{
+					} else {
 						setBorder(BorderFactory.createLineBorder(Color.red));
 
 						// Prendo il possesso di quella casella
 						takeBox();
-					//}
-
+					}
 				}
-			});
+			}
+		});
 	}
 
-	private void takeBox(){ requestClient.takeBox(username, idBox, System.out::println); }
+	// Implement API PUT takeBox
+	private void takeBox(){
 
-	//evitare release multipla
-	private void checkReleaseBox(){  requestClient.releaseBox(username, idBox, System.out::println);}
+		requestClient.takeBox(username, this.tile.getOriginalPosition(), msg ->{
+			log("Take box id: "+this.tile.getOriginalPosition());
+			log(msg+"");
+		});
+	}
 
+	// Implement API GET getState
+	private boolean checkStateBox(){
+
+		requestClient.checkStateBox(this.username, this.tile.getOriginalPosition(), msg -> {
+			log("Check state box id: "+tile.getOriginalPosition());
+			setStateBox(msg);
+		});
+		return getStateBox();
+	}
+
+	// Implement API PUT release
+	private void releaseBox(){
+
+		requestClient.releaseBox(username, this.tile.getOriginalPosition(), msg ->{
+			log("Release, position box id: "+this.tile.getOriginalPosition());
+			log(msg+"");
+		});
+	}
+
+	private void setStateBox(String result){
+		this.stateBox = result;
+	}
+
+	private Boolean getStateBox(){
+		return Boolean.parseBoolean(this.stateBox);
+	}
+
+	private void log(String msg){
+		synchronized (System.out){
+			System.out.println(msg);
+		}
+	}
 }

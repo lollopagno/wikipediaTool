@@ -7,7 +7,6 @@ import retrofit2.Response;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -20,12 +19,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("serial")
 public class PuzzleBoard extends JFrame{
 
     private final SelectionManager selectionManager = new SelectionManager();
-    private final ScheduledExecutorService job = Executors.newSingleThreadScheduledExecutor();
 
     private final RequestClient requestClient;
     private String username;
@@ -73,7 +72,6 @@ public class PuzzleBoard extends JFrame{
         });
     }
 
-    
     private void createTiles(final String imagePath, final JPanel board) {
 
 		final BufferedImage image;
@@ -107,7 +105,6 @@ public class PuzzleBoard extends JFrame{
                                             (imageWidth / columns),
                                             imageHeight / rows)));
 
-                            // TODO getOriginalPosition or getCurrentPosition ??
                             tiles.add(new Tile(imagePortion, position, response.body().get(position).getOriginalPosition()));;
                             position++;
                         }
@@ -129,13 +126,15 @@ public class PuzzleBoard extends JFrame{
     	Collections.sort(tiles);
 
     	tiles.forEach(tile -> {
-    		final TileButton btn = new TileButton(tile, this.requestClient, tile.getOriginalPosition(), this.username);
+    		final TileButton btn = new TileButton(tile, this.requestClient, this.username);
             board.add(btn);
             btn.setBorder(BorderFactory.createLineBorder(Color.gray));
-            /* check if another players has selected a card*/
-            this.job.execute(()-> selectedCard(tiles,btn));
 
             btn.addActionListener(actionListener -> {
+
+                // TODO Qui implementare azione di deselezione
+                log("Deselect button");
+
             	selectionManager.selectTile(this.username,this.requestClient,tile, () -> {
             		paintPuzzle(board);
                 	checkSolution();
@@ -148,19 +147,9 @@ public class PuzzleBoard extends JFrame{
     }
 
     private void checkSolution() {
-        // TODO: Questa parte deve essere effettuata dal server immagino.
     	if(tiles.stream().allMatch(Tile::isInRightPlace)) {
     		JOptionPane.showMessageDialog(this, "Puzzle Completed!", "", JOptionPane.INFORMATION_MESSAGE);
     	}
-    }
-
-    private void selectedCard(List<Tile> tiles, TileButton btn){
-        tiles.forEach(tile->{
-            if(tile.getSelected()){
-                System.out.println("yellow");
-                btn.setBorder(BorderFactory.createLineBorder(Color.yellow));
-            }
-        });
     }
 
     private void log(String msg) {

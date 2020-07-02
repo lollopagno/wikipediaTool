@@ -19,6 +19,7 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
     private final RequestClient client;
 
     private final ScheduledExecutorService job = Executors.newSingleThreadScheduledExecutor();
+    private final ScheduledExecutorService jobColor = Executors.newSingleThreadScheduledExecutor();
 
     public RegisterView(int x, int y) {
 
@@ -90,6 +91,9 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
             // Update view
             this.updateListUser();
 
+            //Update color box
+            this.updateColorBox(username);
+
             // Start game
             this.client.startGame(username);
         });
@@ -101,6 +105,14 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
     public void updateListUser() {
         SwingUtilities.invokeLater(() -> this.setTitle("List user"));
         this.job.scheduleAtFixedRate(this::updateView, 0, 30000, TimeUnit.MILLISECONDS);
+    }
+
+    /**
+     * Execution job: update color box
+     * @param username name user
+     */
+    private void updateColorBox(String username){
+        this.jobColor.scheduleAtFixedRate(() -> updateCardColor(username), 0, 5000, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -144,6 +156,33 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
                 this.revalidate();
             });
 
+        });
+    }
+
+    /**
+     * Update color border box
+     * @param username name user
+     */
+    private void updateCardColor(String username){
+
+        log("Execute thread color box yellow");
+
+        this.client.mappingBox(tiles -> {
+
+            tiles.forEach(tile -> {
+
+                this.client.checkStateBox(username, tile.getOriginalPosition(), msg -> {
+                    if(Boolean.parseBoolean(msg)){
+                        System.out.println("Box is colored yellow");
+                        SwingUtilities.invokeLater(() -> {
+
+                            // TODO capire come riprendere il bottone di quel tile da cambiare
+                            //final TileButton btn = new TileButton(tile, this.client, username);
+                            //btn.setBorder(BorderFactory.createLineBorder(Color.yellow));
+                        });
+                    }
+                });
+            });
         });
     }
 
