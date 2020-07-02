@@ -138,13 +138,15 @@ public class PuzzleBoard extends JFrame{
     	
     	Collections.sort(tiles);
 
-        /* check if another players has selected a card*/
-        this.job.execute(()-> selectedCard(tiles));
+
 
     	tiles.forEach(tile -> {
     		final TileButton btn = new TileButton(tile, this.requestClient, tile.getOriginalPosition(), this.username, this.selectionManager);
             board.add(btn);
             btn.setBorder(BorderFactory.createLineBorder(Color.gray));
+            /* check if another players has selected a card*/
+            this.job.execute(()-> selectedCard(tiles,btn));
+
             btn.addActionListener(actionListener -> {
             	selectionManager.selectTile(this.username,this.requestClient,tile, () -> {
             		paintPuzzle(board);
@@ -164,11 +166,11 @@ public class PuzzleBoard extends JFrame{
     	}
     }
 
-    private void selectedCard(List<Tile> tiles){
+    private void selectedCard(List<Tile> tiles, TileButton btn){
         tiles.forEach(tile->{
             if(tile.getSelected()){
                 System.out.println("yellow");
-                rootPane.setBorder(BorderFactory.createLineBorder(Color.yellow));
+                btn.setBorder(BorderFactory.createLineBorder(Color.yellow));
             }
         });
     }
