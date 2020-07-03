@@ -6,6 +6,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import javax.swing.*;
+import java.awt.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -94,20 +96,23 @@ public class RequestClient {
     /**
      * HTTP PUT for take a boxe
      * @param name user name
-     * @param id id boxe
-     * @param action lambda-function
+     * @param button tile button
      */
-    public void takeBox(String name, Integer id, Consumer<String> action){
+    public void takeBox(String name, TileButton button){
 
-        log("Username: "+name);
-
-        Call<ReturnMessage> call = RemoteServices.getInstance().getPuzzleService().take(name, id);
+        Call<ReturnMessage> call = RemoteServices.getInstance().getPuzzleService().take(name, button.getTile().getOriginalPosition());
         call.enqueue(new Callback<>() {
 
             @Override
             public void onResponse(Call<ReturnMessage> call, Response<ReturnMessage> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    action.accept(response.body().getMessage());
+
+                    button.setBorder(BorderFactory.createLineBorder(Color.red));
+                    button.setColor(Color.red);
+                    button.getTile().setTaker(name);
+
+                    log("Take box id: " + button.getTile().getOriginalPosition());
+                    log(response.body().getMessage() + "");
                 }
             }
 
@@ -146,17 +151,21 @@ public class RequestClient {
     /**
      * HTTP PUT for release a boxe
      * @param name name user
-     * @param id id box
-     * @param action lambda-function
+     * @param button tile button
      */
-    public void releaseBox(String name, Integer id, Consumer<String> action){
-        Call<ReturnMessage> call = RemoteServices.getInstance().getPuzzleService().release(name,id);
+    public void releaseBox(String name, TileButton button){
+        Call<ReturnMessage> call = RemoteServices.getInstance().getPuzzleService().release(name,button.getTile().getOriginalPosition());
         call.enqueue(new Callback<>() {
 
             @Override
             public void onResponse(Call<ReturnMessage> call, Response<ReturnMessage> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    action.accept(response.body().getMessage());
+
+                    button.setBorder(BorderFactory.createLineBorder(Color.gray));
+                    button.setColor(Color.gray);
+
+                    log("Release, position box id: " + button.getTile().getOriginalPosition());
+                    log(response.body().getMessage() + "");
                 }
             }
 

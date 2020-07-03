@@ -19,7 +19,6 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
     private final RequestClient client;
 
     private final ScheduledExecutorService job = Executors.newSingleThreadScheduledExecutor();
-    private final ScheduledExecutorService jobColor = Executors.newSingleThreadScheduledExecutor();
 
     public RegisterView(int x, int y) {
 
@@ -57,7 +56,6 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
                 job.shutdown();
-                jobColor.shutdown();
             }
         });
     }
@@ -84,7 +82,6 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
 
     /**
      * RegisterUser button action
-     *
      * @param username user name
      */
     private void registerUser(String username) {
@@ -94,9 +91,6 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
 
             // Update view
             this.updateListUser();
-
-            //Update color box
-            this.updateColorBox(username);
 
             // Start game
             this.client.startGame(username);
@@ -111,14 +105,6 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
         this.job.scheduleAtFixedRate(this::updateView, 0, 30000, TimeUnit.MILLISECONDS);
     }
 
-    /**
-     * Execution job: update color box
-     *
-     * @param username name user
-     */
-    private void updateColorBox(String username) {
-        this.jobColor.scheduleAtFixedRate(() -> updateCardColor(username), 0, 5000, TimeUnit.MILLISECONDS);
-    }
 
     /**
      * Create table with all users
@@ -160,31 +146,6 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
             });
 
         });
-    }
-
-    /**
-     * Update color border box
-     *
-     * @param username name user
-     */
-    private void updateCardColor(String username) {
-        log("Update color box every 5s");
-
-        this.client.mappingBox(tiles -> tiles.forEach(tile -> {
-
-            this.client.checkStateBox(username, tile.getOriginalPosition(), msg -> {
-
-                if (Boolean.parseBoolean(msg)) {
-                    SwingUtilities.invokeLater(() -> {
-
-                        // TODO capire come riprendere il bottone di quel tile da cambiare
-                        //log("Box is colored yellow");
-                        //final TileButton btn = new TileButton(tile, this.client, username);
-                        //btn.setBorder(BorderFactory.createLineBorder(Color.yellow));
-                    });
-                }
-            });
-        }));
     }
 
     private void log(String msg) {
