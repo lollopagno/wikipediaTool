@@ -18,9 +18,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import static java.awt.Color.yellow;
 
@@ -28,17 +25,15 @@ import static java.awt.Color.yellow;
 public class PuzzleBoard extends JFrame {
 
     private final SelectionManager selectionManager = new SelectionManager();
-    private final ScheduledExecutorService jobColor = Executors.newSingleThreadScheduledExecutor();
 
     private final RequestClient requestClient;
     private final String username;
 
-    private List<Tile> tiles = new ArrayList<>();
+    private final List<Tile> tiles = new ArrayList<>();
 
     final int rows, columns;
 
     public PuzzleBoard(final int rows, final int columns, final String imagePath, String username) {
-
         // Dimension Puzzle
         this.rows = rows;
         this.columns = columns;
@@ -63,9 +58,7 @@ public class PuzzleBoard extends JFrame {
             @Override
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
-
-                // There isn't any op to do after delete.
-                requestClient.deleteUser(username, null);
+                requestClient.deleteUser(username);
             }
 
             @Override
@@ -111,7 +104,7 @@ public class PuzzleBoard extends JFrame {
                         }
                     }
                     paintPuzzle(board);
-                    jobColor.scheduleAtFixedRate(() -> updateCardColor(username), 0, 5000, TimeUnit.MILLISECONDS);
+                    updateCardColor(username);
                 }
             }
 
@@ -186,6 +179,7 @@ public class PuzzleBoard extends JFrame {
                                     log("Box is colored yellow");
                                     p.getButton().setBorder(BorderFactory.createLineBorder(Color.yellow));
                                 })
+
                         );
             }
         }));
