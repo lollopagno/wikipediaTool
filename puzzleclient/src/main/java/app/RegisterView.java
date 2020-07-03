@@ -57,6 +57,7 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
                 job.shutdown();
+                jobColor.shutdown();
             }
         });
     }

@@ -7,6 +7,7 @@ import retrofit2.Response;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -20,6 +21,8 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static java.awt.Color.yellow;
 
 @SuppressWarnings("serial")
 public class PuzzleBoard extends JFrame{
@@ -129,14 +132,19 @@ public class PuzzleBoard extends JFrame{
     	tiles.forEach(tile -> {
     		final TileButton btn = new TileButton(tile, this.requestClient, this.username);
             board.add(btn);
-            btn.setBorder(BorderFactory.createLineBorder(Color.gray));
-            btn.setColor(Color.gray);
+
+            // TODO: MEGLIO QUESTO?
+            //btn.setBorder(BorderFactory.createLineBorder(Color.gray));
+            //btn.setColor(Color.gray);
+            //TODO : O QUESTO?
+            btn.setBorder(BorderFactory.createLineBorder(btn.getColor()));
+            btn.setColor(btn.getColor());
 
             // Action Button puzzle
             btn.addActionListener(actionListener -> {
 
                 // Check button is not yellow
-                if(! btn.getColor().equals(Color.yellow)) {
+                if(! btn.getColor().equals(yellow)) {
 
                     // Check button is red
                     if(btn.getColor().equals(Color.red)){

@@ -11,7 +11,7 @@ public class SelectionManager {
 			selectionActive = false;
 
 			swap(selectedTile, tile);
-			requestClient.moveBox(username,selectedTile.getOriginalPosition(),tile.getOriginalPosition(),System.out::println);
+			requestClient.moveBox(username,selectedTile.getCurrentPosition(),tile.getCurrentPosition(),System.out::println);
 			listener.onSwapPerformed();
 		} else {
 			selectionActive = true;
