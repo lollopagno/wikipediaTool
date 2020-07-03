@@ -85,7 +85,6 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
      * @param username user name
      */
     private void registerUser(String username) {
-
         this.client.addPlayer(username, msg -> {
             log(msg + ": " + username);
 
@@ -110,7 +109,6 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
      * Create table with all users
      */
     private void updateView() {
-
         // Get list user
         this.client.allUsers(list -> {
             Vector<Vector<String>> rowData = new Vector<>();
