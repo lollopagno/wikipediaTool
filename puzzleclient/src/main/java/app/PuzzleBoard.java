@@ -33,7 +33,9 @@ public class PuzzleBoard extends JFrame {
 
     final int rows, columns;
 
-    public PuzzleBoard(final String imagePath, String username) {
+    final String imagePath = "src/main/java/app/bletchley-park-mansion.jpg";
+
+    public PuzzleBoard(String username) {
         // Dimension Puzzle
         this.rows = 3;
         this.columns = 5;

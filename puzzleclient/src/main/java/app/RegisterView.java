@@ -58,6 +58,8 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
                 job.shutdown();
             }
         });
+
+        this.job.scheduleAtFixedRate(this::updateView, 0, 30000, TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -88,20 +90,10 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
         this.client.addPlayer(username, msg -> {
             log(msg + ": " + username);
 
-            // Update view
-            this.updateListUser();
-
             // Start game
-            this.client.startGame(username);
+            final PuzzleBoard puzzle = new PuzzleBoard(username);
+            puzzle.setVisible(true);
         });
-    }
-
-    /**
-     * Execution job: update list user view
-     */
-    public void updateListUser() {
-        SwingUtilities.invokeLater(() -> this.setTitle("List user"));
-        this.job.scheduleAtFixedRate(this::updateView, 0, 30000, TimeUnit.MILLISECONDS);
     }
 
 

@@ -22,7 +22,6 @@ public class RequestClient {
 
     private RequestClient() {}
 
-    final String imagePath = "src/main/java/app/bletchley-park-mansion.jpg";
 
     /**
      * HTTP POST for register user name
@@ -235,14 +234,6 @@ public class RequestClient {
                 log(t.getMessage());
             }
         });
-    }
-
-    /**
-     * Start puzzle game
-     */
-    public void startGame(String username) {
-        final PuzzleBoard puzzle = new PuzzleBoard(this.imagePath, username);
-        puzzle.setVisible(true);
     }
 
     private void log(String msg) {
