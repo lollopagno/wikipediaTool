@@ -22,8 +22,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static java.awt.Color.yellow;
-
 @SuppressWarnings("serial")
 public class PuzzleBoard extends JFrame {
     private final SelectionManager selectionManager = new SelectionManager();
@@ -93,6 +91,7 @@ public class PuzzleBoard extends JFrame {
             public void onResponse(Call<Set<Box>> call, Response<Set<Box>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     int position = 0;
+                    List<Box> lists = new LinkedList<>(response.body());
 
                     for (int i = 0; i < rows; i++) {
                         for (int j = 0; j < columns; j++) {
@@ -102,8 +101,9 @@ public class PuzzleBoard extends JFrame {
                                             (imageWidth / columns),
                                             imageHeight / rows)));
 
-                            List<Box> lists = new LinkedList<>(response.body());
-                            tiles.add(new Tile(imagePortion, position, lists.get(position).getOriginalPosition(), username));
+                            int currPos = position;
+                            Optional<Box> remoteTile = lists.stream().filter(f -> f.getOriginalPosition() == currPos).findFirst();
+                            tiles.add(new Tile(imagePortion, position, remoteTile.get().getCurrentPosition(), username));
                             position++;
                         }
                     }
@@ -140,7 +140,7 @@ public class PuzzleBoard extends JFrame {
         Collections.sort(tiles);
 
         tiles.forEach(tile -> {
-            final TileButton btn = new TileButton(tile, this.requestClient, this.username);
+            final TileButton btn = new TileButton(tile);
             tile.setButton(btn);
             board.add(btn);
 
@@ -149,33 +149,21 @@ public class PuzzleBoard extends JFrame {
 
             // Action Button puzzle
             btn.addActionListener(actionListener -> {
-
-                // Check button is not yellow
-                if (!btn.getColor().equals(yellow)) {
-
-                    // Check button is red
-                    if (btn.getColor().equals(Color.red)) {
-                        btn.releaseBox();
-                    } else {
-                        // Action for gray button
-                        btn.takeBox();
-
-                        // Move boxes
-                        selectionManager.selectTile(this.username, this.requestClient, tile, () -> {
-                            paintPuzzle(board);
-                            checkSolution();
-                        });
-                    }
-                }
+                // Move boxes
+                selectionManager.selectTile(this.username, this.requestClient, btn, () -> {
+                    paintPuzzle(board);
+                    checkSolution();
+                });
             });
         });
 
         pack();
-        setLocationRelativeTo(null);
+        // setLocationRelativeTo(null);
     }
 
     /**
      * Update color border box
+     *
      * @param username name user
      */
     private void updateCardColor(String username) {

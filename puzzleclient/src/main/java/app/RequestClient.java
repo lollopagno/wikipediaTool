@@ -101,7 +101,7 @@ public class RequestClient {
      * @param name   user name
      * @param button tile button
      */
-    public void takeBox(String name, TileButton button) {
+    public void takeBox(String name, TileButton button, Consumer<Boolean> consumer) {
 
         Call<ReturnMessage> call = RemoteServices.getInstance().getPuzzleService().take(name, button.getTile().getOriginalPosition());
         call.enqueue(new Callback<>() {
@@ -116,6 +116,8 @@ public class RequestClient {
 
                     log("Take box id: " + button.getTile().getOriginalPosition());
                     log(response.body().getMessage() + "");
+
+                    consumer.accept(response.body().getResult());
                 }
             }
 
@@ -228,21 +230,20 @@ public class RequestClient {
      * @param id2    final position
      * @param action lambda-function
      */
-    public void moveBox(String name, Integer id, Integer id2, Consumer<String> action) {
-
+    public void moveBox(String name, Integer id, Integer id2, Consumer<Boolean> action) {
         log("Move id: " + id + " with id: " + id2);
-        Call<Boolean> call = RemoteServices.getInstance().getPuzzleService().move(name, id, id2);
+        Call<ReturnMessage> call = RemoteServices.getInstance().getPuzzleService().move(name, id, id2);
         call.enqueue(new Callback<>() {
 
             @Override
-            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+            public void onResponse(Call<ReturnMessage> call, Response<ReturnMessage> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    action.accept(response.toString());
+                    action.accept(response.body().getResult());
                 }
             }
 
             @Override
-            public void onFailure(Call<Boolean> call, Throwable t) {
+            public void onFailure(Call<ReturnMessage> call, Throwable t) {
                 log(t.getMessage());
             }
         });

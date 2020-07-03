@@ -1,21 +1,42 @@
 package app;
 
+import java.awt.*;
+
+import static java.awt.Color.yellow;
+
 public class SelectionManager {
 
 	private boolean selectionActive = false;
 	private Tile selectedTile;
 
-	public void selectTile(String username, RequestClient requestClient,final Tile tile, final Listener listener) {
+	public void selectTile(String username, RequestClient requestClient, final TileButton btn, final Listener listener) {
 
-		if(selectionActive) {
-			selectionActive = false;
+		// Check button is not yellow
+		if (!btn.getColor().equals(yellow)) {
 
-			swap(selectedTile, tile);
-			requestClient.moveBox(username,selectedTile.getCurrentPosition(),tile.getCurrentPosition(),System.out::println);
-			listener.onSwapPerformed();
-		} else {
-			selectionActive = true;
-			selectedTile = tile;
+			// Check button is red
+			if (btn.getColor().equals(Color.red)) {
+				requestClient.releaseBox(username, btn);
+			} else {
+				// Action for gray button
+				requestClient.takeBox(username, btn, took -> {
+					if(!took) return;
+
+					if (selectionActive) {
+						selectionActive = false;
+
+						requestClient.moveBox(username, selectedTile.getOriginalPosition(), btn.getTile().getOriginalPosition(), moved -> {
+							if (moved) {
+								swap(selectedTile, btn.getTile());
+								listener.onSwapPerformed();
+							}
+						});
+					} else {
+						selectionActive = true;
+						selectedTile = btn.getTile();
+					}
+				});
+			}
 		}
 	}
 
@@ -26,11 +47,11 @@ public class SelectionManager {
 	}
 
 	@FunctionalInterface
-	interface Listener{
+	interface Listener {
 		void onSwapPerformed();
 	}
 
-	public boolean getSelected(){
+	public boolean getSelected() {
 		return selectionActive;
 	}
 

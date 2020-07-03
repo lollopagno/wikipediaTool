@@ -20,7 +20,7 @@ public interface Puzzle {
     Call<ReturnMessage> getState(@Path("player") final String player, @Path("id") final int id);
 
     @PUT("/move/{player}/{first}/{second}")
-    Call<Boolean> move(@Path("player") final String player, @Path("first") final int first, @Path("second") final int second);
+    Call<ReturnMessage> move(@Path("player") final String player, @Path("first") final int first, @Path("second") final int second);
 
     @GET("/mapping")
     Call<Set<Box>> getMappings();
