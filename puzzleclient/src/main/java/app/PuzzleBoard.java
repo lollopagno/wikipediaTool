@@ -1,5 +1,6 @@
 package app;
 
+import app.remoteservices.Box;
 import app.remoteservices.RemoteServices;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -15,8 +16,7 @@ import java.awt.image.CropImageFilter;
 import java.awt.image.FilteredImageSource;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -26,7 +26,6 @@ import static java.awt.Color.yellow;
 
 @SuppressWarnings("serial")
 public class PuzzleBoard extends JFrame {
-
     private final SelectionManager selectionManager = new SelectionManager();
     private final ScheduledExecutorService jobColor = Executors.newSingleThreadScheduledExecutor();
 
@@ -34,9 +33,7 @@ public class PuzzleBoard extends JFrame {
     private final String username;
 
     private final List<Tile> tiles = new ArrayList<>();
-
     final int rows, columns;
-
     final String imagePath = "src/main/java/app/bletchley-park-mansion.jpg";
 
     public PuzzleBoard(String username) {
@@ -90,10 +87,10 @@ public class PuzzleBoard extends JFrame {
         final int imageHeight = image.getHeight(null);
 
         // API GET for extract position boxes image
-        Call<List<Tile>> boxes = RemoteServices.getInstance().getPuzzleService().getMappings();
+        Call<Set<Box>> boxes = RemoteServices.getInstance().getPuzzleService().getMappings();
         boxes.enqueue(new Callback<>() {
             @Override
-            public void onResponse(Call<List<Tile>> call, Response<List<Tile>> response) {
+            public void onResponse(Call<Set<Box>> call, Response<Set<Box>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     int position = 0;
 
@@ -105,7 +102,8 @@ public class PuzzleBoard extends JFrame {
                                             (imageWidth / columns),
                                             imageHeight / rows)));
 
-                            tiles.add(new Tile(imagePortion, position, response.body().get(position).getOriginalPosition(), username));
+                            List<Box> lists = new LinkedList<>(response.body());
+                            tiles.add(new Tile(imagePortion, position, lists.get(position).getOriginalPosition(), username));
                             position++;
                         }
                     }
@@ -115,10 +113,24 @@ public class PuzzleBoard extends JFrame {
             }
 
             @Override
-            public void onFailure(Call<List<Tile>> call, Throwable t) {
+            public void onFailure(Call<Set<Box>> call, Throwable t) {
                 log(t.getMessage());
             }
         });
+        /*Call<String> call = RemoteServices.getInstance().getPuzzleService().getMappings();
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                log(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });*/
+
+        log("Ok");
     }
 
     // Paint Puzzle

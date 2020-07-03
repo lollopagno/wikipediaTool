@@ -9,6 +9,7 @@ import retrofit2.Response;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public class RequestClient {
@@ -189,23 +190,34 @@ public class RequestClient {
      *
      * @param action lambda-function
      */
-    public void mappingBox(Consumer<List<Tile>> action) {
-        Call<List<Tile>> call = RemoteServices.getInstance().getPuzzleService().getMappings();
+    public void mappingBox(Consumer<Set<app.remoteservices.Box>> action) {
+        Call<Set<app.remoteservices.Box>> call = RemoteServices.getInstance().getPuzzleService().getMappings();
         call.enqueue(new Callback<>() {
 
             @Override
-            public void onResponse(Call<List<Tile>> call, Response<List<Tile>> response) {
+            public void onResponse(Call<Set<app.remoteservices.Box>> call, Response<Set<app.remoteservices.Box>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     action.accept(response.body());
                 }
             }
 
             @Override
-            public void onFailure(Call<List<Tile>> call, Throwable t) {
+            public void onFailure(Call<Set<app.remoteservices.Box>> call, Throwable t) {
                 log(t.getMessage());
             }
         });
+        /*Call<String> call = RemoteServices.getInstance().getPuzzleService().getMappings();
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                log(response.body());
+            }
 
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });*/
     }
 
     /**

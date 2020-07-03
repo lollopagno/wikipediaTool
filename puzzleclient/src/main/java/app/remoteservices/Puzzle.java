@@ -7,6 +7,7 @@ import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 import java.util.List;
+import java.util.Set;
 
 public interface Puzzle {
     @PUT("/take/{player}/{id}")
@@ -22,7 +23,7 @@ public interface Puzzle {
     Call<Boolean> move(@Path("player") final String player, @Path("first") final int first, @Path("second") final int second);
 
     @GET("/mapping")
-    Call<List<Tile>> getMappings();
+    Call<Set<Box>> getMappings();
 
     @GET("/state")
     Call<String> getGameState();
