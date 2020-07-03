@@ -7,9 +7,9 @@ import retrofit2.Response;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.CropImageFilter;
 import java.awt.image.FilteredImageSource;
@@ -18,14 +18,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import static java.awt.Color.yellow;
 
 @SuppressWarnings("serial")
-public class PuzzleBoard extends JFrame{
+public class PuzzleBoard extends JFrame {
 
     private final SelectionManager selectionManager = new SelectionManager();
 
@@ -35,26 +32,26 @@ public class PuzzleBoard extends JFrame{
     private List<Tile> tiles = new ArrayList<>();
 
     final int rows, columns;
-	
+
     public PuzzleBoard(final int rows, final int columns, final String imagePath, String username) {
 
         // Dimension Puzzle
-    	this.rows = rows;
-		this.columns = columns;
+        this.rows = rows;
+        this.columns = columns;
 
-		// Object Request Client
+        // Object Request Client
         this.requestClient = new RequestClient(this.rows, this.columns);
         this.username = username;
 
-    	setTitle("Puzzle");
+        setTitle("Puzzle");
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
+
         JPanel board = new JPanel();
         board.setBorder(BorderFactory.createLineBorder(Color.gray));
         board.setLayout(new GridLayout(rows, columns, 0, 0));
         getContentPane().add(board, BorderLayout.CENTER);
-        
+
         createTiles(imagePath, board);
 
         // Action close view puzzle
@@ -63,11 +60,10 @@ public class PuzzleBoard extends JFrame{
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
 
-                requestClient.deleteUser(username, msg ->{
-                    log(msg+": "+username);
-                });
-                log("Closed window puzzle!");
-       }
+                // There isn't any op to do after delete.
+                requestClient.deleteUser(username, null);
+            }
+
             @Override
             public void windowClosed(WindowEvent e) {
                 super.windowClosed(e);
@@ -76,10 +72,9 @@ public class PuzzleBoard extends JFrame{
     }
 
     private void createTiles(final String imagePath, final JPanel board) {
+        final BufferedImage image;
 
-		final BufferedImage image;
-
-		// Load image
+        // Load image
         try {
             image = ImageIO.read(new File(imagePath));
         } catch (IOException ex) {
@@ -94,7 +89,6 @@ public class PuzzleBoard extends JFrame{
         // API GET for extract position boxes image
         Call<List<Tile>> boxes = RemoteServices.getInstance().getPuzzleService().getMappings();
         boxes.enqueue(new Callback<>() {
-
             @Override
             public void onResponse(Call<List<Tile>> call, Response<List<Tile>> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -108,7 +102,7 @@ public class PuzzleBoard extends JFrame{
                                             (imageWidth / columns),
                                             imageHeight / rows)));
 
-                            tiles.add(new Tile(imagePortion, position, response.body().get(position).getOriginalPosition()));;
+                            tiles.add(new Tile(imagePortion, position, response.body().get(position).getOriginalPosition()));
                             position++;
                         }
                     }
@@ -121,16 +115,16 @@ public class PuzzleBoard extends JFrame{
                 log(t.getMessage());
             }
         });
-	}
+    }
 
-	// Paint Puzzle
+    // Paint Puzzle
     private void paintPuzzle(final JPanel board) {
-    	board.removeAll();
-    	
-    	Collections.sort(tiles);
+        board.removeAll();
 
-    	tiles.forEach(tile -> {
-    		final TileButton btn = new TileButton(tile, this.requestClient, this.username);
+        Collections.sort(tiles);
+
+        tiles.forEach(tile -> {
+            final TileButton btn = new TileButton(tile, this.requestClient, this.username);
             board.add(btn);
 
             // TODO: MEGLIO QUESTO?
@@ -142,16 +136,12 @@ public class PuzzleBoard extends JFrame{
 
             // Action Button puzzle
             btn.addActionListener(actionListener -> {
-
                 // Check button is not yellow
-                if(! btn.getColor().equals(yellow)) {
-
+                if (!btn.getColor().equals(yellow)) {
                     // Check button is red
-                    if(btn.getColor().equals(Color.red)){
+                    if (btn.getColor().equals(Color.red)) {
                         btn.actionButtonRed();
-
-                    }else {
-
+                    } else {
                         // Action for gray button
                         btn.actionButtonGray();
 
@@ -163,22 +153,22 @@ public class PuzzleBoard extends JFrame{
                     }
                 }
             });
-    	});
-    	
-    	pack();
+        });
+
+        pack();
         setLocationRelativeTo(null);
     }
 
     // Check Solution
     private void checkSolution() {
-    	if(tiles.stream().allMatch(Tile::isInRightPlace)) {
-    		JOptionPane.showMessageDialog(this, "Puzzle Completed!", "", JOptionPane.INFORMATION_MESSAGE);
-    	}
+        if (tiles.stream().allMatch(Tile::isInRightPlace)) {
+            JOptionPane.showMessageDialog(this, "Puzzle Completed!", "", JOptionPane.INFORMATION_MESSAGE);
+        }
     }
 
     private void log(String msg) {
         synchronized (System.out) {
-            System.out.println("[Info] "+msg);
+            System.out.println("[Info] " + msg);
         }
     }
 }

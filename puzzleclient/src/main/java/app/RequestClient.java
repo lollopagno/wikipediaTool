@@ -7,6 +7,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class RequestClient {
@@ -78,7 +79,7 @@ public class RequestClient {
 
             @Override
             public void onResponse(Call<ReturnMessage> call, Response<ReturnMessage> response) {
-                if (response.isSuccessful() && response.body() != null) {
+                if (response.isSuccessful() && response.body() != null && action != null) {
                     action.accept(response.body().getMessage());
                 }
             }
@@ -149,8 +150,6 @@ public class RequestClient {
      * @param action lambda-function
      */
     public void releaseBox(String name, Integer id, Consumer<String> action){
-
-
         Call<ReturnMessage> call = RemoteServices.getInstance().getPuzzleService().release(name,id);
         call.enqueue(new Callback<>() {
 

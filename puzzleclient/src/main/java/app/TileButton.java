@@ -1,19 +1,10 @@
 package app;
 
-import java.awt.Color;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicReference;
-
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.text.StyledEditorKit;
+import javax.swing.*;
+import java.awt.*;
 
 @SuppressWarnings("serial")
-public class TileButton extends JButton{
+public class TileButton extends JButton {
 
 	private final RequestClient requestClient;
 	private final String username;
@@ -31,25 +22,23 @@ public class TileButton extends JButton{
 	}
 
 	// Action for button red
-	public void actionButtonRed(){
-
+	public void actionButtonRed() {
 		// Check state box
 
 		// ATTENZIONE NON ELIMINARE IL CONTROLLO DEL IF
 		// --> Questo controllo alla fine può essere eliminato <--
 		//if (checkStateBox()) {
 
-			setBorder(BorderFactory.createLineBorder(Color.gray));
-			setColor(Color.gray);
+		setBorder(BorderFactory.createLineBorder(Color.gray));
+		setColor(Color.gray);
 
-			// Deseleziono la casella presa
-			releaseBox();
+		// Deseleziono la casella presa
+		releaseBox();
 		//}
 	}
 
 	// Action for button gray
-	public void actionButtonGray(){
-
+	public void actionButtonGray() {
 		setBorder(BorderFactory.createLineBorder(Color.red));
 		setColor(Color.red);
 
@@ -58,46 +47,51 @@ public class TileButton extends JButton{
 	}
 
 	// Implement API PUT takeBox
-	private void takeBox(){
-
-		requestClient.takeBox(username, this.tile.getOriginalPosition(), msg ->{
-			log("Take box id: "+this.tile.getOriginalPosition());
-			log(msg+"");
+	private void takeBox() {
+		requestClient.takeBox(username, this.tile.getOriginalPosition(), msg -> {
+			log("Take box id: " + this.tile.getOriginalPosition());
+			log(msg + "");
 		});
 	}
 
 	// Implement API GET getState
-	private boolean checkStateBox(){
-
+	private boolean checkStateBox() {
 		requestClient.checkStateBox(this.username, this.tile.getOriginalPosition(), msg -> {
-			log("Check state box id: "+tile.getOriginalPosition());
+			log("Check state box id: " + tile.getOriginalPosition());
 			setStateBox(msg);
 		});
 		return getStateBox();
 	}
 
 	// Implement API PUT release
-	private void releaseBox(){
-
-		requestClient.releaseBox(username, this.tile.getOriginalPosition(), msg ->{
-			log("Release, position box id: "+this.tile.getOriginalPosition());
-			log(msg+"");
+	private void releaseBox() {
+		requestClient.releaseBox(username, this.tile.getOriginalPosition(), msg -> {
+			log("Release, position box id: " + this.tile.getOriginalPosition());
+			log(msg + "");
 		});
 	}
 
 	// Metodi get/set: colore del bottone
-	public void setColor(Color color){ this.color = color;}
-	public Color getColor(){ return this.color;}
+	public void setColor(Color color) {
+		this.color = color;
+	}
+
+	public Color getColor() {
+		return this.color;
+	}
 
 	// Metodi get/set: stato (true, false) del box del risultato dell'API GET getState
-	private void setStateBox(String result){
+	private void setStateBox(String result) {
 		this.stateBox = result;
 	}
-	private Boolean getStateBox(){ return Boolean.parseBoolean(this.stateBox);}
 
-	private void log(String msg){
-		synchronized (System.out){
-			System.out.println("[Info] "+msg);
+	private Boolean getStateBox() {
+		return Boolean.parseBoolean(this.stateBox);
+	}
+
+	private void log(String msg) {
+		synchronized (System.out) {
+			System.out.println("[Info] " + msg);
 		}
 	}
 }

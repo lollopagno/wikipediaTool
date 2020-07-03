@@ -68,7 +68,8 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
     }
 
     @Override
-    public void keyTyped(KeyEvent e) {}
+    public void keyTyped(KeyEvent e) {
+    }
 
     @Override
     public void keyPressed(KeyEvent e) {
@@ -78,16 +79,18 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
     }
 
     @Override
-    public void keyReleased(KeyEvent e) {}
+    public void keyReleased(KeyEvent e) {
+    }
 
     /**
      * RegisterUser button action
+     *
      * @param username user name
      */
     private void registerUser(String username) {
 
         this.client.addPlayer(username, msg -> {
-            log(msg+": "+username);
+            log(msg + ": " + username);
 
             // Update view
             this.updateListUser();
@@ -110,16 +113,17 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
 
     /**
      * Execution job: update color box
+     *
      * @param username name user
      */
-    private void updateColorBox(String username){
+    private void updateColorBox(String username) {
         this.jobColor.scheduleAtFixedRate(() -> updateCardColor(username), 0, 5000, TimeUnit.MILLISECONDS);
     }
 
     /**
      * Create table with all users
      */
-    private void updateView(){
+    private void updateView() {
 
         // Get list user
         this.client.allUsers(list -> {
@@ -135,10 +139,8 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
             });
 
             // Model for create JTable not editable
-            TableModel model = new DefaultTableModel(rowData, this.columnTable)
-            {
-                public boolean isCellEditable(int row, int column)
-                {
+            TableModel model = new DefaultTableModel(rowData, this.columnTable) {
+                public boolean isCellEditable(int row, int column) {
                     return false;
                 }
             };
@@ -162,36 +164,32 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
 
     /**
      * Update color border box
+     *
      * @param username name user
      */
-    private void updateCardColor(String username){
-
+    private void updateCardColor(String username) {
         log("Update color box every 5s");
 
-        this.client.mappingBox(tiles -> {
+        this.client.mappingBox(tiles -> tiles.forEach(tile -> {
 
-            tiles.forEach(tile -> {
+            this.client.checkStateBox(username, tile.getOriginalPosition(), msg -> {
 
-                this.client.checkStateBox(username, tile.getOriginalPosition(), msg -> {
+                if (Boolean.parseBoolean(msg)) {
+                    SwingUtilities.invokeLater(() -> {
 
-                    if(Boolean.parseBoolean(msg)){
-                        SwingUtilities.invokeLater(() -> {
-
-                            // TODO capire come riprendere il bottone di quel tile da cambiare
-                            //log("Box is colored yellow");
-                            //final TileButton btn = new TileButton(tile, this.client, username);
-                            //btn.setBorder(BorderFactory.createLineBorder(Color.yellow));
-                        });
-                    }
-                });
+                        // TODO capire come riprendere il bottone di quel tile da cambiare
+                        //log("Box is colored yellow");
+                        //final TileButton btn = new TileButton(tile, this.client, username);
+                        //btn.setBorder(BorderFactory.createLineBorder(Color.yellow));
+                    });
+                }
             });
-        });
+        }));
     }
 
-    private void log(String msg){
+    private void log(String msg) {
         synchronized (System.out) {
-            System.out.println("[Info] "+msg);
+            System.out.println("[Info] " + msg);
         }
     }
 }
-
