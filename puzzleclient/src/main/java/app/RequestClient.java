@@ -9,19 +9,20 @@ import retrofit2.Response;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 public class RequestClient {
+    private static RequestClient singleton;
+
+    public static RequestClient instance() {
+        if (singleton == null)
+            singleton = new RequestClient();
+        return singleton;
+    }
+
+    private RequestClient() {}
 
     final String imagePath = "src/main/java/app/bletchley-park-mansion.jpg";
-    private final int x;
-    private final int y;
-
-    public RequestClient(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
 
     /**
      * HTTP POST for register user name
@@ -240,7 +241,7 @@ public class RequestClient {
      * Start puzzle game
      */
     public void startGame(String username) {
-        final PuzzleBoard puzzle = new PuzzleBoard(this.x, this.y, this.imagePath, username);
+        final PuzzleBoard puzzle = new PuzzleBoard(this.imagePath, username);
         puzzle.setVisible(true);
     }
 

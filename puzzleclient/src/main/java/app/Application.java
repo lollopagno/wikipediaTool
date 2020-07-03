@@ -7,7 +7,7 @@ public class Application {
 	public static void main(final String[] args) {
 
 		// View
-		JFrame registerUser = new RegisterView(3, 5);
+		JFrame registerUser = new RegisterView();
 		registerUser.setVisible(true);
 	}
 }

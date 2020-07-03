@@ -20,10 +20,10 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
 
     private final ScheduledExecutorService job = Executors.newSingleThreadScheduledExecutor();
 
-    public RegisterView(int x, int y) {
+    public RegisterView() {
 
         // Client Object
-        this.client = new RequestClient(x, y);
+        this.client = RequestClient.instance();
 
         // Params View
         this.setTitle("Register User");

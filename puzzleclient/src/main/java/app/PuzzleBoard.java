@@ -33,13 +33,13 @@ public class PuzzleBoard extends JFrame {
 
     final int rows, columns;
 
-    public PuzzleBoard(final int rows, final int columns, final String imagePath, String username) {
+    public PuzzleBoard(final String imagePath, String username) {
         // Dimension Puzzle
-        this.rows = rows;
-        this.columns = columns;
+        this.rows = 3;
+        this.columns = 5;
 
         // Object Request Client
-        this.requestClient = new RequestClient(this.rows, this.columns);
+        this.requestClient = RequestClient.instance();
         this.username = username;
 
         setTitle("Puzzle");
