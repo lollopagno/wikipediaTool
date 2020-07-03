@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static java.awt.Color.yellow;
 
@@ -27,13 +28,12 @@ import static java.awt.Color.yellow;
 public class PuzzleBoard extends JFrame {
 
     private final SelectionManager selectionManager = new SelectionManager();
+    private final ScheduledExecutorService jobColor = Executors.newSingleThreadScheduledExecutor();
 
     private final RequestClient requestClient;
     private final String username;
 
     private List<Tile> tiles = new ArrayList<>();
-
-    private final ScheduledExecutorService jobColor = Executors.newSingleThreadScheduledExecutor();
 
     final int rows, columns;
 
@@ -111,7 +111,7 @@ public class PuzzleBoard extends JFrame {
                         }
                     }
                     paintPuzzle(board);
-                    updateCardColor(username);
+                    jobColor.scheduleAtFixedRate(() -> updateCardColor(username), 0, 5000, TimeUnit.MILLISECONDS);
                 }
             }
 
@@ -186,7 +186,6 @@ public class PuzzleBoard extends JFrame {
                                     log("Box is colored yellow");
                                     p.getButton().setBorder(BorderFactory.createLineBorder(Color.yellow));
                                 })
-
                         );
             }
         }));

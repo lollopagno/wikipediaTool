@@ -127,6 +127,7 @@ public class RequestClient {
      * @param id id box
      * @param action lambda-function
      */
+    // TODO eliminarla?
     public void checkStateBox(String name, Integer id, Consumer<String> action){
 
         Call<ReturnMessage> call = RemoteServices.getInstance().getPuzzleService().getState(name,id);
