@@ -16,7 +16,9 @@ public class TileButton extends JButton {
 		setColor(Color.gray);
 	}
 
-	public Tile getTile(){return this.tile;}
+	public Tile getTile() {
+		return this.tile;
+	}
 
 	// Metodi get/set: colore del bottone
 	public void setColor(Color color) {

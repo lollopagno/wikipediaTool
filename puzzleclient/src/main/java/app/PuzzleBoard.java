@@ -117,23 +117,13 @@ public class PuzzleBoard extends JFrame {
                 log(t.getMessage());
             }
         });
-        /*Call<String> call = RemoteServices.getInstance().getPuzzleService().getMappings();
-        call.enqueue(new Callback<>() {
-            @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                log(response.body());
-            }
-
-            @Override
-            public void onFailure(Call<String> call, Throwable t) {
-
-            }
-        });*/
-
-        log("Ok");
     }
 
-    // Paint Puzzle
+    /**
+     * Paint the puzzle made by the tile buttons.
+     *
+     * @param board The current board.
+     */
     private void paintPuzzle(final JPanel board) {
         board.removeAll();
 
@@ -158,7 +148,6 @@ public class PuzzleBoard extends JFrame {
         });
 
         pack();
-        // setLocationRelativeTo(null);
     }
 
     /**
@@ -167,38 +156,36 @@ public class PuzzleBoard extends JFrame {
      * @param username name user
      */
     private void updateCardColor(String username) {
-
         log("Update color box every 5s");
 
         this.requestClient.mappingBox(t -> tiles.forEach(tile -> {
-
             String taker = tile.getTaker();
             if (!taker.equals("") && !taker.equals(username)) {
-
                 this.tiles.stream()
-                        .filter(f -> f.getOriginalPosition() == tile.getOriginalPosition())
-                        .findFirst()
-                        .ifPresent(p ->
-
-                                SwingUtilities.invokeLater(() -> {
-
+                        .filter(f -> f.getOriginalPosition() == tile.getOriginalPosition()).findFirst()
+                        .ifPresent(p -> SwingUtilities.invokeLater(() -> {
                                     log("Box is colored yellow");
                                     p.getButton().setBorder(BorderFactory.createLineBorder(Color.yellow));
                                 })
-
                         );
             }
         }));
     }
 
-
-    // Check Solution
+    /**
+     * Check for the solution.
+     */
     private void checkSolution() {
         if (tiles.stream().allMatch(Tile::isInRightPlace)) {
             JOptionPane.showMessageDialog(this, "Puzzle Completed!", "", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
+    /**
+     * Print a string in the default log.
+     *
+     * @param msg Message to log.
+     */
     private void log(String msg) {
         synchronized (System.out) {
             System.out.println("[Info] " + msg);

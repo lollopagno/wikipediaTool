@@ -5,23 +5,29 @@ import java.awt.*;
 import static java.awt.Color.yellow;
 
 public class SelectionManager {
-
 	private boolean selectionActive = false;
 	private Tile selectedTile;
 
+	/**
+	 * Manage the selection of a tile.
+	 *
+	 * @param username      Username of the selector.
+	 * @param requestClient The request client.
+	 * @param btn           The button clicked.
+	 * @param listener      The listener of change.
+	 */
 	public void selectTile(String username, RequestClient requestClient, final TileButton btn, final Listener listener) {
-
-		// Check button is not yellow
+		// Check if button is not taken by another player.
 		if (!btn.getColor().equals(yellow)) {
-
-			// Check button is red
+			// Check if button is not already taken by the player.
 			if (btn.getColor().equals(Color.red)) {
 				requestClient.releaseBox(username, btn);
 			} else {
-				// Action for gray button
+				// Now declare the tile as taken by the player.
 				requestClient.takeBox(username, btn, took -> {
-					if(!took) return;
+					if (!took) return;
 
+					// If I have two tile taken, I swap them.
 					if (selectionActive) {
 						selectionActive = false;
 
@@ -40,6 +46,12 @@ public class SelectionManager {
 		}
 	}
 
+	/**
+	 * Swap two tiles.
+	 *
+	 * @param t1 First tile.
+	 * @param t2 Second tile.
+	 */
 	private void swap(final Tile t1, final Tile t2) {
 		int pos = t1.getCurrentPosition();
 		t1.setCurrentPosition(t2.getCurrentPosition());
@@ -50,9 +62,4 @@ public class SelectionManager {
 	interface Listener {
 		void onSwapPerformed();
 	}
-
-	public boolean getSelected() {
-		return selectionActive;
-	}
-
 }
