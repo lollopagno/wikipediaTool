@@ -32,6 +32,7 @@ public class PuzzleBoard extends JFrame {
 
     private final List<Tile> tiles = new ArrayList<>();
     final int rows, columns;
+    final JPanel board = new JPanel();
     final String imagePath = "src/main/java/app/bletchley-park-mansion.jpg";
 
     public PuzzleBoard(String username) {
@@ -47,12 +48,11 @@ public class PuzzleBoard extends JFrame {
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        JPanel board = new JPanel();
-        board.setBorder(BorderFactory.createLineBorder(Color.gray));
-        board.setLayout(new GridLayout(rows, columns, 0, 0));
-        getContentPane().add(board, BorderLayout.CENTER);
+        this.board.setBorder(BorderFactory.createLineBorder(Color.gray));
+        this.board.setLayout(new GridLayout(rows, columns, 0, 0));
+        getContentPane().add(this.board, BorderLayout.CENTER);
 
-        createTiles(imagePath, board);
+        createTiles(imagePath);
 
         // Action close view puzzle
         this.addWindowListener(new WindowAdapter() {
@@ -85,7 +85,7 @@ public class PuzzleBoard extends JFrame {
         });
     }
 
-    private void createTiles(final String imagePath, final JPanel board) {
+    private void createTiles(final String imagePath) {
         final BufferedImage image;
 
         // Load image
@@ -123,7 +123,7 @@ public class PuzzleBoard extends JFrame {
                             position++;
                         }
                     }
-                    paintPuzzle(board);
+                    paintPuzzle();
                     updateColor.scheduleAtFixedRate(() -> addColor(username), 0, 5000, TimeUnit.MILLISECONDS);
                 }
             }
@@ -137,17 +137,17 @@ public class PuzzleBoard extends JFrame {
 
      /**
      * Paint the puzzle made by the tile buttons.
-     * @param board The current board.
+     //* @param board The current board.
      */
-    private void paintPuzzle(final JPanel board) {
-        board.removeAll();
+    private void paintPuzzle() {
+        this.board.removeAll();
 
         Collections.sort(tiles);
 
         tiles.forEach(tile -> {
             final TileButton btn = new TileButton(tile);
             tile.setButton(btn);
-            board.add(btn);
+            this.board.add(btn);
 
             btn.setBorder(BorderFactory.createLineBorder(btn.getColor()));
             btn.setColor(btn.getColor());
@@ -156,7 +156,7 @@ public class PuzzleBoard extends JFrame {
             btn.addActionListener(actionListener -> {
                 // Move boxes
                 selectionManager.selectTile(this.username, this.requestClient, btn, () -> {
-                    paintPuzzle(board);
+                    paintPuzzle();
                     checkSolution();
                 });
             });
