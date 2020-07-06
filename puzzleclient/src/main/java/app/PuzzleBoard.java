@@ -134,11 +134,11 @@ public class PuzzleBoard extends JFrame {
             tile.setButton(btn);
             board.add(btn);
 
-            //btn.setBorder(BorderFactory.createLineBorder(btn.getColor()));
-            //btn.setColor(btn.getColor());
+            btn.setBorder(BorderFactory.createLineBorder(btn.getColor()));
+            btn.setColor(btn.getColor());
 
-            btn.setBorder(BorderFactory.createLineBorder(Color.gray));
-            btn.setColor(Color.gray);
+            //btn.setBorder(BorderFactory.createLineBorder(Color.gray));
+            //btn.setColor(Color.gray);
 
             // Action Button puzzle
             btn.addActionListener(actionListener -> {
