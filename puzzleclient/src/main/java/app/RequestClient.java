@@ -114,7 +114,6 @@ public class RequestClient {
                     button.setColor(Color.red);
                     button.getTile().setTaker(name);
 
-                    log("Take box id: " + button.getTile().getOriginalPosition());
                     log(response.body().getMessage() + "");
 
                     consumer.accept(response.body().getResult());
@@ -135,6 +134,7 @@ public class RequestClient {
      * @param id     id box
      * @param action lambda-function
      */
+    // TODO lo buttiamo?
     public void checkStateBox(String name, Integer id, Consumer<String> action) {
 
         Call<ReturnMessage> call = RemoteServices.getInstance().getPuzzleService().getState(name, id);
@@ -161,7 +161,7 @@ public class RequestClient {
     /**
      * HTTP PUT for release a boxe
      *
-     * @param name   name user
+     * @param name name user
      * @param button tile button
      */
     public void releaseBox(String name, TileButton button) {
@@ -175,7 +175,6 @@ public class RequestClient {
                     button.setBorder(BorderFactory.createLineBorder(Color.gray));
                     button.setColor(Color.gray);
 
-                    log("Release, position box id: " + button.getTile().getOriginalPosition());
                     log(response.body().getMessage() + "");
                 }
             }
@@ -208,6 +207,8 @@ public class RequestClient {
                 log(t.getMessage());
             }
         });
+
+        // TODO lo buttiamo?
         /*Call<String> call = RemoteServices.getInstance().getPuzzleService().getMappings();
         call.enqueue(new Callback<>() {
             @Override
@@ -231,7 +232,7 @@ public class RequestClient {
      * @param action lambda-function
      */
     public void moveBox(String name, Integer id, Integer id2, Consumer<Boolean> action) {
-        log("Move id: " + id + " with id: " + id2);
+
         Call<ReturnMessage> call = RemoteServices.getInstance().getPuzzleService().move(name, id, id2);
         call.enqueue(new Callback<>() {
 

@@ -29,9 +29,4 @@ public class TileButton extends JButton {
 		return this.color;
 	}
 
-	private void log(String msg) {
-		synchronized (System.out) {
-			System.out.println("[Info] " + msg);
-		}
-	}
 }

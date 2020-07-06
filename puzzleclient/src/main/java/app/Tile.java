@@ -36,10 +36,6 @@ public class Tile implements Comparable<Tile> {
         return this.originalPosition;
     }
 
-    public String getTaker() {
-        return this.taker;
-    }
-
     public void setTaker(String user) {
         this.taker = user;
     }

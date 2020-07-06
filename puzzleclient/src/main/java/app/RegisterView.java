@@ -93,7 +93,7 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
             final PuzzleBoard puzzle = new PuzzleBoard(username);
             puzzle.setVisible(true);
 
-            this.job.scheduleAtFixedRate(this::updateView, 0, 30000, TimeUnit.MILLISECONDS);
+            this.job.scheduleAtFixedRate(this::updateView, 0, 5000, TimeUnit.MILLISECONDS);
         });
     }
 
@@ -105,7 +105,7 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
         this.client.allUsers(list -> {
             Vector<Vector<String>> rowData = new Vector<>();
 
-            log("Update table in view every 30s");
+            log("Update user list in view every 5s");
 
             // Add user into vector
             list.forEach(user -> {

@@ -17,11 +17,13 @@ public class SelectionManager {
 	 * @param listener      The listener of change.
 	 */
 	public void selectTile(String username, RequestClient requestClient, final TileButton btn, final Listener listener) {
+
 		// Check if button is not taken by another player.
 		if (!btn.getColor().equals(yellow)) {
 			// Check if button is not already taken by the player.
 			if (btn.getColor().equals(Color.red)) {
 				requestClient.releaseBox(username, btn);
+				this.selectionActive = false;
 			} else {
 				// Now declare the tile as taken by the player.
 				requestClient.takeBox(username, btn, took -> {
@@ -48,7 +50,6 @@ public class SelectionManager {
 
 	/**
 	 * Swap two tiles.
-	 *
 	 * @param t1 First tile.
 	 * @param t2 Second tile.
 	 */

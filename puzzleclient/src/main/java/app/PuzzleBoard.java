@@ -2,7 +2,6 @@ package app;
 
 import app.remoteservices.Box;
 import app.remoteservices.RemoteServices;
-import app.remoteservices.ReturnMessage;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -26,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("serial")
 public class PuzzleBoard extends JFrame {
     private final SelectionManager selectionManager = new SelectionManager();
-    private final ScheduledExecutorService jobColor = Executors.newSingleThreadScheduledExecutor();
+    private final ScheduledExecutorService addColor = Executors.newSingleThreadScheduledExecutor();
 
     private final RequestClient requestClient;
     private final String username;
@@ -61,20 +60,21 @@ public class PuzzleBoard extends JFrame {
             @Override
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
-                //TODO: RELEASE SE PRESENTE UNA TAKER DI QUEL PLAYER ALLA CHIUSURA ESECUZIONE
-                /*log("CONCLUSIONE--> PROCEDO CON RELEASE SE PRESENTE");
 
+                // Release box
                 requestClient.mappingBox(t-> t.forEach(tile -> {
                     String taker = tile.getTaker();
+
                     if(taker.equals(username)) {
-                        this.tiles.stream()
+                        tiles.stream()
                                 .filter(f -> f.getOriginalPosition() == tile.getOriginalPosition()).findFirst()
                                 .ifPresent(p -> SwingUtilities.invokeLater(() -> {
-                                            this.requestClient.releaseBox(username, p.getButton());
-                                        })
-                                );
+                                            requestClient.releaseBox(username, p.getButton());
+                                }));
                     }
-                }));*/
+                }));
+
+                // Delete user from user list server
                 requestClient.deleteUser(username);
             }
 
@@ -124,7 +124,7 @@ public class PuzzleBoard extends JFrame {
                         }
                     }
                     paintPuzzle(board);
-                    jobColor.scheduleAtFixedRate(() -> updateCardColor(username), 0, 1000, TimeUnit.MILLISECONDS);
+                    addColor.scheduleAtFixedRate(() -> addColor(username), 0, 1000, TimeUnit.MILLISECONDS);
                 }
             }
 
@@ -137,7 +137,6 @@ public class PuzzleBoard extends JFrame {
 
     /**
      * Paint the puzzle made by the tile buttons.
-     *
      * @param board The current board.
      */
     private void paintPuzzle(final JPanel board) {
@@ -152,9 +151,6 @@ public class PuzzleBoard extends JFrame {
 
             btn.setBorder(BorderFactory.createLineBorder(btn.getColor()));
             btn.setColor(btn.getColor());
-
-            //btn.setBorder(BorderFactory.createLineBorder(Color.gray));
-            //btn.setColor(Color.gray);
 
             // Action Button puzzle
             btn.addActionListener(actionListener -> {
@@ -171,23 +167,32 @@ public class PuzzleBoard extends JFrame {
 
     /**
      * Update color border box
-     *
      * @param username name user
      */
-    private void updateCardColor(String username) {
+    private void addColor(String username) {
         log("Update color box every 5s");
 
         this.requestClient.mappingBox(t-> t.forEach(tile -> {
             String taker = tile.getTaker();
+
+            // If color button is gray and user take a box --> color box yellow
             if (!taker.equals("") && !taker.equals(username)) {
                 this.tiles.stream()
                         .filter(f -> f.getOriginalPosition() == tile.getOriginalPosition()).findFirst()
                         .ifPresent(p -> SwingUtilities.invokeLater(() -> {
-                                    log("Box is colored yellow");
                                     p.getButton().setColor(Color.yellow);
                                     p.getButton().setBorder(BorderFactory.createLineBorder(Color.yellow));
                                 })
                         );
+
+            // If color button is yellow and user release a box --> color box gray
+            }else if(taker.equals("")){
+                this.tiles.stream()
+                        .filter(f -> f.getOriginalPosition() == tile.getOriginalPosition() && f.getButton().getColor() == Color.yellow).findFirst()
+                        .ifPresent(p -> SwingUtilities.invokeLater(() -> {
+                            p.getButton().setColor(Color.gray);
+                            p.getButton().setBorder(BorderFactory.createLineBorder(Color.gray));
+                        }));
             }
         }));
     }
@@ -203,7 +208,6 @@ public class PuzzleBoard extends JFrame {
 
     /**
      * Print a string in the default log.
-     *
      * @param msg Message to log.
      */
     private void log(String msg) {
