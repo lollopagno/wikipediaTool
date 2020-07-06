@@ -58,7 +58,6 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
                 job.shutdown();
             }
         });
-
     }
 
     @Override
@@ -105,7 +104,7 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
         this.client.allUsers(list -> {
             Vector<Vector<String>> rowData = new Vector<>();
 
-            log("Update user list in view every 5s");
+            log("Update user list every 5s");
 
             // Add user into vector
             list.forEach(user -> {

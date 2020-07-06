@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("serial")
 public class PuzzleBoard extends JFrame {
     private final SelectionManager selectionManager = new SelectionManager();
-    private final ScheduledExecutorService addColor = Executors.newSingleThreadScheduledExecutor();
+    private final ScheduledExecutorService updateColor = Executors.newSingleThreadScheduledExecutor();
 
     private final RequestClient requestClient;
     private final String username;
@@ -43,7 +43,7 @@ public class PuzzleBoard extends JFrame {
         this.requestClient = RequestClient.instance();
         this.username = username;
 
-        setTitle("Puzzle");
+        setTitle("Puzzle "+username);
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -124,7 +124,7 @@ public class PuzzleBoard extends JFrame {
                         }
                     }
                     paintPuzzle(board);
-                    addColor.scheduleAtFixedRate(() -> addColor(username), 0, 1000, TimeUnit.MILLISECONDS);
+                    updateColor.scheduleAtFixedRate(() -> addColor(username), 0, 5000, TimeUnit.MILLISECONDS);
                 }
             }
 
@@ -135,7 +135,7 @@ public class PuzzleBoard extends JFrame {
         });
     }
 
-    /**
+     /**
      * Paint the puzzle made by the tile buttons.
      * @param board The current board.
      */
@@ -162,8 +162,8 @@ public class PuzzleBoard extends JFrame {
             });
         });
         pack();
-
     }
+
 
     /**
      * Update color border box

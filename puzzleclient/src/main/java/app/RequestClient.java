@@ -26,7 +26,6 @@ public class RequestClient {
 
     /**
      * HTTP POST for register user name
-     *
      * @param name   user name
      * @param action lambda-function
      */
@@ -51,7 +50,6 @@ public class RequestClient {
 
     /**
      * HTTP GET for extract list user
-     *
      * @param action lambda-function
      */
     public void allUsers(Consumer<List<String>> action) {
@@ -74,7 +72,6 @@ public class RequestClient {
 
     /**
      * HTTP DELETE for delete user from server
-     *
      * @param name user name
      */
     public void deleteUser(String name) {
@@ -97,7 +94,6 @@ public class RequestClient {
 
     /**
      * HTTP PUT for take a boxe
-     *
      * @param name   user name
      * @param button tile button
      */
@@ -114,8 +110,6 @@ public class RequestClient {
                     button.setColor(Color.red);
                     button.getTile().setTaker(name);
 
-                    log(response.body().getMessage() + "");
-
                     consumer.accept(response.body().getResult());
                 }
             }
@@ -128,39 +122,7 @@ public class RequestClient {
     }
 
     /**
-     * HTTP GET for get state of specific boxe
-     *
-     * @param name   name user
-     * @param id     id box
-     * @param action lambda-function
-     */
-    // TODO lo buttiamo?
-    public void checkStateBox(String name, Integer id, Consumer<String> action) {
-
-        Call<ReturnMessage> call = RemoteServices.getInstance().getPuzzleService().getState(name, id);
-        call.enqueue(new Callback<>() {
-
-            @Override
-            public void onResponse(Call<ReturnMessage> call, Response<ReturnMessage> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    if (response.body().getMessage().equals("true")) {
-                        action.accept("true");
-                    } else {
-                        action.accept("false");
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ReturnMessage> call, Throwable t) {
-                log(t.getMessage());
-            }
-        });
-    }
-
-    /**
      * HTTP PUT for release a boxe
-     *
      * @param name name user
      * @param button tile button
      */
@@ -174,8 +136,6 @@ public class RequestClient {
 
                     button.setBorder(BorderFactory.createLineBorder(Color.gray));
                     button.setColor(Color.gray);
-
-                    log(response.body().getMessage() + "");
                 }
             }
 
@@ -188,7 +148,6 @@ public class RequestClient {
 
     /**
      * HTTP GET for get list tile
-     *
      * @param action lambda-function
      */
     public void mappingBox(Consumer<Set<app.remoteservices.Box>> action) {
@@ -207,25 +166,10 @@ public class RequestClient {
                 log(t.getMessage());
             }
         });
-
-        // TODO lo buttiamo?
-        /*Call<String> call = RemoteServices.getInstance().getPuzzleService().getMappings();
-        call.enqueue(new Callback<>() {
-            @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                log(response.body());
-            }
-
-            @Override
-            public void onFailure(Call<String> call, Throwable t) {
-
-            }
-        });*/
     }
 
     /**
      * HTTP PUT for move the box
-     *
      * @param name   name user
      * @param id     initial position
      * @param id2    final position
