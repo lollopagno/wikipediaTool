@@ -108,7 +108,7 @@ public class PuzzleBoard extends JFrame {
                         }
                     }
                     paintPuzzle(board);
-                    jobColor.scheduleAtFixedRate(() -> updateCardColor(username), 0, 5000, TimeUnit.MILLISECONDS);
+                    jobColor.scheduleAtFixedRate(() -> updateCardColor(username), 0, 1000, TimeUnit.MILLISECONDS);
                 }
             }
 

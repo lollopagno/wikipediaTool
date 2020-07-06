@@ -28,7 +28,7 @@ public class SelectionManager {
 					if (!took) return;
 
 					// If I have two tile taken, I swap them.
-					if (selectionActive) {
+					if ((selectionActive) && (!selectedTile.getButton().getColor().equals(yellow))) {
 						selectionActive = false;
 
 						requestClient.moveBox(username, selectedTile.getOriginalPosition(), btn.getTile().getOriginalPosition(), moved -> {
