@@ -2,6 +2,7 @@ package app;
 
 import app.remoteservices.Box;
 import app.remoteservices.RemoteServices;
+import app.remoteservices.ReturnMessage;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -56,9 +57,24 @@ public class PuzzleBoard extends JFrame {
 
         // Action close view puzzle
         this.addWindowListener(new WindowAdapter() {
+
             @Override
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
+                //TODO: RELEASE SE PRESENTE UNA TAKER DI QUEL PLAYER ALLA CHIUSURA ESECUZIONE
+                /*log("CONCLUSIONE--> PROCEDO CON RELEASE SE PRESENTE");
+
+                requestClient.mappingBox(t-> t.forEach(tile -> {
+                    String taker = tile.getTaker();
+                    if(taker.equals(username)) {
+                        this.tiles.stream()
+                                .filter(f -> f.getOriginalPosition() == tile.getOriginalPosition()).findFirst()
+                                .ifPresent(p -> SwingUtilities.invokeLater(() -> {
+                                            this.requestClient.releaseBox(username, p.getButton());
+                                        })
+                                );
+                    }
+                }));*/
                 requestClient.deleteUser(username);
             }
 
@@ -149,8 +165,8 @@ public class PuzzleBoard extends JFrame {
                 });
             });
         });
-
         pack();
+
     }
 
     /**
