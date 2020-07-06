@@ -168,6 +168,7 @@ public class PuzzleBoard extends JFrame {
                         .filter(f -> f.getOriginalPosition() == tile.getOriginalPosition()).findFirst()
                         .ifPresent(p -> SwingUtilities.invokeLater(() -> {
                                     log("Box is colored yellow");
+                                    p.getButton().setColor(Color.yellow);
                                     p.getButton().setBorder(BorderFactory.createLineBorder(Color.yellow));
                                 })
                         );
