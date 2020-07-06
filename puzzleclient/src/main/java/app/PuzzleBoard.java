@@ -108,7 +108,7 @@ public class PuzzleBoard extends JFrame {
                         }
                     }
                     paintPuzzle(board);
-                    jobColor.scheduleAtFixedRate(() -> updateCardColor(username), 0, 30000, TimeUnit.MILLISECONDS);
+                    jobColor.scheduleAtFixedRate(() -> updateCardColor(username), 0, 5000, TimeUnit.MILLISECONDS);
                 }
             }
 
@@ -134,8 +134,11 @@ public class PuzzleBoard extends JFrame {
             tile.setButton(btn);
             board.add(btn);
 
-            btn.setBorder(BorderFactory.createLineBorder(btn.getColor()));
-            btn.setColor(btn.getColor());
+            //btn.setBorder(BorderFactory.createLineBorder(btn.getColor()));
+            //btn.setColor(btn.getColor());
+
+            btn.setBorder(BorderFactory.createLineBorder(Color.gray));
+            btn.setColor(Color.gray);
 
             // Action Button puzzle
             btn.addActionListener(actionListener -> {
@@ -158,7 +161,7 @@ public class PuzzleBoard extends JFrame {
     private void updateCardColor(String username) {
         log("Update color box every 5s");
 
-        this.requestClient.mappingBox(t -> tiles.forEach(tile -> {
+        this.requestClient.mappingBox(t-> t.forEach(tile -> {
             String taker = tile.getTaker();
             if (!taker.equals("") && !taker.equals(username)) {
                 this.tiles.stream()
