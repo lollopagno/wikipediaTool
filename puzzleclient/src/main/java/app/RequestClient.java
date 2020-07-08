@@ -194,6 +194,25 @@ public class RequestClient {
         });
     }
 
+    /**
+     * HTTP PUT for set position default
+     */
+    public void defaultPositionBox(){
+
+        Call<ReturnMessage> call = RemoteServices.getInstance().getPuzzleService().defaultPosition();
+        call.enqueue(new Callback<>() {
+
+            @Override
+            public void onResponse(Call<ReturnMessage> call, Response<ReturnMessage> response) {}
+
+            @Override
+            public void onFailure(Call<ReturnMessage> call, Throwable t) {
+                log(t.getMessage());
+            }
+        });
+
+    }
+
     private void log(String msg) {
         synchronized (System.out) {
             System.out.println("[Info] " + msg);

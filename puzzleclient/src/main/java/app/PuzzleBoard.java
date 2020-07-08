@@ -124,7 +124,7 @@ public class PuzzleBoard extends JFrame {
                         }
                     }
                     paintPuzzle();
-                    updateColor.scheduleAtFixedRate(() -> addColor(username), 0, 5000, TimeUnit.MILLISECONDS);
+                    updateColor.scheduleAtFixedRate(() -> addColor(username), 0, 1500, TimeUnit.MILLISECONDS);
                 }
             }
 
@@ -137,14 +137,13 @@ public class PuzzleBoard extends JFrame {
 
      /**
      * Paint the puzzle made by the tile buttons.
-     //* @param board The current board.
      */
     private void paintPuzzle() {
         this.board.removeAll();
 
-        Collections.sort(tiles);
+        Collections.sort(this.tiles);
 
-        tiles.forEach(tile -> {
+        this.tiles.forEach(tile -> {
             final TileButton btn = new TileButton(tile);
             tile.setButton(btn);
             this.board.add(btn);
@@ -170,7 +169,7 @@ public class PuzzleBoard extends JFrame {
      * @param username name user
      */
     private void addColor(String username) {
-        log("Update color box every 5s");
+        log("Update color box every 1,5s");
 
         this.requestClient.mappingBox(t-> t.forEach(tile -> {
             String taker = tile.getTaker();
@@ -201,8 +200,10 @@ public class PuzzleBoard extends JFrame {
      * Check for the solution.
      */
     private void checkSolution() {
-        if (tiles.stream().allMatch(Tile::isInRightPlace)) {
+        if (this.tiles.stream().allMatch(Tile::isInRightPlace)) {
             JOptionPane.showMessageDialog(this, "Puzzle Completed!", "", JOptionPane.INFORMATION_MESSAGE);
+            // TODO set position default box
+            //this.requestClient.defaultPositionBox();
         }
     }
 

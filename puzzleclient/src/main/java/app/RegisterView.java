@@ -27,7 +27,7 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
 
         // Params View
         this.setTitle("Register User");
-        this.setSize(500, 500);
+        this.setSize(500, 300);
         this.setLayout(new BorderLayout());
 
         // Button Register User
@@ -40,7 +40,7 @@ public class RegisterView extends JFrame implements ActionListener, KeyListener 
 
         // Control Panel
         this.controlPanel = new JPanel(new FlowLayout());
-        this.controlPanel.setSize(500, (int) (500 * 0.1));
+        this.controlPanel.setSize(500, (int) (300 * 0.1));
 
         this.controlPanel.add(registerUser);
         this.controlPanel.add(this.username);

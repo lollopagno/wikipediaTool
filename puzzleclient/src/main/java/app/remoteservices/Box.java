@@ -26,10 +26,6 @@ public class Box {
         this.taker = taker;
     }
 
-    public boolean isTaken() {
-        return taken;
-    }
-
     public int getOriginalPosition() {
         return originalPosition;
     }
@@ -42,7 +38,4 @@ public class Box {
         return taker;
     }
 
-    public boolean isInRightPlace() {
-        return inRightPlace;
-    }
 }

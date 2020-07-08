@@ -25,6 +25,7 @@ public interface Puzzle {
     @GET("/mapping")
     Call<Set<Box>> getMappings();
 
-    @GET("/state")
-    Call<String> getGameState();
+    @PUT("/defaultPosition")
+    Call<ReturnMessage> defaultPosition();
+
 }
