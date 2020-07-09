@@ -197,9 +197,9 @@ public class RequestClient {
     /**
      * HTTP PUT for set position default
      */
-    public void defaultPositionBox(){
+    public void gameReset(){
 
-        Call<ReturnMessage> call = RemoteServices.getInstance().getPuzzleService().defaultPosition();
+        Call<ReturnMessage> call = RemoteServices.getInstance().getPuzzleService().gameReset();
         call.enqueue(new Callback<>() {
 
             @Override
@@ -210,7 +210,6 @@ public class RequestClient {
                 log(t.getMessage());
             }
         });
-
     }
 
     private void log(String msg) {

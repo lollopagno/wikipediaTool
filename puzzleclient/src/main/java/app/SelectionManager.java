@@ -59,6 +59,7 @@ public class SelectionManager {
 		int pos = t1.getCurrentPosition();
 		t1.setCurrentPosition(t2.getCurrentPosition());
 		t2.setCurrentPosition(pos);
+
 	}
 
 	@FunctionalInterface
