@@ -218,6 +218,7 @@ public class PuzzleBoard extends JFrame {
                         }
                     });
         }));
+        checkSolution();
     }
 
     /**
