@@ -217,14 +217,16 @@ public class PuzzleBoard extends JFrame {
                             });
                         }
                     });
-            terminate();
+            checkSolution();
         }));
     }
 
     /**
      * Check for the solution.
      */
-    private void terminate() {
+
+    /* TODO TERMINATE--------*/
+    /*private void terminate() {
 
         if (this.tiles.stream().allMatch(Tile::isInRightPlace)) {
             updateColor.shutdown();
@@ -232,7 +234,7 @@ public class PuzzleBoard extends JFrame {
             JOptionPane.showMessageDialog(this, "Puzzle Completed!", "", JOptionPane.INFORMATION_MESSAGE);
 
         }
-    }
+    }*/
     private void checkSolution() {
 
         if (this.tiles.stream().allMatch(Tile::isInRightPlace)) {
