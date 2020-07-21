@@ -23,7 +23,6 @@ public class RequestClient {
 
     private RequestClient() {}
 
-
     /**
      * HTTP POST for register user name
      * @param name   user name
@@ -197,17 +196,20 @@ public class RequestClient {
     /**
      * HTTP PUT for set position default
      */
-    public void gameReset(){
+    public void gameReset(Consumer<Boolean> action){
 
         Call<ReturnMessage> call = RemoteServices.getInstance().getPuzzleService().gameReset();
         call.enqueue(new Callback<>() {
 
             @Override
-            public void onResponse(Call<ReturnMessage> call, Response<ReturnMessage> response) {}
+            public void onResponse(Call<ReturnMessage> call, Response<ReturnMessage> response) {
+                action.accept(true);
+            }
 
             @Override
             public void onFailure(Call<ReturnMessage> call, Throwable t) {
-                log(t.getMessage());
+                // TODO Why failure??
+                action.accept(true);
             }
         });
     }
