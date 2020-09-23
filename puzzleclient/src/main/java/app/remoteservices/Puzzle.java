@@ -9,7 +9,6 @@ import retrofit2.http.Path;
 import java.util.Set;
 
 public interface Puzzle {
-
     @PUT("/take/{player}/{id}")
     Call<ReturnMessage> take(@Path("player") final String player, @Path("id") final int id);
 
@@ -27,5 +26,4 @@ public interface Puzzle {
 
     @DELETE("/game/reset")
     Call<ReturnMessage> gameReset();
-
 }

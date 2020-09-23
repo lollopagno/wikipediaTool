@@ -21,18 +21,18 @@ public class RequestClient {
         return singleton;
     }
 
-    private RequestClient() {}
+    private RequestClient() {
+    }
 
     /**
-     * HTTP POST for register user name
-     * @param name   user name
-     * @param action lambda-function
+     * HTTP POST for register user name.
+     *
+     * @param name   User name.
+     * @param action Lambda-function.
      */
     public void addPlayer(String name, Consumer<String> action) {
-
         Call<ReturnMessage> add = RemoteServices.getInstance().getPlayersService().addPlayer(name);
         add.enqueue(new Callback<>() {
-
             @Override
             public void onResponse(Call<ReturnMessage> call, Response<ReturnMessage> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -48,13 +48,13 @@ public class RequestClient {
     }
 
     /**
-     * HTTP GET for extract list user
-     * @param action lambda-function
+     * HTTP GET for extract list user.
+     *
+     * @param action Lambda-function.
      */
     public void allUsers(Consumer<List<String>> action) {
         Call<List<String>> res = RemoteServices.getInstance().getPlayersService().allPlayers();
         res.enqueue(new Callback<>() {
-
             @Override
             public void onResponse(Call<List<String>> call, Response<List<String>> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -70,13 +70,13 @@ public class RequestClient {
     }
 
     /**
-     * HTTP DELETE for delete user from server
-     * @param name user name
+     * HTTP DELETE for delete user from server.
+     *
+     * @param name User name.
      */
     public void deleteUser(String name) {
         Call<ReturnMessage> call = RemoteServices.getInstance().getPlayersService().deletePlayer(name);
         call.enqueue(new Callback<>() {
-
             @Override
             public void onResponse(Call<ReturnMessage> call, Response<ReturnMessage> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -92,23 +92,20 @@ public class RequestClient {
     }
 
     /**
-     * HTTP PUT for take a boxe
-     * @param name   user name
-     * @param button tile button
+     * HTTP PUT for take a boxe.
+     *
+     * @param name   User name.
+     * @param button Tile button.
      */
     public void takeBox(String name, TileButton button, Consumer<Boolean> consumer) {
-
         Call<ReturnMessage> call = RemoteServices.getInstance().getPuzzleService().take(name, button.getTile().getOriginalPosition());
         call.enqueue(new Callback<>() {
-
             @Override
             public void onResponse(Call<ReturnMessage> call, Response<ReturnMessage> response) {
                 if (response.isSuccessful() && response.body() != null) {
-
                     button.setBorder(BorderFactory.createLineBorder(Color.red));
                     button.setColor(Color.red);
                     button.getTile().setTaker(name);
-
                     consumer.accept(response.body().getResult());
                 }
             }
@@ -121,18 +118,17 @@ public class RequestClient {
     }
 
     /**
-     * HTTP PUT for release a boxe
-     * @param name name user
-     * @param button tile button
+     * HTTP PUT for release a boxe.
+     *
+     * @param name   Name user.
+     * @param button Tile button.
      */
     public void releaseBox(String name, TileButton button) {
         Call<ReturnMessage> call = RemoteServices.getInstance().getPuzzleService().release(name, button.getTile().getOriginalPosition());
         call.enqueue(new Callback<>() {
-
             @Override
             public void onResponse(Call<ReturnMessage> call, Response<ReturnMessage> response) {
                 if (response.isSuccessful() && response.body() != null) {
-
                     button.setBorder(BorderFactory.createLineBorder(Color.gray));
                     button.setColor(Color.gray);
                 }
@@ -146,13 +142,13 @@ public class RequestClient {
     }
 
     /**
-     * HTTP GET for get list tile
-     * @param action lambda-function
+     * HTTP GET for get list tile.
+     *
+     * @param action Lambda-function
      */
     public void mappingBox(Consumer<Set<app.remoteservices.Box>> action) {
         Call<Set<app.remoteservices.Box>> call = RemoteServices.getInstance().getPuzzleService().getMappings();
         call.enqueue(new Callback<>() {
-
             @Override
             public void onResponse(Call<Set<app.remoteservices.Box>> call, Response<Set<app.remoteservices.Box>> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -168,17 +164,16 @@ public class RequestClient {
     }
 
     /**
-     * HTTP PUT for move the box
-     * @param name   name user
-     * @param id     initial position
-     * @param id2    final position
-     * @param action lambda-function
+     * HTTP PUT for move the box.
+     *
+     * @param name   Name user.
+     * @param id     Initial position.
+     * @param id2    Final position.
+     * @param action Lambda-function.
      */
     public void moveBox(String name, Integer id, Integer id2, Consumer<Boolean> action) {
-
         Call<ReturnMessage> call = RemoteServices.getInstance().getPuzzleService().move(name, id, id2);
         call.enqueue(new Callback<>() {
-
             @Override
             public void onResponse(Call<ReturnMessage> call, Response<ReturnMessage> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -194,13 +189,11 @@ public class RequestClient {
     }
 
     /**
-     * HTTP PUT for set position default
+     * HTTP PUT for set position default.
      */
-    public void gameReset(Consumer<Boolean> action){
-
+    public void gameReset(Consumer<Boolean> action) {
         Call<ReturnMessage> call = RemoteServices.getInstance().getPuzzleService().gameReset();
         call.enqueue(new Callback<>() {
-
             @Override
             public void onResponse(Call<ReturnMessage> call, Response<ReturnMessage> response) {
                 action.accept(true);

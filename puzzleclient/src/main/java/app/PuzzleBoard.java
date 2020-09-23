@@ -45,7 +45,7 @@ public class PuzzleBoard extends JFrame {
         this.requestClient = RequestClient.instance();
         this.username = username;
 
-        setTitle("Puzzle "+username);
+        setTitle("Puzzle " + username);
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -63,14 +63,14 @@ public class PuzzleBoard extends JFrame {
                 super.windowClosing(e);
 
                 // Release box
-                requestClient.mappingBox(t-> t.forEach(tile -> {
+                requestClient.mappingBox(t -> t.forEach(tile -> {
                     String taker = tile.getTaker();
 
-                    if(taker.equals(username)) {
+                    if (taker.equals(username)) {
                         tiles.stream()
                                 .filter(f -> f.getOriginalPosition() == tile.getOriginalPosition()).findFirst()
                                 .ifPresent(p -> SwingUtilities.invokeLater(() -> {
-                                            requestClient.releaseBox(username, p.getButton());
+                                    requestClient.releaseBox(username, p.getButton());
                                 }));
                     }
                 }));
@@ -137,7 +137,7 @@ public class PuzzleBoard extends JFrame {
         });
     }
 
-     /**
+    /**
      * Paint the puzzle made by the tile buttons.
      */
     private void paintPuzzle() {
@@ -169,7 +169,7 @@ public class PuzzleBoard extends JFrame {
     /**
      * Repaint puzzle by moves box made by other client
      */
-    private void repaintPuzzle(){
+    private void repaintPuzzle() {
 
         this.board.removeAll();
         Collections.sort(this.tiles);
@@ -187,12 +187,13 @@ public class PuzzleBoard extends JFrame {
 
     /**
      * Update color border box
+     *
      * @param username name user
      */
     private void addColor(String username) {
         log("Update color box every 1,5s");
 
-        this.requestClient.mappingBox(t-> t.forEach(tile -> {
+        this.requestClient.mappingBox(t -> t.forEach(tile -> {
 
             String taker = tile.getTaker();
 
@@ -209,7 +210,7 @@ public class PuzzleBoard extends JFrame {
                                 p.getButton().setBorder(BorderFactory.createLineBorder(Color.yellow));
                             });
 
-                        // If color button is yellow and user release a box --> color box gray
+                            // If color button is yellow and user release a box --> color box gray
                         } else if (taker.equals("") && p.getButton().getColor() == Color.yellow) {
                             SwingUtilities.invokeLater(() -> {
                                 p.getButton().setColor(Color.gray);
@@ -229,13 +230,13 @@ public class PuzzleBoard extends JFrame {
         if (this.tiles.stream().allMatch(Tile::isInRightPlace) && !updateColor.isShutdown()) {
 
             //Await termination executor UpdateColor
-            while(!updateColor.isShutdown()) {
+            while (!updateColor.isShutdown()) {
                 updateColor.shutdown();
             }
 
             JOptionPane.showMessageDialog(this, "Puzzle Completed!", "", JOptionPane.INFORMATION_MESSAGE);
             this.requestClient.gameReset(result -> {
-                if(result){
+                if (result) {
                     updateColor = Executors.newSingleThreadScheduledExecutor();
                     updateColor.scheduleAtFixedRate(() -> addColor(username), 0, 1500, TimeUnit.MILLISECONDS);
                 }
@@ -245,6 +246,7 @@ public class PuzzleBoard extends JFrame {
 
     /**
      * Print a string in the default log.
+     *
      * @param msg Message to log.
      */
     private void log(String msg) {
