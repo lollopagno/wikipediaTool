@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("serial")
 public class PuzzleBoard extends JFrame {
     private final SelectionManager selectionManager = new SelectionManager();
-    private final ScheduledExecutorService updateColor = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledExecutorService updateColor = Executors.newSingleThreadScheduledExecutor();
     private final ScheduledExecutorService updatePuzzle = Executors.newSingleThreadScheduledExecutor();
 
     private final RequestClient requestClient;
@@ -217,8 +217,8 @@ public class PuzzleBoard extends JFrame {
                             });
                         }
                     });
+            checkSolution();
         }));
-        checkSolution();
     }
 
     /**
@@ -226,9 +226,20 @@ public class PuzzleBoard extends JFrame {
      */
     private void checkSolution() {
 
-        if (this.tiles.stream().allMatch(Tile::isInRightPlace)) {
+        if (this.tiles.stream().allMatch(Tile::isInRightPlace) && !updateColor.isShutdown()) {
+
+            //Await termination executor UpdateColor
+            while(!updateColor.isShutdown()) {
+                updateColor.shutdown();
+            }
+
             JOptionPane.showMessageDialog(this, "Puzzle Completed!", "", JOptionPane.INFORMATION_MESSAGE);
-            this.requestClient.gameReset();
+            this.requestClient.gameReset(result -> {
+                if(result){
+                    updateColor = Executors.newSingleThreadScheduledExecutor();
+                    updateColor.scheduleAtFixedRate(() -> addColor(username), 0, 1500, TimeUnit.MILLISECONDS);
+                }
+            });
         }
     }
 
