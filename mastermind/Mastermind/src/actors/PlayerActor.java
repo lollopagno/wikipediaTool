@@ -105,7 +105,6 @@ public class PlayerActor extends MastermindActorImpl {
         Optional<PlayerInfo> info = this.others.getNextUnsolvedPlayer();
         Sequence trySequence;
         if (info.isPresent()) {
-            // Questa azione può essere molto dispendiosa, occorre eseguirla su un altro Thread.
             trySequence = info.get().extractGuess(iAm.getSequence().getSequence().size());
             if (jumpTurn) {
                 this.log("------------ out of time --------------");
