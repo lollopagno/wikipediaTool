@@ -15,7 +15,7 @@ public class PlayerInfo {
 
     private Sequence sequence;
     SequenceInfoGuess last1try, last2try;
-    Set<Sequence> allTries;
+    final Set<Sequence> allTries;
 
     public PlayerInfo(PlayerReference reference) {
         this.name = reference.getName();
@@ -94,7 +94,7 @@ public class PlayerInfo {
         return new SequenceImpl(number);
     }
 
-    private Sequence createElaborateSequence(int lenght) {
+    private Sequence createElaborateSequence(int length) {
         Sequence seq;
         int tries = 0;
         do {
@@ -104,7 +104,7 @@ public class PlayerInfo {
             List<Integer> last2 = new ArrayList<>(last2try.getNumbers().getSequence());
             int rightPlaced = last1try.getRightPlaceNumbers();
             int right = last1try.getRightNumbers();
-            List<Integer> number = new ArrayList<>(lenght);
+            List<Integer> number = new ArrayList<>(length);
             last1.forEach(e -> number.add(-1));
 
             /*
@@ -118,10 +118,10 @@ public class PlayerInfo {
             soluzione. Continuo fino a quando non ho scorso tutta la seq1.
              */
             // Generate the new random start index.
-            int s = new Random().nextInt(lenght);
+            int s = new Random().nextInt(length);
             // Start from random index. Repeat at max length times.
-            for (int i = s, j = 0; j < lenght && rightPlaced > 0; i++, j++) {
-                if (i == lenght)
+            for (int i = s, j = 0; j < length && rightPlaced > 0; i++, j++) {
+                if (i == length)
                     i = 0;
 
                 int l1 = last1.get(i);
@@ -144,10 +144,10 @@ public class PlayerInfo {
                     nuovamente tutta la seq1. Ovviamente lo devo mettere in una
                     posizione diversa, altrimenti sarebbe stato ben posizionato.
                  */
-                for (int i = r.nextInt(lenght - rightPlaced), j = 0;
-                     j < lenght && rightPlaced > 0;
+                for (int i = r.nextInt(length - rightPlaced), j = 0;
+                     j < length && rightPlaced > 0;
                      i++, j++) {
-                    if (i == lenght)
+                    if (i == length)
                         i = 0;
 
                     // Se ho già sfruttato questo numero continuo.
@@ -156,7 +156,7 @@ public class PlayerInfo {
                         continue;
 
                     // Controllo se last2 contiene il numero e nel caso lo aggiungo ai numbers.
-                    for (int x = 0; x < lenght; x++) {
+                    for (int x = 0; x < length; x++) {
                         if (last2.get(x) == m) {
                             int rn = getRandomFreeIndexNotI(number, i);
                             number.set(rn, m);
@@ -175,10 +175,10 @@ public class PlayerInfo {
             Se così non fosse, dovrei prendere dei numeri casuali dalla seq1
             per finire tutti i numeri ben posizionati.
              */
-            for (int i = r.nextInt(lenght), j = 0;
-                 j < lenght && rightPlaced > 0;
+            for (int i = r.nextInt(length), j = 0;
+                 j < length && rightPlaced > 0;
                  i++, j++) {
-                if (i == lenght)
+                if (i == length)
                     i = 0;
 
                 // Se ho già sfruttato questo numero continuo.
@@ -193,10 +193,10 @@ public class PlayerInfo {
             /*
              * Trovo tutti i numeri che ho indovinato ma mal posizionato.
              */
-            for (int i = r.nextInt(lenght), j = 0;
-                 j < lenght && right > 0;
+            for (int i = r.nextInt(length), j = 0;
+                 j < length && right > 0;
                  i++, j++) {
-                if (i == lenght)
+                if (i == length)
                     i = 0;
 
                 // Controllo che non sia un numero che ho già gestito.
@@ -206,7 +206,7 @@ public class PlayerInfo {
                 // Controllo se last2 contiene il numero e nel caso lo aggiungo ai numbers.
                 int n = last1.get(i);
                 // Controllo se last2 contiene il numero e nel caso lo aggiungo ai numbers.
-                for (int x = 0; x < lenght; x++) {
+                for (int x = 0; x < length; x++) {
                     if (last2.get(x) == n) {
                         int rn = getRandomFreeIndexNotI(number, i);
                         number.set(rn, n);
@@ -216,10 +216,10 @@ public class PlayerInfo {
                 }
             }
 
-            for (int i = r.nextInt(lenght), j = 0;
-                 j < lenght && right > 0;
+            for (int i = r.nextInt(length), j = 0;
+                 j < length && right > 0;
                  i++, j++) {
-                if (i == lenght)
+                if (i == length)
                     i = 0;
 
                 int n = last1.get(i);
@@ -234,7 +234,7 @@ public class PlayerInfo {
             /*
              * Terza esplorazione: riempio casualmente tutti i rimanenti slot.
              */
-            List<Integer> filled = fillNumberWithRand(lenght, number);
+            List<Integer> filled = fillNumberWithRand(length, number);
 
             seq = new SequenceImpl(filled);
         } while (allTries.contains(seq) && tries < 10000);

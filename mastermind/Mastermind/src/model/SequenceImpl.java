@@ -3,7 +3,7 @@ package model;
 import java.util.*;
 
 public class SequenceImpl implements Sequence {
-    List<Integer> numbers;
+    final List<Integer> numbers;
 
     public SequenceImpl(List<Integer> numbers) {
         this.numbers = numbers;
@@ -16,12 +16,6 @@ public class SequenceImpl implements Sequence {
     }
 
     @Override
-    // Setta la sequenza random scelta da un players
-    public void setSequence(List<Integer> numbers) {
-        this.numbers = numbers;
-    }
-
-    @Override
     public SequenceInfoGuess tryGuess(Sequence guess) {
         List<Integer> sequence = guess.getSequence();
         int rightPlaceNumbers = 0;
@@ -31,7 +25,7 @@ public class SequenceImpl implements Sequence {
         sequence.forEach(e -> visited.add(false));
 
         List<Integer> rights = new LinkedList<>();
-        for(int i = 0; i < 10; i++)
+        for (int i = 0; i < 10; i++)
             rights.add(0);
 
         // Verifico ogni singolo numero del guess.
@@ -57,7 +51,7 @@ public class SequenceImpl implements Sequence {
                         break;
                     }
 
-                    if(!visited.get(iPlayer)) {
+                    if (!visited.get(iPlayer)) {
                         rights.set(nGuess, rights.get(nGuess) + 1);
                         visited.set(iPlayer, true);
                     }
@@ -66,7 +60,7 @@ public class SequenceImpl implements Sequence {
         }
 
         int rightNumbers = 0;
-        for(int i = 0; i < 10; i++) {
+        for (int i = 0; i < 10; i++) {
             int elem = rights.get(i);
             rightNumbers += Math.max(elem, 0);
         }
@@ -86,16 +80,16 @@ public class SequenceImpl implements Sequence {
 
     @Override
     public int compareTo(Sequence sequence) {
-        if(numbers.size() != sequence.getSequence().size())
-            throw new IllegalArgumentException("Comparation of sequences of different size.");
+        if (numbers.size() != sequence.getSequence().size())
+            throw new IllegalArgumentException("Compare sequences of different size.");
 
-        for(int i = 0; i < numbers.size(); i++){
+        for (int i = 0; i < numbers.size(); i++) {
             int order = numbers.get(i).compareTo(sequence.getSequence().get(i));
             // If there's an order, I'll return it.
-            if(order != 0)
+            if (order != 0)
                 return order;
         }
-        
+
         // Return that the sequences are equals.
         return 0;
     }

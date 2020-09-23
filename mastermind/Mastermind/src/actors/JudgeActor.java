@@ -14,18 +14,13 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class JudgeActor extends MastermindActorImpl {
-    ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+    final ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
     ScheduledFuture future;
     private SequenceInfoJudge sequenceInfoJudge;
     private PlayersView view;
     private int allReadyMsg = 0;
     private int timeBetweenTurns = 0;
     boolean playerWon = false;
-
-    @Override
-    public void preStart() throws Exception {
-        super.preStart();
-    }
 
     @Override
     public Receive createReceive() {
@@ -133,7 +128,7 @@ public class JudgeActor extends MastermindActorImpl {
         // Create the judge instance to manage all turns between players.
         this.sequenceInfoJudge = new SequenceInfoJudge(players);
 
-        // Inizialize all players.
+        // Initialize all players.
         players.forEach(elem ->
                 elem.getRef().tell(
                         new StartMsg(

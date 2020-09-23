@@ -5,8 +5,8 @@ import akka.actor.ActorSystem;
 
 public class EndGameJudge implements Message {
 
-    private ActorSystem mySystem;
-    private ActorRef myReference;
+    private final ActorSystem mySystem;
+    private final ActorRef myReference;
 
     public EndGameJudge(ActorSystem system, ActorRef reference) {
         this.mySystem = system;

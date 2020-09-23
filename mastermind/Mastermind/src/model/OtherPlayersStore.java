@@ -1,7 +1,5 @@
 package model;
 
-import actors.messages.NumberAnswer;
-import akka.actor.ActorRef;
 import info.PlayerInfo;
 
 import java.util.LinkedList;
@@ -33,24 +31,6 @@ public class OtherPlayersStore {
                         f.getName().equals(name))
                 .findFirst()
                 .ifPresent(player -> player.setTry(guess));
-    }
-
-    /**
-     * Send the number response to all players except the sender.
-     *
-     * @param response Response to send.
-     * @param self     Actor ref to self.
-     */
-    public void notifyOtherPlayersAboutResponse(SequenceInfoGuess response, ActorRef self) {
-        others.forEach(playerInfo ->
-                playerInfo
-                        .getReference()
-                        .tell(
-                                new NumberAnswer(
-                                        response.getRightNumbers(),
-                                        response.getRightPlaceNumbers()
-                                ),
-                                self));
     }
 
     public Optional<PlayerInfo> getNextUnsolvedPlayer() {

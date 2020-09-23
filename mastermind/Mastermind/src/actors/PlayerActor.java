@@ -21,11 +21,6 @@ public class PlayerActor extends MastermindActorImpl {
     public PlayersView view;
 
     @Override
-    public void preStart() throws Exception {
-        super.preStart();
-    }
-
-    @Override
     public Receive createReceive() {
         return receiveBuilder()
                 .match(StartMsg.class, msg -> {
@@ -74,7 +69,6 @@ public class PlayerActor extends MastermindActorImpl {
                     SequenceInfoGuess response = this.iAm.getSequence().tryGuess(guess);
 
                     // Send to the sender the full response and notify others.
-                    others.notifyOtherPlayersAboutResponse(response, getSelf());
                     getSender().tell(new ReturnGuessMsg(response), getSelf());
                 })
                 .match(ReturnGuessMsg.class, msg -> {
@@ -111,7 +105,7 @@ public class PlayerActor extends MastermindActorImpl {
         Optional<PlayerInfo> info = this.others.getNextUnsolvedPlayer();
         Sequence trySequence;
         if (info.isPresent()) {
-            // Questa azione può essere molto dispendiosa, occore eseguirla su un altro Thread.
+            // Questa azione può essere molto dispendiosa, occorre eseguirla su un altro Thread.
             trySequence = info.get().extractGuess(iAm.getSequence().getSequence().size());
             if (jumpTurn) {
                 this.log("------------ out of time --------------");

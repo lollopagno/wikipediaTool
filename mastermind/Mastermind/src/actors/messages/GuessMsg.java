@@ -1,10 +1,6 @@
 package actors.messages;
 
-import info.PlayerInfo;
 import model.Sequence;
-import model.SequenceImpl;
-
-import java.util.ArrayList;
 
 public final class GuessMsg implements Message {
 

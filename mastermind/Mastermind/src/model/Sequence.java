@@ -8,18 +8,14 @@ import java.util.List;
 public interface Sequence extends Comparable<Sequence> {
     /**
      * Return the list of numbers.
-     * @return
+     *
+     * @return The Integers List.
      */
     List<Integer> getSequence();
 
     /**
-     * Set the list of numbers.
-     * @param numbers List of numbers.
-     */
-    void setSequence(List<Integer> numbers);
-
-    /**
      * Try a guess by another player.
+     *
      * @param guess The list of numbers from another player.
      * @return Info about the guess.
      */

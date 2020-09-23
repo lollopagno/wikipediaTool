@@ -11,12 +11,13 @@ public class SequenceInfoJudge {
     // Setta i players di una partita
     public SequenceInfoJudge(List<PlayerReference> players) {
         playerIndex = 0;
-        this.players = (ArrayList<PlayerReference>)((ArrayList<PlayerReference>)players).clone();
+        this.players = (ArrayList<PlayerReference>) ((ArrayList<PlayerReference>) players).clone();
     }
 
     /**
      * Get the next player. Increment the player index.
      * Calculate a new turn if needed.
+     *
      * @return Turn player info.
      */
     public PlayerReference getNextPlayer() {
@@ -50,21 +51,7 @@ public class SequenceInfoJudge {
         return this.players.size();
     }
 
-    /**
-     * Visualizza stato ordine dell'ordine dei player rispetto al turno corrente
-     * @return Array List.
-     */
-    public ArrayList<String> showTurn() {
-
-        ArrayList<String> orderPlayer = new ArrayList<>();
-
-        for (PlayerReference player : this.players) {
-            orderPlayer.add(player.getName());
-        }
-        return orderPlayer;
-    }
-
-    public ArrayList<PlayerReference> showPlayer(){
+    public ArrayList<PlayerReference> showPlayer() {
         return this.players;
     }
 }
