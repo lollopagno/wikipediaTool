@@ -67,16 +67,11 @@ public class PlayerPanel extends JPanel implements PlayerView {
             newPanel.setName(to);
             newPanel.setSequence(sequence.getNumbers());
             newPanel.setInfo(sequence.getRightPlaceNumbers(), sequence.getRightNumbers());
-            // TODO: Deve essere aggiunta anche ad un pannello visualizzabile.
             this.solutions.add(newPanel);
             this.solutionsPanel.add(newPanel);
             this.repaint();
             this.revalidate();
         }
-        /*SwingUtilities.invokeLater(() -> {
-            this.solutionsPanel.updateUI();
-            this.updateUI();
-        });*/
     }
 
     @Override

@@ -16,7 +16,7 @@ public class PlayerActor extends MastermindActorImpl {
     private ActorRef judgeActor;
     private PlayerInfo iAm;
     OtherPlayersStore others;
-    boolean jumpTurn = false, haveSend = false;
+    boolean jumpTurn = false, sent = false;
 
     public PlayersView view;
 
@@ -50,18 +50,17 @@ public class PlayerActor extends MastermindActorImpl {
                         others.addPlayer(new PlayerInfo(elem));
                     });
 
-                    // TODO: Ho modificato questo messaggio per tornare solo gli altri. Non dovrebbe succedere nulla.
                     getSender().tell(new ReadyMsg(), getSelf());
                 })
                 .match(StartTurn.class, msg -> {
                     // StartTurn dal Judge.
                     jumpTurn = false;
-                    haveSend = false;
+                    sent = false;
                     startExtraction();
                 })
                 .match(JumpTurn.class, msg -> {
                     //Tempo finito salta il turno
-                    if (haveSend)
+                    if (sent)
                         return;
 
                     this.jumpTurn = true;
@@ -79,10 +78,6 @@ public class PlayerActor extends MastermindActorImpl {
                     getSender().tell(new ReturnGuessMsg(response), getSelf());
                 })
                 .match(ReturnGuessMsg.class, msg -> {
-                    // ReturnGuessMsg dal player che risponde in funzione del guess richiesto
-                    //int rightNumbers = msg.getSequence().getRightNumbers();
-                    //int rightPlaceNumbers = msg.getSequence().getRightPlaceNumbers();
-
                     // Save the guess and notify the view.
                     String enemy = getSender().path().name();
                     this.others.saveGuess(enemy, msg.getSequence());
@@ -97,12 +92,7 @@ public class PlayerActor extends MastermindActorImpl {
                     this.judgeActor.tell(new EndTurn(), getSelf());
                 })
                 .match(NumberAnswer.class, msg -> {
-                    // NumberAnswer dal player che invia A TUTTI la risposta
-
-                    // TODO Memorizzare informazione sulla risposta ricevuta.
-                    // In verità è inutile memorizzare la risposta se non si ha anche la sequenza ad essa collegata.
-                    // Infatti la risposta del prof è stata totalmente inutile.
-
+                    // Not memorized solution.
                 }).match(EndGame.class, msg -> {
                     // Judge declare end game. Stop the player.
                     this.iAm.stopPlayer(getContext());
@@ -126,9 +116,7 @@ public class PlayerActor extends MastermindActorImpl {
             if (jumpTurn) {
                 this.log("------------ out of time --------------");
             } else {
-                haveSend = true;
-
-                // TODO: Perché viene inviato il riferimento a iAm? Quando sarebbero recuperabili tramite una getSender()?
+                sent = true;
                 info.get().getReference().tell(new GuessMsg(trySequence), getSelf());
             }
         } else {

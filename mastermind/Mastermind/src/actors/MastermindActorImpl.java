@@ -6,8 +6,8 @@ public abstract class MastermindActorImpl extends AbstractActor implements Maste
     @Override
     public abstract Receive createReceive();
 
-    protected void log(String message){
-        synchronized (System.out){
+    protected void log(String message) {
+        synchronized (System.out) {
             System.out.println("[" + this.getSelf().path().name() + "] " + message);
         }
     }

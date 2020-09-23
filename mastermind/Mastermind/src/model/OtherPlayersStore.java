@@ -12,7 +12,7 @@ public class OtherPlayersStore {
     final int length;
     private final List<PlayerInfo> others;
 
-    public OtherPlayersStore(int length){
+    public OtherPlayersStore(int length) {
         this.others = new LinkedList<>();
         this.length = length;
     }
@@ -23,7 +23,8 @@ public class OtherPlayersStore {
 
     /**
      * Save a guess made to another player.
-     * @param name Another player name.
+     *
+     * @param name  Another player name.
      * @param guess Guess tried.
      */
     public void saveGuess(String name, SequenceInfoGuess guess) {
@@ -36,10 +37,11 @@ public class OtherPlayersStore {
 
     /**
      * Send the number response to all players except the sender.
+     *
      * @param response Response to send.
-     * @param self Actor ref to self.
+     * @param self     Actor ref to self.
      */
-    public void notifyOtherPlayersAboutResponse(SequenceInfoGuess response, ActorRef self){
+    public void notifyOtherPlayersAboutResponse(SequenceInfoGuess response, ActorRef self) {
         others.forEach(playerInfo ->
                 playerInfo
                         .getReference()
@@ -53,14 +55,14 @@ public class OtherPlayersStore {
 
     public Optional<PlayerInfo> getNextUnsolvedPlayer() {
         String name = "";
-        for(PlayerInfo info: this.others) {
-            if(!info.isSolved(length)) {
+        for (PlayerInfo info : this.others) {
+            if (!info.isSolved(length)) {
                 name = name.concat(info.getName());
                 break;
             }
         }
 
-        if(name.isEmpty())
+        if (name.isEmpty())
             return Optional.empty();
 
         String finalName = name;

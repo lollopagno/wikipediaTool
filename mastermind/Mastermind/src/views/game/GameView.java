@@ -87,10 +87,4 @@ public class GameView extends JFrame implements ActionListener {
     private void stopGame() {
         this.judgeRef.tell(new EndGameJudge(this.system, this.judgeRef), ActorRef.noSender());
     }
-
-    private void log(String msg){
-        synchronized (System.out){
-            System.out.println("[Mastermind] --> "+msg);
-        }
-    }
 }

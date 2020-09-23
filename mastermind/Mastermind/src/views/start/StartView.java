@@ -50,7 +50,8 @@ public class StartView extends JFrame implements ActionListener, KeyListener {
     }
 
     @Override
-    public void keyTyped(KeyEvent e) {}
+    public void keyTyped(KeyEvent e) {
+    }
 
     @Override
     public void keyPressed(KeyEvent e) {
@@ -60,17 +61,18 @@ public class StartView extends JFrame implements ActionListener, KeyListener {
     }
 
     @Override
-    public void keyReleased(KeyEvent e) {}
+    public void keyReleased(KeyEvent e) {
+    }
 
     /**
      * Prepare the next view where the game runs.
      */
     private void generateGameView() {
-        if(this.busy)
+        if (this.busy)
             return;
         this.busy = true;
 
-        try{
+        try {
             Optional<Integer> actors = this.actors.getValue();
             Optional<Integer> length = this.length.getValue();
             Optional<Integer> time = this.time.getValue();
@@ -79,11 +81,9 @@ public class StartView extends JFrame implements ActionListener, KeyListener {
                 game.setVisible(true);
                 this.setVisible(false);
             })));
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        }
-        finally {
+        } finally {
             this.busy = false;
         }
     }

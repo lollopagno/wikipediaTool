@@ -42,9 +42,10 @@ public class PlayerInfo {
 
     /**
      * Stop lifecycle Actor.
+     *
      * @param context Actor context.
      */
-    public void stopPlayer(ActorContext context){
+    public void stopPlayer(ActorContext context) {
         context.stop(this.reference);
     }
 
@@ -58,7 +59,7 @@ public class PlayerInfo {
      * @param guess Guess to save.
      */
     public void setTry(SequenceInfoGuess guess) {
-        if(last1try == null || last1try.getNumbers() == null) { // This is for the first time.
+        if (last1try == null || last1try.getNumbers() == null) { // This is for the first time.
             last1try = guess;
             return;
         }
@@ -72,7 +73,6 @@ public class PlayerInfo {
     }
 
     public Sequence extractGuess(int length) {
-        // TODO: Da completare. Ritornare una sequenza coerente con i tentativi precedenti.
         if (this.last1try != null && this.last2try != null) {
             return createElaborateSequence(length);
         }
@@ -99,7 +99,6 @@ public class PlayerInfo {
         int tries = 0;
         do {
             tries++;
-            // TODO: This generation may be interrupted.
             Random r = new Random();
             List<Integer> last1 = new ArrayList<>(last1try.getNumbers().getSequence());
             List<Integer> last2 = new ArrayList<>(last2try.getNumbers().getSequence());
