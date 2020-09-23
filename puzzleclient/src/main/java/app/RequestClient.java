@@ -201,7 +201,6 @@ public class RequestClient {
 
             @Override
             public void onFailure(Call<ReturnMessage> call, Throwable t) {
-                // TODO Why failure??
                 action.accept(true);
             }
         });
